@@ -647,6 +647,79 @@ export function LocalAssistant({
             {t("분", " min")}
           </p>
           <p className="local-summary">{result.summary}</p>
+          {result.explanation && (
+            <>
+              <h3>{t("입력 검사에 대한 설명", "Input checks explained")}</h3>
+              <p>{result.explanation.inputChecks}</p>
+              <h3>
+                {t("호출 조건에 대한 설명", "Caller requirements explained")}
+              </h3>
+              <p>{result.explanation.callerRequirements}</p>
+              {result.explanation.examples.length > 0 && (
+                <>
+                  <h3>
+                    {t(
+                      "예시별 계산과 모델 설명",
+                      "Each observation and its model explanation",
+                    )}
+                  </h3>
+                  <p className="muted">
+                    {t(
+                      "계산 값은 프로그램이 제공하고 설명은 모델이 작성했습니다. 항목이 모두 있어도 설명이 정확하다는 뜻은 아닙니다.",
+                      "Values come from the program; explanations come from the model. Complete coverage does not establish correctness.",
+                    )}
+                  </p>
+                  {result.explanation.examples.map((item) => {
+                    const observed = result.observations?.[item.case - 1];
+                    const citation = result.citations[item.citation - 1];
+                    return (
+                      <div className="local-citation" key={item.case}>
+                        <h4>
+                          {t("예시", "Example")} {item.case}
+                        </h4>
+                        {observed && (
+                          <>
+                            <p>{t("입력", "Input")}</p>
+                            <pre>{observed.args}</pre>
+                            <p>
+                              {observed.status === "returned"
+                                ? t("프로그램 계산 값", "Program observation")
+                                : t(
+                                    "프로그램 확인 불가",
+                                    "Program could not establish a result",
+                                  )}
+                            </p>
+                            <pre>{observed.value}</pre>
+                          </>
+                        )}
+                        <p>
+                          <strong>{t("모델 설명", "Model explanation")}</strong>
+                          : {item.explanation}
+                        </p>
+                        {citation && (
+                          <button
+                            disabled={busy}
+                            onClick={() =>
+                              void run(() =>
+                                request(
+                                  "localSource",
+                                  { id: result.id, index: item.citation - 1 },
+                                  state.contextId,
+                                ),
+                              )
+                            }
+                          >
+                            {t("예시", "Example")} {item.case} ·{" "}
+                            {t("원문 근거", "Source evidence")} L{citation.line}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+            </>
+          )}
           {result.observations && (
             <p className="muted">
               {t(

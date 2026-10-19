@@ -16,6 +16,7 @@ export async function explanationObservationChecks(
     "export function sample(x: number) { return { ratio: x/x, reciprocal: 1/x, value: x }; }\nfunction other(x: number) { return x; }\n";
   let requests = 0,
     chats = 0;
+  let omitExample = false;
   let received: Record<string, any> | undefined;
   const model = {
     name: "fixture:observations",
@@ -60,9 +61,16 @@ export async function explanationObservationChecks(
                   explanation: "Source return expression.",
                 },
               ],
-              edits: [],
-              risks: [],
-              checks: [],
+              inputChecks: "The function has no input validation.",
+              callerRequirements: "Numeric input is assumed by this fixture.",
+              examples: received!.calculationObservations.cases.map(
+                (_: unknown, i: number) => ({
+                  case: omitExample ? 1 : i + 1,
+                  citation: 1,
+                  explanation:
+                    "Controlled per-case explanation; not a quality assessment.",
+                }),
+              ),
             }),
           },
         }),
@@ -148,6 +156,13 @@ export async function explanationObservationChecks(
     ]);
     assert.deepEqual(received!.calculationObservations.cases, expected);
     assert.deepEqual(result.observations, expected);
+    assert.equal(result.explanation?.examples.length, expected.length);
+    assert.equal(
+      result.explanation?.inputChecks,
+      "The function has no input validation.",
+    );
+    assert.equal(result.checks.length, 0);
+    assert.equal(result.edits.length, 0);
     assert.equal(result.timeoutSeconds, 300);
     assert.equal(
       received!.source.before +
@@ -158,6 +173,27 @@ export async function explanationObservationChecks(
     assert.equal(doc.getText(), source);
     reports.push(
       "Explanation observations: host-retained results, progress phases and a selected time limit reach the actual local-model client and returned view; invalid limits and fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+    );
+
+    const firstExample = result.explanation!.examples[0];
+    await c.assistant.source(
+      result.id,
+      c.state.contextId,
+      firstExample.citation - 1,
+    );
+    assert.equal(
+      doc.getText(vscode.window.activeTextEditor!.selection),
+      "return { ratio: x/x, reciprocal: 1/x, value: x };",
+    );
+    omitExample = true;
+    await assert.rejects(
+      c.assistant.generate(c.state.contextId, payload),
+      /every supplied example/,
+    );
+    omitExample = false;
+    assert.equal(doc.getText(), source);
+    reports.push(
+      "Explanation coverage: actual client returns separate input checks and caller requirements with every example; its citation opens exact source, duplicated or missing examples are rejected and source remains unchanged (controlled model response)",
     );
 
     const beforeRejected = chats;

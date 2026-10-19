@@ -63,9 +63,9 @@ function fixture(path: string | undefined) {
       content: JSON.stringify({
         summary: "배송비",
         citations: [{ quote: "fee = 3000", explanation: "값" }],
-        edits: [],
-        risks: [],
-        checks: [],
+        inputChecks: "입력 검사가 없습니다.",
+        callerRequirements: "사용처의 조건은 알 수 없습니다.",
+        examples: [],
       }),
     },
   };

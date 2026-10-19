@@ -130,6 +130,24 @@ async function rpc(r) {
         edits: [],
         risks: [],
         checks: [],
+        explanation: {
+          inputChecks: ko
+            ? "입력 검사를 구분해 보여 주는 화면 검증용 설명입니다."
+            : "Controlled text for the input-check section.",
+          callerRequirements: ko
+            ? "호출 조건을 구분해 보여 주는 화면 검증용 설명입니다."
+            : "Controlled text for the caller-requirements section.",
+          examples:
+            r.payload.observationId === observation?.id && observation
+              ? observation.items.map((_, i) => ({
+                  case: i + 1,
+                  citation: 1,
+                  explanation: ko
+                    ? "이 예시의 계산 값과 나란히 표시하는 모의 모델 설명입니다."
+                    : "A controlled model explanation beside this example's observed value.",
+                }))
+              : [],
+        },
         focus: { name: fn.name, line: fn.line, endLine: fn.endLine },
         ...(r.payload.observationId === observation?.id && observation
           ? { observations: observation.items }

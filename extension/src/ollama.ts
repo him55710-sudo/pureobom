@@ -8,7 +8,7 @@ import {
   assistantMessages,
   assistantContextSize,
   assistantLimits,
-  assistantSchema,
+  assistantResponseSchema,
   parseAssistantProposal,
   validateAssistantInput,
   type AssistantInput,
@@ -282,7 +282,8 @@ export class OllamaClient {
     // Verify local-only mode again immediately before any source leaves the extension.
     await this.localOnly(signal, onProgress);
     const messages = assistantMessages(input);
-    const contextSize = assistantContextSize(messages);
+    const format = assistantResponseSchema(input);
+    const contextSize = assistantContextSize(messages, format);
     // Reserve our bounded output for the final structured answer. Only request
     // this switch when the server explicitly advertises it; some models have
     // named reasoning levels or do not permit disabling thinking.
@@ -299,7 +300,7 @@ export class OllamaClient {
         shift: false,
         ...(canDisableThinking ? { think: false } : {}),
         messages,
-        format: assistantSchema,
+        format,
         options: {
           temperature: 0,
           num_ctx: contextSize,
