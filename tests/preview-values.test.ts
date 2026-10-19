@@ -122,6 +122,10 @@ describe("calculation values across the JSON webview boundary", () => {
       0,
     );
     expect(() => encodePreviewMessage(deep)).toThrow(/limit/);
+    // Strings consume one node in both directions, not twice on decoding.
+    const nearNodeLimit = Array.from({ length: 19999 }, () => "x");
+    expect(wire(nearNodeLimit)).toEqual(nearNodeLimit);
+    expect(() => wire([...nearNodeLimit, "x"])).toThrow(/limit/);
   });
   it("keeps negative-zero inputs and actual interpreter results through both directions", () => {
     const file = {

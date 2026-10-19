@@ -93,19 +93,23 @@ export function decodePreviewMessage(message: unknown): unknown {
   if (!record || record.encoding !== version) throw invalid();
   const check = budget();
   function visit(raw: unknown, depth: number): unknown {
-    check(depth);
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw invalid();
     const node = raw as {
       type?: unknown;
       value?: unknown;
       nullPrototype?: unknown;
     };
+    check(
+      depth,
+      node.type === "string" && typeof node.value === "string"
+        ? node.value
+        : "",
+    );
     if (node.type === "undefined") return undefined;
     if (node.type === "null") return null;
     if (node.type === "boolean" && typeof node.value === "boolean")
       return node.value;
     if (node.type === "string" && typeof node.value === "string") {
-      check(depth, node.value);
       return node.value;
     }
     if (node.type === "number") {
