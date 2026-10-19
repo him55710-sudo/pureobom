@@ -1,0 +1,116 @@
+{
+  "collectedAt": "2026-10-19T20:28:24.172Z",
+  "scope": "Path-aware, snapshot-checked trace navigation. Public authored fixtures only. Partial native results are not full-suite passes. No private source, model request, performance improvement or deployment claim.",
+  "basedOn": "3b45c19096aacb81da0777d51a121f8aa4f891e0",
+  "runtimeCommit": null,
+  "logs": [
+    {
+      "path": "test-results/trace-core.log",
+      "sha256": "c03a88b763fc71ecacba54d6bc9a7f31b1e7e40bd1385538a5b66c66843971f7",
+      "status": "failed",
+      "detail": "New test syntax error; one suite failed to compile, 41 existing tests passed."
+    },
+    {
+      "path": "test-results/trace-core-second.log",
+      "sha256": "510fc34abf966e43eae74cfe6ddba91d0d47f8b366f3b7379c0c382104118fdd",
+      "status": "passed",
+      "detail": "108 tests in five files; includes three new source-location cases."
+    },
+    {
+      "path": "test-results/trace-extension-build-second.log",
+      "sha256": "bca4ce8c54817629c35768612973d5afe77e67defa9be3c77c6e4bfd10512de8",
+      "status": "passed",
+      "detail": "TypeScript and bundled extension build."
+    },
+    {
+      "path": "test-results/trace-web-build.log",
+      "sha256": "00fcc38039c066e171ff27837c0b2cf4e50a123d9179b0115a5032f4eb06a838",
+      "status": "passed",
+      "detail": "TypeScript and Vite web build."
+    },
+    {
+      "path": "test-results/trace-development-first.log",
+      "sha256": "8c88cb829617fb938421d9d30d2a24a04187346df5e94fe52745124937d989ca",
+      "status": "failed",
+      "detail": "Full native run stopped at Go unavailable before new checks."
+    },
+    {
+      "path": "test-results/trace-development-second.log",
+      "sha256": "61db8142a6c7cdeb062cc24f21be3d0e8021ef92eb4d83b58f63349f366d98dd",
+      "status": "failed",
+      "detail": "After process-local Go/Java PATH setup, full native run stopped at C# reader version assertion before new checks; underlying cause not established."
+    },
+    {
+      "path": "test-results/trace-native-focused-first.log",
+      "sha256": "608c24d1f71fd290699996c82c07f00db8c7ae92ac3cad59bc78f7773455fa2d",
+      "status": "passed",
+      "detail": "Actual development host, trace-source-only, three checks."
+    },
+    {
+      "path": "test-results/trace-package.log",
+      "sha256": "ff7f9ab79b15f30f5f773b7eae5947d98931e49a42108c2ba59b16378fe13e2d",
+      "status": "passed",
+      "detail": "Packaged 0.7 development VSIX."
+    },
+    {
+      "path": "test-results/trace-native-installed.log",
+      "sha256": "35c6816f17897f4046bdfe176c7ee73b57757cbfafc33d2da296f33975b094f7",
+      "status": "passed",
+      "detail": "Fresh production VSIX, trace-source-only, three checks and eleven installed file hashes."
+    }
+  ],
+  "development": {
+    "scope": "trace-source-only",
+    "vscode": "1.96.4",
+    "checks": [
+      "Trace source handles: unknown handles, stale contexts, superseded results and invalid indexes are rejected; clients cannot supply a navigation path",
+      "Trace source freshness: an unopened imported file changed on disk is rejected before showing a stale line, even without an editor change notification",
+      "Trace source navigation: actual worker/controller opens exact imported condition, loop, callback and return lines across files with duplicate basenames; returned-data mutation cannot redirect selection; source text stays unchanged"
+    ],
+    "passed": 3,
+    "timestamp": "2026-10-19T20:26:34.609Z"
+  },
+  "installed": {
+    "scope": "trace-source-only",
+    "vscode": "1.96.4",
+    "checks": [
+      "Trace source handles: unknown handles, stale contexts, superseded results and invalid indexes are rejected; clients cannot supply a navigation path",
+      "Trace source freshness: an unopened imported file changed on disk is rejected before showing a stale line, even without an editor change notification",
+      "Trace source navigation: actual worker/controller opens exact imported condition, loop, callback and return lines across files with duplicate basenames; returned-data mutation cannot redirect selection; source text stays unchanged"
+    ],
+    "passed": 3,
+    "timestamp": "2026-10-19T20:27:31.914Z",
+    "installation": {
+      "kind": "installed-vsix",
+      "version": "0.7.0",
+      "vsixSha256": "b50ba123ae5469d3ebe25d9ea997300d3a8c1e4562fa7993efcee5047803d98b",
+      "verifiedFiles": {
+        "out/extension.cjs": "5b52ed36b6963a1e4b81101abb78951c329f3f042bbc2bba8a0007bba0c2f99a",
+        "out/worker.cjs": "94eaa360014861331367bf4a103b420640d200bdf24fae51ffcece5c9ed04e5c",
+        "runtime/benchmark.py": "dc403b72ad1a349071ab7a8543ce44563415e485d85111c9fc8764156b59660b",
+        "runtime/python_source.py": "1e972114a1cc94eb9260c9530955f49a96f473d322fe4209a58ec97d6e34d4cb",
+        "runtime/go_source.go": "a8e185b81d3aa62a9cbfafdec9d8a8926c9ead6bfe4533fe9038d0a7ad714824",
+        "runtime/PureobomJavaSource.java": "6d439b2668972bf3c32e1574ad714d63ed0c5444de5bef80448e72f19f5b7b10",
+        "runtime/PureobomCSharpSource.cs": "ed8a9bc9d9f081dbe5d61d260ea68a70d0403ee4b1469298a1a2a121e7f544ac",
+        "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+        "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+        "media/view.js": "4ff7d1ec831eae8e06a724e934b8977c689324f063ef4f2c66ff9d06b8f8a448",
+        "media/view.css": "1d3e65a57ce3d4ce19ba943d1c674e35fbd658d0d29add849b4ca6fa30c804a3"
+      },
+      "extensionMode": "production"
+    }
+  },
+  "directUI": {
+    "status": "not_verified",
+    "reason": "Browser webview attachment timed out; inventory confirmed no created tab. Own preview server stopped.",
+    "attempts": 1,
+    "screenshot": null
+  },
+  "harness": {
+    "initialFailure": "EADDRINUSE on default port 4175",
+    "correction": "Trace mode now allocates a free local port like other focused preview modes."
+  },
+  "ci": {
+    "status": "pending"
+  }
+}

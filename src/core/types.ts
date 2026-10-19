@@ -131,7 +131,8 @@ export type Patch = {
   description: Words;
   semanticChecked: false;
 };
-export type Trace = { line: number; text: string };
+// A missing path denotes a display-only notice, not a source location.
+export type Trace = { path?: string; line: number; text: string };
 export type Simulation = {
   ok: boolean;
   result?: unknown;

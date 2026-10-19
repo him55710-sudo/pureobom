@@ -6,6 +6,8 @@ Go addition in the 0.7 development source: [model-free syntax reading and exact 
 
 ## 0.7.0 — local AI development preview (unreleased)
 
+- Fix [calculation trace source navigation](docs/TRACE_NAVIGATION.md) across imported files. Show the originating path and line, resolve only recorded locations in the host, reject stale text and superseded calculation handles, and leave omission notices unlinked. Keep local partial checks, full-suite failures and CI evidence separate.
+
 - Add [bounded while loops, local updates and interpreted array callbacks](docs/BOUNDED_PREVIEW.md) to JS/TS previews. Preserve lexical scope, evaluation order and sparse map positions; keep existing execution budgets and explicit unsupported results. The unchanged real-project target now matches Node for three original assertion cases and eleven separately selected inputs. This does not resolve prior model explanation failures or establish an optimization.
 
 - Preserve special calculation values and negative-zero inputs across VS Code JSON messages, result/trace displays and Markdown; distinguish real strings from numeric NaN/infinities. Add Korean/English explanations and scan projects beneath hidden ancestor folders without including hidden project content. [Evidence](docs/evidence/local-ai/preview-values.md) separates four matched actual-code inputs from the still-unavailable requested function and prior model failures.

@@ -37,6 +37,10 @@ export type PatchSummary = {
 export type FormatSummary =
   | PatchSummary
   | { unchanged: true; description: Words };
+// The controller binds this opaque handle to its latest calculation snapshot.
+export type SimulationView = import("../../src/core/types").Simulation & {
+  traceId: string;
+};
 export type Request = {
   id: string;
   action: string;

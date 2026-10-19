@@ -32,6 +32,8 @@
 
 ## 재현
 
+위에서 기록한 다른 파일 trace 이동 결함은 후속 [계산 출처 이동](TRACE_NAVIGATION.md)에서 수정한다. 그 수정의 검증은 별도 기록이며 `5242fcc` 결과에 소급하지 않는다.
+
 ```sh
 pnpm exec vitest run tests/iteration-preview.test.ts
 pnpm extension:build

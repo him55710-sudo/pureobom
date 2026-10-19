@@ -205,6 +205,9 @@ export function activate(context: vscode.ExtensionContext) {
           case "source":
             await controller.source(r.contextId, p.line);
             break;
+          case "traceSource":
+            await controller.traceSource(r.contextId, p.traceId, p.index);
+            break;
           case "diagnosticSource":
             await controller.diagnosticSource(
               r.contextId,

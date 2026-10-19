@@ -16,6 +16,7 @@ import { sqlSourceChecks } from "./sqlSource";
 import { functionFormatChecks } from "./formatFunction";
 import { previewValueChecks } from "./previewValues";
 import { iterationPreviewChecks } from "./iterationPreview";
+import { traceSourceChecks } from "./traceSource";
 const reports: string[] = [];
 async function until(
   check: () => boolean,
@@ -92,6 +93,30 @@ export async function run() {
     }
   };
   await ready();
+  if (process.env.PUREOBOM_ONLY_TRACE_SOURCE === "1") {
+    await traceSourceChecks(c, ready, reports);
+    await vscode.workspace.fs.writeFile(
+      vscode.Uri.file(process.env.PUREOBOM_INTEGRATION_REPORT!),
+      Buffer.from(
+        JSON.stringify(
+          {
+            scope: "trace-source-only",
+            vscode: vscode.version,
+            checks: reports,
+            passed: reports.length,
+            timestamp: new Date().toISOString(),
+            installation,
+          },
+          null,
+          2,
+        ),
+      ),
+    );
+    console.log(
+      JSON.stringify({ scope: "trace-source-only", passed: reports.length }),
+    );
+    return;
+  }
   if (process.env.PUREOBOM_ONLY_BENCHMARK === "1") {
     await benchmarkChecks(c, ready, reports);
     await vscode.workspace.fs.writeFile(
@@ -730,6 +755,7 @@ export async function run() {
   await functionFormatChecks(c, ready, reports);
   await previewValueChecks(c, ready, reports);
   await iterationPreviewChecks(c, ready, reports);
+  await traceSourceChecks(c, ready, reports);
   await projectChecks(c, ready, reports);
   await benchmarkChecks(c, ready, reports);
   const report = {

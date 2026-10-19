@@ -10,10 +10,15 @@ import { EditorProblems } from "./EditorProblems";
 import { LocalAssistant } from "./LocalAssistant";
 import { ProjectChecks } from "./ProjectChecks";
 import type { ScenarioReport } from "../../src/core/scenarioModel";
-import type { Lang, Rule, Simulation, Words } from "../../src/core/types";
+import type { Lang, Rule, Words } from "../../src/core/types";
 import { displayValue } from "../../src/core/previewValues";
 import { PreviewValueHelp } from "../../src/components/PreviewValueHelp";
-import type { FormatSummary, PatchSummary, ViewState } from "../src/protocol";
+import type {
+  FormatSummary,
+  PatchSummary,
+  SimulationView,
+  ViewState,
+} from "../src/protocol";
 import { host, request } from "./bridge";
 import "./style.css";
 import "./journey.css";
@@ -45,7 +50,7 @@ function App() {
   const [patch, setPatch] = useState<PatchSummary>();
   const [fn, setFn] = useState("");
   const [args, setArgs] = useState("[50000]");
-  const [simulation, setSimulation] = useState<Simulation>();
+  const [simulation, setSimulation] = useState<SimulationView>();
   const context = useRef("");
   const draftRevision = useRef(0);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -744,7 +749,7 @@ function App() {
               e.preventDefault();
               void action(async () => {
                 const id = state.contextId;
-                const result = await request<Simulation>(
+                const result = await request<SimulationView>(
                   "simulate",
                   { name: fn, args },
                   id,
@@ -782,12 +787,24 @@ function App() {
                 {simulation.trace.map((step, i) => (
                   <li key={i}>
                     {step.text}{" "}
-                    <button
-                      className="line-link"
-                      onClick={() => source(step.line)}
-                    >
-                      L{step.line}
-                    </button>
+                    {step.path && (
+                      <button
+                        className="line-link"
+                        disabled={disabled}
+                        aria-label={`${t("원본 코드 보기", "View source")}: ${step.path}, ${t("줄", "line")} ${step.line}`}
+                        onClick={() =>
+                          void action(() =>
+                            request(
+                              "traceSource",
+                              { traceId: simulation.traceId, index: i },
+                              state.contextId,
+                            ),
+                          )
+                        }
+                      >
+                        {step.path} · L{step.line}
+                      </button>
+                    )}
                   </li>
                 ))}
               </ol>

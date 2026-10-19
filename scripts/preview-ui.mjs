@@ -16,6 +16,7 @@ const { demo } = await import(
 );
 const values = process.argv.includes("--values");
 const iteration = process.argv.includes("--iteration");
+const trace = process.argv.includes("--trace");
 const transportBundle = await build({
   entryPoints: ["src/core/previewValues.ts"],
   bundle: true,
@@ -26,29 +27,43 @@ const { encodePreviewMessage, decodePreviewMessage, usesPreviewTransport } =
   await import(
     `data:text/javascript;base64,${Buffer.from(transportBundle.outputFiles[0].text).toString("base64")}`
   );
-const files = iteration
+const files = trace
   ? [
       {
-        path: "iteration.ts",
+        path: "main.ts",
         content:
-          "const scale=2; export function calculate(count:number){let i=0,total=0;while(i<count){i++;if(i===2)continue;total+=i;}const values=[total,count].map(x=>x*scale);return {values,last:values.at(-1)};}",
+          "import { helper } from './nested/helper';\nexport function calculate(n: number) {\n  return helper(n);\n}\n",
+      },
+      {
+        path: "nested/helper.ts",
+        content:
+          "export function helper(n: number) {\n  if (n < 0) return 0;\n  while(n > 1) { n--; }\n  return [n].map(x => {\n    return x * 3;\n  })[0];\n}\n",
       },
     ]
-  : values
+  : iteration
     ? [
         {
-          path: "values.ts",
+          path: "iteration.ts",
           content:
-            'export function calculate(input: number) { return { input, ratio: input / input, reciprocal: 1 / input, absent: undefined, literal: null, text: "NaN", negativeZero: -0, nested: [undefined, "[NaN]"] }; }\n',
+            "const scale=2; export function calculate(count:number){let i=0,total=0;while(i<count){i++;if(i===2)continue;total+=i;}const values=[total,count].map(x=>x*scale);return {values,last:values.at(-1)};}",
         },
       ]
-    : structuredClone(demo);
+    : values
+      ? [
+          {
+            path: "values.ts",
+            content:
+              'export function calculate(input: number) { return { input, ratio: input / input, reciprocal: 1 / input, absent: undefined, literal: null, text: "NaN", negativeZero: -0, nested: [undefined, "[NaN]"] }; }\n',
+          },
+        ]
+      : structuredClone(demo);
 const worker = new Worker(resolve("extension/out/worker.cjs"));
 let seq = 0,
   version = 1,
   active = files[0],
   patch,
-  project;
+  project,
+  simulation;
 const pending = new Map();
 worker.on("message", ({ id, result, error }) => {
   const p = pending.get(id);
@@ -111,14 +126,35 @@ async function rpc(r) {
       files,
       patch: r.payload.patchId ? patch : undefined,
     });
-  else if (r.action === "simulate")
+  else if (r.action === "simulate") {
     result = await call("simulate", {
       ...r.payload,
       path: active.path,
       files,
       args: JSON.parse(r.payload.args),
     });
-  else if (r.action === "source" || r.action === "preview")
+    result.traceId = `preview-${++seq}`;
+    simulation = { ...result, contextId: String(version) };
+  } else if (r.action === "traceSource") {
+    if (
+      r.contextId !== String(version) ||
+      simulation?.contextId !== r.contextId ||
+      simulation?.traceId !== r.payload.traceId
+    )
+      throw Error("Stale calculation");
+    const step = simulation.trace[r.payload.index];
+    if (!step?.path) throw Error("No source location");
+    await mkdir("test-results/trace-ui", { recursive: true });
+    await writeFile(
+      "test-results/trace-ui/navigation.json",
+      JSON.stringify(
+        { path: step.path, line: step.line, previewOnly: true },
+        null,
+        2,
+      ),
+    );
+    result = { previewOnly: true };
+  } else if (r.action === "source" || r.action === "preview")
     result = { previewOnly: true };
   else if (r.action === "report" && values) {
     await mkdir("test-results/preview-values-ui", { recursive: true });
@@ -177,6 +213,6 @@ const server = createServer(async (req, res) => {
     res.end(String(e));
   }
 });
-server.listen(values || iteration ? 0 : 4175, "127.0.0.1", () =>
+server.listen(values || iteration || trace ? 0 : 4175, "127.0.0.1", () =>
   console.log(`UX preview: http://127.0.0.1:${server.address().port}`),
 );

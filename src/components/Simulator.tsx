@@ -154,7 +154,11 @@ export function Simulator({
             <summary>{ko ? "판단 과정 보기" : "View decision trace"}</summary>
             {(result.after || result.before).trace.map((t, i) => (
               <div className="trace" key={i}>
-                <code>L{t.line}</code>
+                {t.path && (
+                  <code>
+                    {t.path} · L{t.line}
+                  </code>
+                )}
                 {t.text}
               </div>
             ))}
@@ -163,8 +167,8 @@ export function Simulator({
       )}
       <p className="footnote">
         {ko
-          ? "제한된 계산 모형입니다. 숫자·조건·반환·직접 연결된 순수 함수만 처리하며, 네트워크·화면·반복문·외부 라이브러리는 실행하지 않습니다. 실제 앱 테스트를 대신하지 않습니다."
-          : "A restricted calculation model supports values, conditions, returns and directly imported pure functions. It does not run network calls, UI, loops or external libraries, and does not replace application tests."}
+          ? "제한된 계산 모형입니다. 지원되는 값·조건·반환·지역 변수·while·map과 연결된 함수를 정해진 연산 한도 안에서 계산합니다. 네트워크·화면·외부 라이브러리는 실행하지 않으며 실제 앱 테스트를 대신하지 않습니다."
+          : "A restricted model evaluates supported values, conditions, returns, local bindings, while, map and imported functions within an operation budget. It does not run network calls, UI or external libraries, and does not replace application tests."}
       </p>
     </div>
   );

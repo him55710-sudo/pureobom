@@ -13,7 +13,7 @@ export function simulate(
   const trace: Trace[] = [];
   let traceCharacters = 0,
     traceOmitted = false;
-  const record = (line: number, text: string) => {
+  const record = (path: string, line: number, text: string) => {
     if (trace.length >= 200 || traceCharacters >= 30000) {
       if (!traceOmitted)
         trace.push({
@@ -28,7 +28,7 @@ export function simulate(
         ? text.slice(0, 2000) + "… [표시 한도 / display limit]"
         : text;
     traceCharacters += shown.length;
-    trace.push({ line, text: shown });
+    trace.push({ path, line, text: shown });
   };
   let budget = 4000,
     depth = 0;
@@ -529,12 +529,16 @@ export function simulate(
       const line = sf.getLineAndCharacterOfPosition(s.getStart(sf)).line + 1;
       if (ts.isReturnStatement(s)) {
         const value = s.expression ? expr(s.expression, sf, env) : undefined;
-        record(line, `${sf.fileName} · 결과 / return: ${displayValue(value)}`);
+        record(sf.fileName, line, `결과 / return: ${displayValue(value)}`);
         return { kind: "return", value };
       }
       if (ts.isIfStatement(s)) {
         const value = expr(s.expression, sf, env);
-        record(line, `${s.expression.getText(sf)} → ${Boolean(value)}`);
+        record(
+          sf.fileName,
+          line,
+          `${s.expression.getText(sf)} → ${Boolean(value)}`,
+        );
         const branch = value ? s.thenStatement : s.elseStatement;
         if (branch) {
           const r = statements(
@@ -568,6 +572,7 @@ export function simulate(
           }
         } finally {
           record(
+            sf.fileName,
             line,
             `반복 진입 / loop entries: ${iterations} · ${s.expression.getText(sf)}`,
           );

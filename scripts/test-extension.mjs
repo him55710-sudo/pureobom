@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import JSZip from "jszip";
 import { resolve } from "node:path";
 const installed = process.argv.includes("--installed");
+const traceSourceOnly = process.argv.includes("--trace-source");
 const workspaces = resolve("test-results/extension-workspaces");
 await mkdir(workspaces, { recursive: true });
 const workspace = await mkdtemp(resolve(workspaces, ".run-"));
@@ -160,12 +161,15 @@ await runTests({
       ? JSON.stringify(expectedInstallation)
       : "",
     PUREOBOM_ONLY_BENCHMARK: process.env.PUREOBOM_ONLY_BENCHMARK || "0",
+    PUREOBOM_ONLY_TRACE_SOURCE: traceSourceOnly ? "1" : "0",
     PUREOBOM_INTEGRATION_REPORT: resolve(
-      installed
-        ? "test-results/installed-extension-integration.json"
-        : process.env.PUREOBOM_ONLY_BENCHMARK === "1"
-          ? "test-results/benchmark-integration.json"
-          : "test-results/extension-integration.json",
+      traceSourceOnly
+        ? `test-results/trace-source-${installed ? "installed" : "development"}.json`
+        : installed
+          ? "test-results/installed-extension-integration.json"
+          : process.env.PUREOBOM_ONLY_BENCHMARK === "1"
+            ? "test-results/benchmark-integration.json"
+            : "test-results/extension-integration.json",
     ),
   },
   launchArgs: [
