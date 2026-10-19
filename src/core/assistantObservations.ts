@@ -1,4 +1,5 @@
 import type { AssistantFocus, AssistantObservation } from "./localAssistant";
+import { assistantExecutionLimits } from "./localAssistant";
 import type { SourceFile } from "./types";
 import { simulate } from "./simulate";
 import { displayValue } from "./previewValues";
@@ -60,6 +61,38 @@ export function observeFunction(
       args: shownArgs,
       status: result.ok ? "returned" : "unavailable",
       value,
+      execution: executionRecords(result.trace, path),
     };
   });
+}
+
+function executionRecords(trace: import("./types").Trace[], path: string) {
+  let omitted = false;
+  const eligible = trace.flatMap((step, index) => {
+    if (
+      step.path !== path ||
+      step.truncated ||
+      step.text.length > assistantExecutionLimits.stepCharacters
+    ) {
+      omitted = true;
+      return [];
+    }
+    return [{ order: index + 1, line: step.line, text: step.text }];
+  });
+  // Keep both early decisions and final observations, with original indexes showing gaps.
+  const selected =
+    eligible.length > assistantExecutionLimits.steps
+      ? [...eligible.slice(0, 8), ...eligible.slice(-4)]
+      : eligible;
+  if (selected.length !== eligible.length) omitted = true;
+  let characters = 0;
+  const steps = selected.filter((step) => {
+    if (characters + step.text.length > assistantExecutionLimits.characters) {
+      omitted = true;
+      return false;
+    }
+    characters += step.text.length;
+    return true;
+  });
+  return { steps, omitted };
 }

@@ -5,15 +5,18 @@ import { resolve } from "node:path";
 import { Worker } from "node:worker_threads";
 const rust = process.argv.includes("--rust");
 const progress = process.argv.includes("--progress");
-const focus = process.argv.includes("--focus") || progress;
+const execution = process.argv.includes("--execution");
+const focus = process.argv.includes("--focus") || progress || execution;
 const folder = resolve(
-  progress
-    ? "test-results/local-ai-progress-ui"
-    : focus
-      ? "test-results/focused-explanation-ui"
-      : rust
-        ? "test-results/rust-source-ui"
-        : "test-results/function-format-ui",
+  execution
+    ? "test-results/execution-records-ui"
+    : progress
+      ? "test-results/local-ai-progress-ui"
+      : focus
+        ? "test-results/focused-explanation-ui"
+        : rust
+          ? "test-results/rust-source-ui"
+          : "test-results/function-format-ui",
 );
 const path = rust ? "sample.rs" : "sample.ts";
 await mkdir(folder, { recursive: true });
@@ -157,6 +160,15 @@ async function rpc(r) {
     };
   }
   if (r.action === "localSource" && focus) return { result: {} };
+  if (r.action === "localObservationSource" && focus) {
+    const step =
+      observation?.id === r.payload.observationId &&
+      observation.items[r.payload.caseIndex]?.execution?.steps[
+        r.payload.stepIndex
+      ];
+    if (!step) throw Error("Stale fixture calculation source");
+    return { result: {} }; // Simulated editor; native navigation is checked by extension integration tests.
+  }
   if (r.action === "prepare" && rust) {
     proposal = await call("rust", {
       file: { path, content: source },

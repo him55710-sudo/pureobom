@@ -14,7 +14,7 @@ export function simulate(
   const trace: Trace[] = [];
   let traceCharacters = 0,
     traceOmitted = false;
-  const record = (path: string, line: number, text: string) => {
+  const record = (path: string | undefined, line: number, text: string) => {
     if (trace.length >= 200 || traceCharacters >= 30000) {
       if (!traceOmitted)
         trace.push({
@@ -29,7 +29,28 @@ export function simulate(
         ? text.slice(0, 2000) + "… [표시 한도 / display limit]"
         : text;
     traceCharacters += shown.length;
-    trace.push({ path, line, text: shown });
+    trace.push({
+      path,
+      line,
+      text: shown,
+      ...(text.length > 2000 ? { truncated: true as const } : {}),
+    });
+  };
+  const recordReturn = (path: string, line: number, value: unknown) => {
+    // Recording must not prevent an intermediate closure/large value from flowing
+    // through the interpreter. Top-level results still pass the transport guard.
+    let shown: string;
+    try {
+      shown = displayValue(value);
+    } catch {
+      record(
+        undefined,
+        line,
+        "반환값의 과정 표시는 생략했습니다. / Return value cannot be displayed in this trace.",
+      );
+      return;
+    }
+    record(path, line, `결과 / return: ${shown}`);
   };
   let budget = 4000,
     depth = 0;
@@ -530,7 +551,7 @@ export function simulate(
       const line = sf.getLineAndCharacterOfPosition(s.getStart(sf)).line + 1;
       if (ts.isReturnStatement(s)) {
         const value = s.expression ? expr(s.expression, sf, env) : undefined;
-        record(sf.fileName, line, `결과 / return: ${displayValue(value)}`);
+        recordReturn(sf.fileName, line, value);
         return { kind: "return", value };
       }
       if (ts.isIfStatement(s)) {
@@ -641,7 +662,15 @@ export function simulate(
             : values[i],
         );
       });
-      if (!ts.isBlock(fn.body)) return expr(fn.body, sf, env);
+      if (!ts.isBlock(fn.body)) {
+        const result = expr(fn.body, sf, env);
+        recordReturn(
+          sf.fileName,
+          sf.getLineAndCharacterOfPosition(fn.body.getStart(sf)).line + 1,
+          result,
+        );
+        return result;
+      }
       const names = new Set(fn.parameters.map((p) => p.name.getText(sf)));
       for (const s of fn.body.statements)
         if (

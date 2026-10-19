@@ -143,6 +143,14 @@ export function activate(context: vscode.ExtensionContext) {
           case "localObserve":
             result = await controller.assistant.observe(r.contextId, p);
             break;
+          case "localObservationSource":
+            await controller.assistant.observationSource(
+              inputString(p.observationId, 100),
+              r.contextId,
+              p.caseIndex,
+              p.stepIndex,
+            );
+            break;
           case "localCancel":
             controller.assistant.cancel();
             break;

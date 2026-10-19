@@ -147,13 +147,60 @@ export class LocalAssistantController implements vscode.Disposable {
       );
     const id = randomUUID();
     this.observed = {
-      view: { id, items: items.map((row) => ({ ...row })) },
+      view: { id, items: structuredClone(items) },
       context: context!,
       version,
       source,
       focusId,
     };
     return { id, items };
+  }
+  private checkedObservation(id: string, context: string | undefined) {
+    const doc = this.current(context),
+      observed = this.observed;
+    if (
+      !observed ||
+      observed.view.id !== id ||
+      observed.context !== context ||
+      observed.version !== doc.version ||
+      observed.source !== doc.getText()
+    )
+      throw Error(
+        "계산 기록이 바뀌었습니다. 다시 계산하세요. / Calculation record is stale. Calculate again.",
+      );
+    return { doc, observed };
+  }
+  async observationSource(
+    id: string,
+    context: string | undefined,
+    caseIndex: unknown,
+    stepIndex: unknown,
+  ) {
+    const { doc, observed } = this.checkedObservation(id, context);
+    if (
+      !Number.isInteger(caseIndex) ||
+      (caseIndex as number) < 0 ||
+      !Number.isInteger(stepIndex) ||
+      (stepIndex as number) < 0
+    )
+      throw Error("Invalid calculation source reference");
+    const step =
+      observed.view.items[caseIndex as number]?.execution?.steps[
+        stepIndex as number
+      ];
+    if (!step || step.line < 1 || step.line > doc.lineCount)
+      throw Error("Invalid calculation source reference");
+    const editor = await vscode.window.showTextDocument(doc, {
+      viewColumn: vscode.ViewColumn.One,
+      preserveFocus: true,
+    });
+    this.checkedObservation(id, context);
+    const range = doc.lineAt(step.line - 1).range;
+    editor.selection = new vscode.Selection(range.start, range.end);
+    editor.revealRange(
+      range,
+      vscode.TextEditorRevealType.InCenterIfOutsideViewport,
+    );
   }
   private focus(context: string | undefined, id: unknown, task: unknown) {
     if (task !== "explain" || !this.resolveFocus)
@@ -211,7 +258,7 @@ export class LocalAssistantController implements vscode.Disposable {
         throw Error(
           "예시 계산이 바뀌었습니다. 선택한 기능에서 다시 계산하세요. / Calculation examples changed. Calculate again for the selected function.",
         );
-      input.observations = observed.view.items.map((row) => ({ ...row }));
+      input.observations = structuredClone(observed.view.items);
     }
     const version = doc.version;
     const controller = new AbortController();
@@ -280,7 +327,7 @@ export class LocalAssistantController implements vscode.Disposable {
         processor: response.processor,
         validation,
         ...(input.observations
-          ? { observations: input.observations.map((row) => ({ ...row })) }
+          ? { observations: structuredClone(input.observations) }
           : {}),
         ...(input.focus
           ? {

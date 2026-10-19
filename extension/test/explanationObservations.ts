@@ -102,6 +102,24 @@ export async function explanationObservationChecks(
       '{"ratio": NaN, "reciprocal": Infinity, "value": 0}',
     );
     assert.equal(expected[1].args, "[-0]");
+    assert.equal(expected[0].execution?.steps[0].line, 1);
+    assert.match(expected[0].execution!.steps[0].text, /Infinity/);
+    observed.items[0].execution!.steps[0].line = 99;
+    observed.items[0].execution!.steps[0].text = "forged trace";
+    await c.assistant.observationSource(observed.id, c.state.contextId, 0, 0);
+    assert.equal(
+      doc.getText(vscode.window.activeTextEditor!.selection),
+      doc.lineAt(0).text,
+    );
+    await assert.rejects(
+      c.assistant.observationSource(observed.id, c.state.contextId, -1, 0),
+    );
+    await assert.rejects(
+      c.assistant.observationSource(observed.id, c.state.contextId, 0, 99),
+    );
+    reports.push(
+      "Explanation execution records: actual worker records a source-linked return; nested client mutation cannot change host evidence or navigation, and invalid record indexes are rejected without model inference",
+    );
     assert.equal(
       expected[1].value,
       '{"ratio": NaN, "reciprocal": -Infinity, "value": -0}',
@@ -215,6 +233,9 @@ export async function explanationObservationChecks(
       }),
     );
     const newer = await c.assistant.observe(c.state.contextId, args);
+    await assert.rejects(
+      c.assistant.observationSource(observed.id, c.state.contextId, 0, 0),
+    );
     await assert.rejects(c.assistant.generate(c.state.contextId, payload));
     const editor = await vscode.window.showTextDocument(
       doc,
@@ -225,6 +246,9 @@ export async function explanationObservationChecks(
     );
     await c.refresh();
     await ready();
+    await assert.rejects(
+      c.assistant.observationSource(newer.id, c.state.contextId, 0, 0),
+    );
     await assert.rejects(
       c.assistant.generate(c.state.contextId, {
         ...payload,

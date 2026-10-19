@@ -480,6 +480,65 @@ export function LocalAssistant({
                       : t("확인 불가", "Unavailable")}
                   </span>
                   <pre>{row.value}</pre>
+                  {row.execution && (
+                    <details>
+                      <summary>
+                        {t(
+                          "계산 과정을 확인하기",
+                          "Inspect calculation records",
+                        )}
+                      </summary>
+                      <p className="muted">
+                        {t(
+                          "현재 파일에서 기록한 분기·반환과 반복 요약입니다. 전체 실행 과정이나 앱 테스트는 아닙니다. 반복 요약은 반복 종료 시 기록됩니다.",
+                          "Recorded conditions, returns and loop summaries in this file. This is not a full execution trace or an application test. Loop summaries are recorded on exit.",
+                        )}
+                      </p>
+                      {row.execution.omitted && (
+                        <p role="note">
+                          {t(
+                            "다른 파일 또는 표시 한도 때문에 일부 기록을 첨부하지 않았습니다.",
+                            "Some records were excluded because they belong to another file or exceed display limits.",
+                          )}
+                        </p>
+                      )}
+                      {row.execution.steps.length ? (
+                        <ol>
+                          {row.execution.steps.map((step, stepIndex) => (
+                            <li key={step.order}>
+                              <button
+                                disabled={busy}
+                                onClick={() =>
+                                  void run(() =>
+                                    request(
+                                      "localObservationSource",
+                                      {
+                                        observationId: observation.id,
+                                        caseIndex: index,
+                                        stepIndex,
+                                      },
+                                      state.contextId,
+                                    ),
+                                  )
+                                }
+                              >
+                                {t("기록", "Record")} {step.order} · L
+                                {step.line}
+                              </button>
+                              <pre>{step.text}</pre>
+                            </li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <p>
+                          {t(
+                            "첨부할 기록이 없습니다. 기록이 없다는 이유로 실행된 동작을 추측하지 않습니다.",
+                            "No records to attach. Missing records do not establish which operations ran.",
+                          )}
+                        </p>
+                      )}
+                    </details>
+                  )}
                 </li>
               ))}
             </ol>
