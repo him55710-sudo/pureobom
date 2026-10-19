@@ -1,5 +1,9 @@
 # 로컬 AI 검증 자료 · 2026-10-16
 
+2026-10-20 예시별 실행 기록: [계산 과정 표시·원문 이동](../../EXPLANATION_EXECUTION.md), [로컬 검사·화면·초기 실패](execution-records-verification.json), [같은 실제 과제의 7B 응답](execution-records-model.json). 실제 응답은 약 512초에 완료돼 여섯 반환값을 맞게 기술했으나 원인·입력 조건 설명이 틀려 과제는 실패했다. 기록 표시·전달 검증과 모델 의미 품질을 구분한다. 소스·구체 입력/반환값·원시 모델 응답은 공개하지 않는다.
+
+기능 소스 `0cf6b34`의 [Windows·Ubuntu 최종 CI](execution-records-ci.json): 각 핵심 329개·개발/production 설치 각 66개·설치 파일 11개 해시·패키지 검사 7개 통과. 실제 로그의 새 기록·깊은 복사·원문 이동 검사를 확인했다. 같은 기능의 운영체제/배포 방식별 반복이며 모델 정확도 점수로 합산하지 않는다.
+
 2026-10-20 실제 웹 화면 평가: [방법·판정](../../CANVAS_EVALUATION.md), [익명 표본 기록](canvas-evaluation.json), [정적 집계 화면](canvas-evaluation.html). 실제 비공개 웹 진입점·자산에서 에이전트가 작성한 후보를 비교했다. 기본 설정의 57개 지점 중 2곳에서 픽셀 차이가 재현돼 미채택했다. 모든 첫 실패·재실행·측정 조건을 유지하며, API 모델 응답이나 앱 속도 개선의 증거로 세지 않는다. 원래 프로젝트 테스트 8개는 기준선 검사이며 변경한 렌더 경로를 다루지 않는다.
 
 2026-10-20 설명 구조 후속: [입력 검사·호출 조건·예시별 설명과 누락 검사](../../STRUCTURED_EXPLANATIONS.md), [로컬 검사·화면 범위](explanation-coverage-verification.json), [실제 모델 평가](explanation-coverage-models.json). `49b1a2b`의 [Windows·Ubuntu CI](explanation-coverage-ci.json)는 각 핵심 324개·개발/production 설치 각 65개·설치 파일 11개 해시·패키지 검사 7개를 통과했다. 모든 항목의 존재와 실제 인용 연결을 확인하며 모델 의미의 참·거짓은 별도 검토다. 기존 실제 실패 기록은 유지한다.

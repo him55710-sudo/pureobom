@@ -32,6 +32,10 @@
 
 핵심 검사는 입력별 실제 분기·반환, 다른 파일 기록 제외, 생략과 원래 번호, 큰 중간값·반환된 함수가 계산을 방해하지 않는지, 잘못된 기록 거절을 다룬다. 실제 VS Code 부분 검사는 worker 기록, 깊은 복사, 원문 이동, 잘못된 번호와 오래된 기록 거절, 실제 HTTP 요청의 전달을 검증한다. HTTP 모델 답변은 제어된 fixture이며 실제 모델 의미 품질과 구분한다. 현재 검증 결과·실패·실제 모델 평가 상태는 [작업 기록](AGENT_WORKLOG.md)에 남긴다.
 
+동일 비공개 과제의 실제 7B CPU 응답은 약 512초에 완료됐다. 이번에는 여섯 반환값을 맞게 기술했으나 입력 검사/호출 조건을 혼동하고 경계 결과의 원인·입력 구성을 잘못 설명해 과제는 여전히 실패했다. [실제 모델 평가](evidence/local-ai/execution-records-model.json)와 [부분 검사·UI·실패 기록](evidence/local-ai/execution-records-verification.json)을 분리한다. 단일 반복 요청이며 일반 모델 정확도 개선을 입증하지 않는다.
+
+기능 커밋 `0cf6b34`의 [Windows·Ubuntu CI](https://github.com/him55710-sudo/pureobom/actions/runs/39335563440)는 각 핵심 **329개**, 개발/production 설치 각각 **66개**, 설치 파일 11개 해시·패키지 검사 7개를 통과했다. 실제 로그에서 새 기록·변조 방어·원문 이동 검사를 대조한 [운영체제별 근거](evidence/local-ai/execution-records-ci.json)다. 통합 검사의 모델 답변은 제어된 fixture이며 위 실제 모델 의미 평가와 합산하지 않는다.
+
 ```sh
 pnpm exec vitest run tests/assistant-observations.test.ts tests/trace-source.test.ts tests/iteration-preview.test.ts tests/explanation-coverage.test.ts tests/local-assistant.test.ts tests/ollama.test.ts
 pnpm extension:build

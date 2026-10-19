@@ -1,0 +1,56 @@
+{
+  "collectedAt": "2026-10-19T22:35:07.902Z",
+  "runtimeCommit": "0cf6b34f889a17bfd8b5b36439d1bc4b67057157",
+  "scope": "One repeated explanation request on the same private source, question and seven inputs used in earlier evaluations. Only bounded execution records and corresponding instructions are added; not seven new independent cases.",
+  "model": {
+    "name": "qwen2.5-coder:7b",
+    "digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+    "processor": "cpu",
+    "timeoutSeconds": 600,
+    "elapsedMs": 512123,
+    "promptTokens": 3176,
+    "outputTokens": 1068
+  },
+  "structuralOutcome": {
+    "accepted": true,
+    "exactCitations": 4,
+    "exampleItems": 7,
+    "returnedObservationsMatchingNative": 6,
+    "nativeExceptionReportedUnavailable": 1,
+    "sourceUnchanged": true
+  },
+  "finalRuntimeInputVerification": {
+    "runtimeCommit": "0cf6b34f889a17bfd8b5b36439d1bc4b67057157",
+    "recalculatedObservationsIdentical": true,
+    "modelMessagesIdentical": true,
+    "responseSchemaIdentical": true,
+    "caseCount": 7,
+    "recordCounts": [
+      6,
+      6,
+      6,
+      0,
+      6,
+      6,
+      7
+    ],
+    "omittedCases": 0
+  },
+  "assessment": {
+    "outcome": "semantic-failed",
+    "reviewer": "Agent review of unchanged source, seven fixed inputs, native outcomes, supplied observations and complete model response; not third-party review.",
+    "returnedValues": "All six returned observations are restated correctly in this attempt.",
+    "remainingErrors": [
+      "Actual runtime input checks and caller preconditions are still conflated; unchecked requirements are presented in the input-check field.",
+      "Required input ordering and data shape are not explained adequately.",
+      "Out-of-range and invalid-arithmetic cases reuse a generic interpolation rationale instead of explaining the determining operation.",
+      "One case description invents an input configuration not present in that case.",
+      "Every case points to the same early-operation citation; valid quote/index references do not establish the claimed downstream reasoning."
+    ],
+    "unavailableCase": "The response states a native exception consistent with earlier native evaluation and source, but the interpreter still reports unavailable; that observation alone does not prove an exception.",
+    "conclusion": "The explanation task still fails. Correctly restated values in one repeated request do not establish general semantic improvement."
+  },
+  "setup": "Initial standalone readiness probe timed out at five seconds. Subsequent product preflight succeeded and reached chat inference; the single generation completed. No request was restarted after an observation timeout.",
+  "privacy": "Private source, identifiers, concrete inputs/results, raw model output, full request and local adapters remain private.",
+  "cleanup": "Verified executable path and listening PID, then terminated only the owned server and children after inference completed; listener absent. Other project servers untouched."
+}

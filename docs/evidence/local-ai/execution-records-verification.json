@@ -1,0 +1,62 @@
+{
+  "collectedAt": "2026-10-19T22:35:07.904Z",
+  "runtimeCommit": "0cf6b34f889a17bfd8b5b36439d1bc4b67057157",
+  "local": [
+    {
+      "path": "test-results/execution-records-core-final.log",
+      "sha256": "cae830a26ec1f89e154236e46afc0e8d6c6167951e42405b15d56d4fdbddde43",
+      "scope": "82 focused core checks in six files, including five new observation checks."
+    },
+    {
+      "path": "test-results/execution-records-build-final.log",
+      "sha256": "ec17e4b116c0e22b3c41798aa5c343e240f872b28f40fa43db7c7680460f9c25",
+      "scope": "Final extension TypeScript/bundle build passed."
+    },
+    {
+      "path": "test-results/execution-records-native-final.log",
+      "sha256": "5c30ffa57709b0c88fa4ad50163116367c37d0ca11a6b1737c7892433e5a8430",
+      "scope": "Final development-host observation subset passed five checks; controlled model HTTP response."
+    },
+    {
+      "path": "test-results/execution-records-installed.log",
+      "sha256": "2b7ef04b702ef94295ba74920037fc6e5458f811dacb867e59dbcc082efd4cd1",
+      "scope": "Earlier candidate installation subset passed five checks before the later intermediate-return display guard; not final runtime installation evidence."
+    }
+  ],
+  "failures": [
+    {
+      "kind": "test fixture",
+      "result": "One new regression fixture failed twice (initial run and diagnostic retry) because it used unsupported chained call syntax. It was changed to a supported local binding then call; no new chained-call support was added. Final focused suite passed."
+    },
+    {
+      "kind": "auxiliary verifier",
+      "result": "Bundling the entire observation dependency graph into an ad hoc helper failed with a missing relative dependency. Reused the actual built worker; final observations, model messages and schema then matched the in-flight request exactly."
+    }
+  ],
+  "browser": {
+    "kind": "Actual built UI/worker with public fixture; simulated editor. No real model in the UI harness, no native screenshot interaction.",
+    "scope": "Korean/English disclosure, different loop counts and returns for two inputs, source-request wiring, and record invalidation after changing inputs.",
+    "buildBoundary": "UI and fixture observations predate the later core intermediate-return guard. UI code is unchanged; final native/CI validation is separate.",
+    "screenshots": [
+      {
+        "path": "docs/evidence/local-ai/execution-records-ko.png",
+        "sha256": "fb5bbd7e776e7206c05117d8bf3f7308cf370dc49621551ae57eaaaeb35635b4",
+        "scope": "Public Korean calculation records."
+      },
+      {
+        "path": "docs/evidence/local-ai/execution-records-en.png",
+        "sha256": "f47ff2e016ba5df1d8739ed70ffb7b4da167afcf7e3a145cfb63529120d7fb44",
+        "scope": "Public English labels; trace text retains original source and bilingual record labels."
+      }
+    ],
+    "cleanup": "Owned temporary browser tab closed and UI harness stopped.",
+    "loggedRequests": {
+      "localObserve": 1,
+      "localObservationSource": 2,
+      "localGenerate": 0,
+      "localModels": 0
+    }
+  },
+  "modelEvidence": "execution-records-model.json",
+  "finalCI": "execution-records-ci.json: exact runtime 0cf6b34 passed Windows/Ubuntu; each 329 core, 66 development, 66 production-installed, eleven file hashes and seven package checks."
+}
