@@ -1,5 +1,9 @@
 # 로컬 AI 검증 자료 · 2026-10-16
 
+2026-10-20 추론 설정: [사용법과 평가 경계](../../LOCAL_AI_THINKING.md), [부분 핵심 36개·native 7개·한/영 화면·요청 동일성](thinking-settings-verification.json), [실제 4B 켜기 요청](thinking-settings-model.json). 같은 비공개 과제와 전체 chat 본문에서 추론 값만 바꿨고 600.016초에 생성 한도로 종료됐다. 완성 답변을 받지 못해 의미 정확도는 미평가이며 이전 끄기 요청의 의미 실패를 해결한 근거가 아니다. [최초 Windows CI 시간 초과](thinking-settings-ci-first-failure.json)도 별도 보존한다.
+
+추론 기능과 화면 후속 `e832712`의 [최종 교차 OS CI](thinking-settings-ci.json): 각 핵심 350개·개발/production 설치 각 69개·설치 파일 11개 해시·패키지 검사 7개 통과. Ubuntu의 첫 성공과 Windows의 같은 코드 재실행 성공이며 최초 5초 테스트 시간 초과의 원인 해결을 뜻하지 않는다.
+
 2026-10-20 산술 기록 후 실제 모델: [같은 비공개 과제의 7B·4B 두 요청](arithmetic-model-followup.json)은 약 499·428초에 완료됐다. 두 응답 모두 인용/예시 구조 검사를 통과했으나 반환값·입력 검증 설명 오류로 과제는 실패했다. [검토 범위·해석 한계](../../ARITHMETIC_RECORDS.md). 같은 소스·질문·일곱 입력의 반복이며 속도 벤치마크나 제삼자 정확도 평가가 아니다. 비공개 원문·구체 입력/결과·원시 모델 답변은 공개하지 않는다.
 
 2026-10-20 배열 비교 후속: [빈 배열·빈 자리의 결과 차이](../../SPARSE_COMPARISON.md), [수정 전 세 실패와 로컬 검증](sparse-comparison-verification.json). 핵심 부분 29개·확장 빌드가 통과했다. 공개 회귀 예제로 확인한 비교 엔진 결함이며 비공개 사용자 프로젝트의 오류 발견·모델 성공으로 세지 않는다.

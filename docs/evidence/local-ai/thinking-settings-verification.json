@@ -1,0 +1,124 @@
+{
+  "collectedAt": "2026-10-19T23:34:07.916Z",
+  "featureCommit": "88cd9a5b3ddf8f6350be2145032ffb32c1c8b597",
+  "finalRuntimeCommit": "e8327125f57883eb4f566082b3657a45eb66cb34",
+  "scope": "Product model-thinking selection; controlled protocol and UI checks are separate from actual model correctness.",
+  "focusedCore": {
+    "passed": 36,
+    "files": 3
+  },
+  "native": {
+    "scope": "explanation-observations-only",
+    "passed": 7,
+    "controlledModel": true
+  },
+  "ui": {
+    "actualBuiltUI": true,
+    "publicFixture": true,
+    "simulatedEditorAndModel": true,
+    "requests": [
+      {
+        "model": "fixture:local",
+        "thinking": true,
+        "lang": "ko"
+      },
+      {
+        "model": "fixture:local",
+        "thinking": false,
+        "lang": "ko"
+      },
+      {
+        "model": "fixture:levels",
+        "thinking": "high",
+        "lang": "en"
+      },
+      {
+        "model": "fixture:unknown",
+        "thinking": null,
+        "lang": "en"
+      }
+    ],
+    "modelSwitchResetsSelectionAndProposal": true,
+    "finalAccessibleLabelChecked": true,
+    "finalSpacingChecked": true,
+    "screenshotCommits": {
+      "results": "88cd9a5b3ddf8f6350be2145032ffb32c1c8b597",
+      "settingsForm": "e8327125f57883eb4f566082b3657a45eb66cb34"
+    }
+  },
+  "actualModelMetadata": {
+    "serverVersion": "0.40.5",
+    "cloudDisabled": true,
+    "model": "qwen3.5:4b",
+    "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+    "thinking": {
+      "values": [
+        false,
+        true
+      ],
+      "default": true
+    }
+  },
+  "actualRequestComparison": {
+    "entireChatRequestIdenticalExceptThink": true,
+    "before": false,
+    "after": true,
+    "sameModelDigest": true,
+    "finalInputProof": {
+      "runtimeCommit": "e8327125f57883eb4f566082b3657a45eb66cb34",
+      "recalculatedObservationsIdentical": true,
+      "modelMessagesIdentical": true,
+      "responseSchemaIdentical": true,
+      "sameSourceQuestionFocusInputsAsPreviousModelAttempt": true,
+      "caseCount": 7,
+      "recordCounts": [
+        12,
+        12,
+        12,
+        0,
+        12,
+        12,
+        12
+      ],
+      "omittedCases": 6
+    }
+  },
+  "logs": [
+    {
+      "path": "test-results/local-ai-thinking-core.log",
+      "sha256": "64fbc113fb84d67ab492c42ba48816f8cb73b938c2474fd72891af34bc4df252"
+    },
+    {
+      "path": "test-results/local-ai-thinking-native.log",
+      "sha256": "f9b9f157e9898941704cbf731c08b0aa1d9e6802b11ecf206cdd0eb257bad3ef"
+    },
+    {
+      "path": "test-results/local-ai-thinking-build.log",
+      "sha256": "6ab091d7ca79762c8340396115c9599e15f56bc19a0b39f87b6b449085e34f5e"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "extension/out/worker.cjs",
+      "sha256": "53ff70c65ad0f5f372c9265018dc4ce98a6cb34bf75044f4e0d4ca6d30022603"
+    },
+    {
+      "path": "extension/out/extension.cjs",
+      "sha256": "0e45c7603085a3c4912c19eb2c64a5d9c535f31d9ef3ac8e5199e907d67a685e"
+    },
+    {
+      "path": "extension/media/view.js",
+      "sha256": "b8066d0acc20ac6fc3c60f10c0c6957eb8cd3e5ac07f812f6f92688f571bdb20"
+    },
+    {
+      "path": "extension/media/view.css",
+      "sha256": "ab7380949e7f5375e351361a071625df960b0ed04a094c3da426b4b53e4574ce"
+    }
+  ],
+  "limits": [
+    "Controlled fixtures do not measure model explanation accuracy.",
+    "Runtime metadata states the requested setting, not an independent observation of model internals.",
+    "The actual private-code trial retains source and inputs; no private text or internal reasoning trace is published.",
+    "Timing is observational, not an isolated benchmark; a local UI build and input-proof calculation overlapped part of generation."
+  ]
+}

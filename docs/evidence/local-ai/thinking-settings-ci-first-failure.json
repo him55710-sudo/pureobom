@@ -1,0 +1,16 @@
+{
+  "commit": "e8327125f57883eb4f566082b3657a45eb66cb34",
+  "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39342286787",
+  "firstWindowsJob": "https://github.com/him55710-sudo/pureobom/actions/runs/39342286787/job/118366473439",
+  "core": {
+    "passed": 349,
+    "failed": 1
+  },
+  "failure": {
+    "file": "tests/python-source.test.ts",
+    "test": "reads the actual shipping branches and exact literals in both languages without inferring currency",
+    "reason": "Vitest test timed out in 5000 ms; reported case duration 5011 ms."
+  },
+  "interpretation": "The first Windows run failed, so it did not reach native/build/package checks. The preceding feature commit passed on both OSes. Retrying only the failed job at the identical commit without changing code, assertions or time limits; a successful retry would not erase this observed timeout.",
+  "logExcerpt": "Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\r\n\r\n FAIL  tests/python-source.test.ts > isolated Python source reader > reads the actual shipping branches and exact literals in both languages without inferring currency\r\nError: Test timed out in 5000ms.\r\nIf this is a long-running test, pass a timeout value as the last argument or configure it globally with \"testTimeout\".\r\n ❯ tests/python-source.test.ts:33:3\r\n     31|\r\n     32| describe(\"isolated Python source reader\", () => {\r\n     33|   it(\"reads the actual shipping branches and exact literals in both la…\r\n       |   ^\r\n     34|     const source = await readFile(\"examples/shipping.py\", \"utf8\");\r\n\r\n     35|     const a = await analyze(source);\r\n\r\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\r\n\r\n Test Files  1 failed | 33 passed (34)\r\n      Tests  1 failed | 349 passed (350)\r\n   Start at  23:34:50\r\n   Duration  67.22s (transform 1.97s, setup 0ms, import 13.30s, tests 117.02s, environment 5ms)\r\n\r\n\r\n##[error]Error: Test timed out in 5000ms.\nIf this is a long-running test, pass a timeout value as the last argument or configure it globally with \"testTimeout\".\n ❯ tests/python-source.test.ts:33:3"
+}
