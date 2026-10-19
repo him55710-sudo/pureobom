@@ -24,7 +24,20 @@
 
 사용자가 지정한 같은 비공개 함수·같은 일곱 입력을 변경하지 않고 실제 제품 worker에서 다시 계산했다. 반환 여섯 개는 native Node와 일치했고 예외 한 개는 제품에서 확인 불가였다. 이전 관찰값도 그대로였다. 비유한 산술 결과를 표시한 사례는 두 개이며, 반환 여섯 사례 모두 기록 한도에 따라 일부 과정이 생략됐다. 소스 해시와 깨끗한 평가 복사본 상태를 확인했다.
 
-이는 새 일곱 사례나 전체 프로젝트 검증이 아니다. 반환값 대조와 기록 표시를 확인한 것이며 각 중간 연산을 독립적인 native 계측으로 전부 대조하지는 않았다. 새 모델 요청은 수행하지 않았으므로 앞선 [실제 7B 설명 실패](evidence/local-ai/execution-records-model.json)는 해결된 것으로 처리하지 않는다. 비공개 원문·식별자·구체 입력/반환값·원시 기록은 공개하지 않는다. 익명 집계만 공개해 제삼자가 해당 비공개 실험을 완전히 재현할 수는 없다.
+이는 새 일곱 사례나 전체 프로젝트 검증이 아니다. 반환값 대조와 기록 표시를 확인한 것이며 각 중간 연산을 독립적인 native 계측으로 전부 대조하지는 않았다. 초기 기록 기능 검사에서는 모델을 요청하지 않았고, 뒤이어 같은 과제의 실제 모델 후속을 별도로 평가했다. 앞선 [실제 7B 설명 실패](evidence/local-ai/execution-records-model.json)는 당시 결과로 보존한다. 비공개 원문·식별자·구체 입력/반환값·원시 기록은 공개하지 않는다. 익명 집계만 공개해 제삼자가 해당 비공개 실험을 완전히 재현할 수는 없다.
+
+## 실제 모델 후속 평가
+
+같은 비공개 원문·질문·일곱 입력과 산술 기록으로 실제 CPU 요청 두 개를 순서대로 실행했다. 요청 메시지·응답 스키마·생성 옵션이 같음을 대조했다. 모델은 서로 다르며, 사고 끄기를 지원하는 4B에는 기존 제품 동작대로 `think:false`가 적용됐다. 각 생성 한도는 10분이다. 비교 엔진 수정 후 `25d0c27`로 재계산한 기록·메시지·스키마도 각 실제 요청과 일치했다.
+
+| 모델 | 완료 시간 | 실제 입력/출력 토큰 | 제품 구조 검사 | 에이전트 의미 검토 |
+| --- | --- | --- | --- | --- |
+| qwen2.5-coder:7b | 약 499초 | 4,629 / 698 | 정확한 인용 4개·예시 7개 통과 | 반환한 세 사례를 예외라고 설명해 실패 |
+| qwen3.5:4b | 약 428초 | 4,590 / 1,131 | 정확한 인용 6개·예시 7개 통과 | 한 반환 결과와 입력 검증 주장이 틀려 실패 |
+
+7B는 연산·반환 기록을 받아도 세 반환 사례를 예외로 설명하고 입력 구성을 잘못 기술했다. 4B는 일부 범위 조정과 비유한 연산 결과를 더 구체적으로 설명했지만, 다른 사례의 반환값을 틀리고 반복의 계속 조건이 입력 크기를 보장한다고 주장했다. 호출자가 지킬 조건도 실제 동작과 모순됐다. 두 과제 모두 통과하지 못했다. [익명 시도별 기록·검토 근거](evidence/local-ai/arithmetic-model-followup.json).
+
+응답 완료·정확한 인용·예시 항목의 존재는 설명의 참을 증명하지 않는다. 이번 두 요청으로 일반 정확도나 모델 우열을 인증하지 않는다. 같은 과제의 반복이며 모델 구조·토큰화·출력 길이·캐시·주변 부하가 달라 소요 시간을 속도 벤치마크로 해석하지 않는다. 첫 요청 일부에는 로컬 검사·빌드가 겹쳤다. 모델의 사고 옵션이 오류의 원인인지도 이번 두 요청으로 판단하지 않는다. 계산 기록을 더 첨부했다는 이유로 기존 설명 실패가 해결된 것으로 처리하지 않는다.
 
 ## 검사와 재현
 
@@ -42,4 +55,4 @@ node scripts/test-extension.mjs --trace-source
 node scripts/preview-function-format.mjs --arithmetic
 ```
 
-English: inspect original arithmetic expressions beside the operands and result actually computed by the bounded JS/TS interpreter, without model inference. Operands are evaluated once. Source links identify the original operator line; omitted steps and stale evidence remain explicit. This is neither a full debugger nor proof of model accuracy, native application correctness or optimization. The unchanged private task still has six matching returns and one unavailable case; no new model-quality claim is made.
+English: inspect original arithmetic expressions beside the operands and result actually computed by the bounded JS/TS interpreter, without model inference. Operands are evaluated once. Source links identify the original operator line; omitted steps and stale evidence remain explicit. The unchanged private task has six matching returns and one unavailable case. Two subsequent actual CPU requests completed in about 499 and 428 seconds and passed structural validation, but both failed semantic review. This is neither a full debugger nor proof of model accuracy, native application correctness or optimization.
