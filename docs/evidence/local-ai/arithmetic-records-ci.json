@@ -1,0 +1,168 @@
+{
+  "testedCommit": "00eedd7b0541d903f81a387b6aa2bae692eec07f",
+  "runtimeSourceCommit": "c64bc4a283afb575605e7b05adcecaf85069975a",
+  "base": "6011505a506deb177c8f3765c7ff922636738a8d",
+  "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39337702532",
+  "collectedAt": "2026-10-19T22:58:14.071Z",
+  "scope": "Full Windows/Ubuntu core, actual VS Code development/production installation and packaged-tool verification. HTTP model responses are controlled fixtures; private native-return comparisons and actual model semantic review are separate.",
+  "jobs": [
+    {
+      "id": 118351233165,
+      "name": "verify (windows-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39337702532/job/118351233165",
+      "conclusion": "success",
+      "corePassed": 335,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 67,
+        "timestamp": "2026-10-19T22:55:06.516Z",
+        "checks": [
+          "Preview values: actual worker/controller and two-way VS Code webview JSON transport preserve NaN, infinities, negative-zero inputs/results and present undefined properties; ordinary strings stay distinct in trace, comparison and Markdown without source edits",
+          "Trace source handles: unknown handles, stale contexts, superseded results and invalid indexes are rejected; clients cannot supply a navigation path",
+          "Trace source freshness: an unopened imported file changed on disk is rejected before showing a stale line, even without an editor change notification",
+          "Trace source navigation: actual worker/controller opens exact imported condition, loop, callback and return lines across files with duplicate basenames; returned-data mutation cannot redirect selection; source text stays unchanged",
+          "Explanation arithmetic: actual worker records original expressions and evaluated operand/result values for zero division and signed infinity, separately from the returned object, with no model inference",
+          "Explanation execution records: actual worker records a source-linked return; nested client mutation cannot change host evidence or navigation, and invalid record indexes are rejected without model inference",
+          "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+          "Explanation observations: host-retained results, progress phases and a selected time limit reach the actual local-model client and returned view; invalid limits and fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+          "Explanation coverage: actual client returns separate input checks and caller requirements with every example; its citation opens exact source, duplicated or missing examples are rejected and source remains unchanged (controlled model response)",
+          "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 67,
+        "timestamp": "2026-10-19T22:56:33.230Z",
+        "checks": [
+          "Preview values: actual worker/controller and two-way VS Code webview JSON transport preserve NaN, infinities, negative-zero inputs/results and present undefined properties; ordinary strings stay distinct in trace, comparison and Markdown without source edits",
+          "Trace source handles: unknown handles, stale contexts, superseded results and invalid indexes are rejected; clients cannot supply a navigation path",
+          "Trace source freshness: an unopened imported file changed on disk is rejected before showing a stale line, even without an editor change notification",
+          "Trace source navigation: actual worker/controller opens exact imported condition, loop, callback and return lines across files with duplicate basenames; returned-data mutation cannot redirect selection; source text stays unchanged",
+          "Explanation arithmetic: actual worker records original expressions and evaluated operand/result values for zero division and signed infinity, separately from the returned object, with no model inference",
+          "Explanation execution records: actual worker records a source-linked return; nested client mutation cannot change host evidence or navigation, and invalid record indexes are rejected without model inference",
+          "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+          "Explanation observations: host-retained results, progress phases and a selected time limit reach the actual local-model client and returned view; invalid limits and fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+          "Explanation coverage: actual client returns separate input checks and caller requirements with every example; its citation opens exact source, duplicated or missing examples are rejected and source remains unchanged (controlled model response)",
+          "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+        ],
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "b08e4c7bd177e50186f336314305edc90ce0e5ffcf985ab7a33076912f6623be",
+        "verifiedFiles": {
+          "out/extension.cjs": "d8d7d24e712b47ed3512dd4aa382511d62588adf426848f04125e7deb67c9a9e",
+          "out/worker.cjs": "6759e45f7eef3e4bbf55507fe1d45a316835a5283eeddeafccf0fe131234b981",
+          "runtime/benchmark.py": "dc403b72ad1a349071ab7a8543ce44563415e485d85111c9fc8764156b59660b",
+          "runtime/python_source.py": "1e972114a1cc94eb9260c9530955f49a96f473d322fe4209a58ec97d6e34d4cb",
+          "runtime/go_source.go": "a8e185b81d3aa62a9cbfafdec9d8a8926c9ead6bfe4533fe9038d0a7ad714824",
+          "runtime/PureobomJavaSource.java": "6d439b2668972bf3c32e1574ad714d63ed0c5444de5bef80448e72f19f5b7b10",
+          "runtime/PureobomCSharpSource.cs": "ed8a9bc9d9f081dbe5d61d260ea68a70d0403ee4b1469298a1a2a121e7f544ac",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "b5eaaea5eee4ffb074338fb5b88ca3974a560e3b4bce363aca5499e31baf5345",
+          "media/view.css": "40a42296aa22f213072fe33a2a02f3df0ceda8f4da7cdcc1213d3fb5efe910ae"
+        },
+        "extensionMode": "production"
+      },
+      "packageChecks": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    },
+    {
+      "id": 118351233256,
+      "name": "verify (ubuntu-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39337702532/job/118351233256",
+      "conclusion": "success",
+      "corePassed": 335,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 67,
+        "timestamp": "2026-10-19T22:53:28.358Z",
+        "checks": [
+          "Preview values: actual worker/controller and two-way VS Code webview JSON transport preserve NaN, infinities, negative-zero inputs/results and present undefined properties; ordinary strings stay distinct in trace, comparison and Markdown without source edits",
+          "Trace source handles: unknown handles, stale contexts, superseded results and invalid indexes are rejected; clients cannot supply a navigation path",
+          "Trace source freshness: an unopened imported file changed on disk is rejected before showing a stale line, even without an editor change notification",
+          "Trace source navigation: actual worker/controller opens exact imported condition, loop, callback and return lines across files with duplicate basenames; returned-data mutation cannot redirect selection; source text stays unchanged",
+          "Explanation arithmetic: actual worker records original expressions and evaluated operand/result values for zero division and signed infinity, separately from the returned object, with no model inference",
+          "Explanation execution records: actual worker records a source-linked return; nested client mutation cannot change host evidence or navigation, and invalid record indexes are rejected without model inference",
+          "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+          "Explanation observations: host-retained results, progress phases and a selected time limit reach the actual local-model client and returned view; invalid limits and fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+          "Explanation coverage: actual client returns separate input checks and caller requirements with every example; its citation opens exact source, duplicated or missing examples are rejected and source remains unchanged (controlled model response)",
+          "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 67,
+        "timestamp": "2026-10-19T22:54:27.613Z",
+        "checks": [
+          "Preview values: actual worker/controller and two-way VS Code webview JSON transport preserve NaN, infinities, negative-zero inputs/results and present undefined properties; ordinary strings stay distinct in trace, comparison and Markdown without source edits",
+          "Trace source handles: unknown handles, stale contexts, superseded results and invalid indexes are rejected; clients cannot supply a navigation path",
+          "Trace source freshness: an unopened imported file changed on disk is rejected before showing a stale line, even without an editor change notification",
+          "Trace source navigation: actual worker/controller opens exact imported condition, loop, callback and return lines across files with duplicate basenames; returned-data mutation cannot redirect selection; source text stays unchanged",
+          "Explanation arithmetic: actual worker records original expressions and evaluated operand/result values for zero division and signed infinity, separately from the returned object, with no model inference",
+          "Explanation execution records: actual worker records a source-linked return; nested client mutation cannot change host evidence or navigation, and invalid record indexes are rejected without model inference",
+          "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+          "Explanation observations: host-retained results, progress phases and a selected time limit reach the actual local-model client and returned view; invalid limits and fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+          "Explanation coverage: actual client returns separate input checks and caller requirements with every example; its citation opens exact source, duplicated or missing examples are rejected and source remains unchanged (controlled model response)",
+          "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+        ],
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "0afb96c31aefaba60df9b122c03601a980cf9e21bd1087f7599b5a06e8afa313",
+        "verifiedFiles": {
+          "out/extension.cjs": "d8d7d24e712b47ed3512dd4aa382511d62588adf426848f04125e7deb67c9a9e",
+          "out/worker.cjs": "6759e45f7eef3e4bbf55507fe1d45a316835a5283eeddeafccf0fe131234b981",
+          "runtime/benchmark.py": "bb136c4c7bdd452aa7a75d216aa5998c41c98fc2cf9cfc089e2edae5ae80c6f9",
+          "runtime/python_source.py": "3b4ddd3535ee4bc0c578bc20463640d94b2f30ef74b463db6f7e1416a04f9ef1",
+          "runtime/go_source.go": "8c49ca4cd6b1e5fdc2b1eae3ea22b9a7c0bed7bb6a1ac0fabfcad7816d29c3ca",
+          "runtime/PureobomJavaSource.java": "6b3ef1aa18ad1b834c0e98ab6c4538d5ece40afd098bc9da6b0e0bb37fe4b9f4",
+          "runtime/PureobomCSharpSource.cs": "86d605f322f2331e864d55613bf0b43948c6dc424b364895c5d344e771d4fdf3",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "b5eaaea5eee4ffb074338fb5b88ca3974a560e3b4bce363aca5499e31baf5345",
+          "media/view.css": "40a42296aa22f213072fe33a2a02f3df0ceda8f4da7cdcc1213d3fb5efe910ae"
+        },
+        "extensionMode": "production"
+      },
+      "packageChecks": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    }
+  ],
+  "localArtifactMatch": {
+    "scope": "Local worker used for unchanged private examples and built UI used for public browser checks match these installed artifacts on both operating systems.",
+    "verifiedFiles": {
+      "out/worker.cjs": "6759e45f7eef3e4bbf55507fe1d45a316835a5283eeddeafccf0fe131234b981",
+      "media/view.js": "b5eaaea5eee4ffb074338fb5b88ca3974a560e3b4bce363aca5499e31baf5345",
+      "media/view.css": "40a42296aa22f213072fe33a2a02f3df0ceda8f4da7cdcc1213d3fb5efe910ae"
+    }
+  },
+  "firstFailedRun": {
+    "commit": "c64bc4a283afb575605e7b05adcecaf85069975a",
+    "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39337376784",
+    "eachOS": {
+      "corePassed": 334,
+      "coreFailed": 1
+    },
+    "cause": "An existing test assumed the returned object was the first trace entry. Arithmetic now precedes it.",
+    "correction": "The test-only follow-up selects explicit return records and retains special-value assertions, also removing the equivalent native-test assumption. Runtime files are unchanged."
+  },
+  "limitations": [
+    "Same tests across OS/install modes are not independent feature counts.",
+    "No new model inference for arithmetic records; previous actual-model semantic failure remains.",
+    "Bounded JS/TS arithmetic observations do not establish whole-app behavior, all-language support, scientific validity or performance gains.",
+    "Not merged, deployed or a stable release."
+  ]
+}
