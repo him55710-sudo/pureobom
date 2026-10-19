@@ -7,20 +7,27 @@ const rust = process.argv.includes("--rust");
 const progress = process.argv.includes("--progress");
 const execution = process.argv.includes("--execution");
 const arithmetic = process.argv.includes("--arithmetic");
+const thinking = process.argv.includes("--thinking");
 const focus =
-  process.argv.includes("--focus") || progress || execution || arithmetic;
+  process.argv.includes("--focus") ||
+  progress ||
+  execution ||
+  arithmetic ||
+  thinking;
 const folder = resolve(
-  arithmetic
-    ? "test-results/arithmetic-records-ui"
-    : execution
-      ? "test-results/execution-records-ui"
-      : progress
-        ? "test-results/local-ai-progress-ui"
-        : focus
-          ? "test-results/focused-explanation-ui"
-          : rust
-            ? "test-results/rust-source-ui"
-            : "test-results/function-format-ui",
+  thinking
+    ? "test-results/local-ai-thinking-ui"
+    : arithmetic
+      ? "test-results/arithmetic-records-ui"
+      : execution
+        ? "test-results/execution-records-ui"
+        : progress
+          ? "test-results/local-ai-progress-ui"
+          : focus
+            ? "test-results/focused-explanation-ui"
+            : rust
+              ? "test-results/rust-source-ui"
+              : "test-results/function-format-ui",
 );
 const path = rust ? "sample.rs" : "sample.ts";
 await mkdir(folder, { recursive: true });
@@ -89,7 +96,21 @@ async function rpc(r) {
     return {
       result: {
         origin: "Controlled UI fixture; no model inference",
-        models: [{ name: "fixture:local", digest: "a".repeat(64), size: 0 }],
+        models: (thinking
+          ? ["fixture:local", "fixture:levels", "fixture:unknown"]
+          : ["fixture:local"]
+        ).map((name) => ({ name, digest: "a".repeat(64), size: 0 })),
+      },
+    };
+  if (r.action === "localModelOptions" && focus)
+    return {
+      result: {
+        thinking:
+          r.payload.model === "fixture:levels"
+            ? { values: ["low", "medium", "high"], default: "medium" }
+            : r.payload.model === "fixture:unknown"
+              ? { values: [] }
+              : { values: [false, true], default: true },
       },
     };
   if (r.contextId !== String(version)) throw Error("Stale fixture context");
@@ -117,11 +138,20 @@ async function rpc(r) {
     return {
       result: {
         id: "focus-fixture",
-        model: "fixture:local",
+        model: r.payload.model,
         digest: "a".repeat(64),
         elapsedMs: 1,
         processor: r.payload.processor || "auto",
         timeoutSeconds: r.payload.timeoutSeconds ?? 180,
+        thinking: {
+          requested: r.payload.thinking ?? null,
+          ...(r.payload.model === "fixture:unknown"
+            ? {}
+            : {
+                modelDefault:
+                  r.payload.model === "fixture:levels" ? "medium" : true,
+              }),
+        },
         summary: ko
           ? "선택한 함수의 설명을 표시하는 화면 검증용 응답입니다. 실제 모델의 설명 품질 검증이 아닙니다."
           : "Controlled response for verifying the selected-function display. This does not evaluate a real model.",

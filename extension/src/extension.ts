@@ -127,6 +127,9 @@ export function activate(context: vscode.ExtensionContext) {
           case "localModels":
             result = await controller.assistant.models();
             break;
+          case "localModelOptions":
+            result = await controller.assistant.modelOptions(p.model);
+            break;
           case "localGenerate":
             result = await controller.assistant.generate(
               r.contextId,

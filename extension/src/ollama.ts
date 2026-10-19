@@ -1,5 +1,11 @@
 import { request as httpRequest } from "node:http";
 import {
+  thinkingMetadata,
+  thinkingRequest,
+  thinkingSelection,
+  type ThinkingValue,
+} from "../../src/core/localAIThinking";
+import {
   localAIPhases,
   type LocalAIPhase,
   type LocalAIProgress,
@@ -49,10 +55,12 @@ export class OllamaRequestError extends Error {
 /** Node's direct HTTP client: fixed numeric loopback, no proxy discovery or redirects. */
 export class OllamaClient {
   readonly origin: string;
+  readonly thinking: ThinkingValue | null;
   constructor(
     readonly port = 11434,
     private timeoutMs = 180000,
     readonly processor: InferenceProcessor = "auto",
+    thinking: ThinkingValue | null = null,
   ) {
     if (!Number.isInteger(port) || port < 1024 || port > 65535)
       throw Error("Invalid local Ollama port");
@@ -63,6 +71,7 @@ export class OllamaClient {
         "연산 장치를 다시 선택하세요. / Select a valid inference processor.",
       );
     this.origin = `http://127.0.0.1:${port}`;
+    this.thinking = thinkingSelection(thinking);
   }
   private json(
     route: keyof typeof routePhases,
@@ -243,13 +252,11 @@ export class OllamaClient {
         size: m.size,
       }));
   }
-  async generate(
+  private async selectedModel(
     modelName: string,
-    input: AssistantInput,
     signal?: AbortSignal,
     onProgress?: LocalAIProgress,
   ) {
-    validateAssistantInput(input);
     if (!localName(modelName))
       throw Error(
         "설치된 로컬 모델을 선택하세요. / Select an installed local model.",
@@ -279,17 +286,26 @@ export class OllamaClient {
       throw Error(
         "로컬 텍스트 모델임을 확인할 수 없습니다. / Could not verify a local text model.",
       );
+    return { model, thinking: thinkingMetadata(info.thinking) };
+  }
+  async modelOptions(modelName: string) {
+    return this.selectedModel(modelName);
+  }
+  async generate(
+    modelName: string,
+    input: AssistantInput,
+    signal?: AbortSignal,
+    onProgress?: LocalAIProgress,
+  ) {
+    validateAssistantInput(input);
+    const selected = await this.selectedModel(modelName, signal, onProgress);
+    const { model } = selected;
+    const thinking = thinkingRequest(this.thinking, selected.thinking);
     // Verify local-only mode again immediately before any source leaves the extension.
     await this.localOnly(signal, onProgress);
     const messages = assistantMessages(input);
     const format = assistantResponseSchema(input);
     const contextSize = assistantContextSize(messages, format);
-    // Reserve our bounded output for the final structured answer. Only request
-    // this switch when the server explicitly advertises it; some models have
-    // named reasoning levels or do not permit disabling thinking.
-    const thinkingValues = object(info.thinking).values;
-    const canDisableThinking =
-      Array.isArray(thinkingValues) && thinkingValues.includes(false);
     const started = Date.now();
     const result = await this.json(
       "/api/chat",
@@ -298,7 +314,7 @@ export class OllamaClient {
         stream: false,
         truncate: false,
         shift: false,
-        ...(canDisableThinking ? { think: false } : {}),
+        ...(thinking.requested !== null ? { think: thinking.requested } : {}),
         messages,
         format,
         options: {
@@ -331,6 +347,7 @@ export class OllamaClient {
       timeoutMs: this.timeoutMs,
       contextSize,
       processor: this.processor,
+      thinking,
       proposal: parseAssistantProposal(result.message.content, input),
     };
   }

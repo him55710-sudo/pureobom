@@ -141,7 +141,7 @@ describe("Ollama loopback protocol (controlled HTTP fixture, not real inference)
     ).rejects.toThrow(/OLLAMA_NO_CLOUD/);
     expect(seen).toEqual(["/api/status"]);
   });
-  it("requests direct answers only when the model advertises a supported off switch", async () => {
+  it("preserves each model's default instead of silently switching thinking off", async () => {
     for (const thinking of [
       { values: [false, true], default: true },
       { values: ["low", "medium", "high"], default: "medium" },
@@ -158,12 +158,144 @@ describe("Ollama loopback protocol (controlled HTTP fixture, not real inference)
             : fixture(req.url),
         );
       });
-      await new OllamaClient(port).generate(model.name, input);
-      if (thinking?.values.some((value) => value === false))
-        expect(chat.think).toBe(false);
-      else expect(chat).not.toHaveProperty("think");
+      const result = await new OllamaClient(port).generate(model.name, input);
+      expect(chat).not.toHaveProperty("think");
+      expect(result.thinking).toEqual({
+        requested: null,
+        ...(thinking ? { modelDefault: thinking.default } : {}),
+      });
       expect(chat.options.num_predict).toBe(4096);
     }
+  });
+  it.each([false, true, "low", "high", "true"])(
+    "forwards the advertised thinking value %s without coercing its type",
+    async (selection) => {
+      let chat: any;
+      const port = await server((req, res, body) => {
+        if (req.url === "/api/chat") chat = body;
+        const base = fixture(req.url);
+        reply(
+          res,
+          req.url === "/api/show"
+            ? {
+                ...base,
+                thinking: {
+                  values: [false, true, "low", "high", "true"],
+                  default: true,
+                },
+              }
+            : req.url === "/api/chat"
+              ? {
+                  ...base,
+                  message: {
+                    ...base!.message,
+                    thinking:
+                      "Controlled internal trace must not enter the product result",
+                  },
+                }
+              : base,
+        );
+      });
+      const result = await new OllamaClient(
+        port,
+        undefined,
+        "auto",
+        selection,
+      ).generate(model.name, input);
+      expect(chat.think).toBe(selection);
+      expect(chat.options.num_predict).toBe(4096);
+      expect(result.thinking).toEqual({
+        requested: selection,
+        modelDefault: true,
+      });
+      expect(JSON.stringify(result)).not.toContain("Controlled internal trace");
+    },
+  );
+  it("loads settings without source and rejects a now-unsupported choice before chat", async () => {
+    const bodies: unknown[] = [];
+    let chats = 0,
+      changed = false;
+    const port = await server((req, res, body) => {
+      if (req.url === "/api/chat") chats++;
+      bodies.push(body);
+      reply(
+        res,
+        req.url === "/api/show"
+          ? {
+              ...fixture(req.url),
+              thinking: {
+                values: changed ? [false] : [false, true],
+                default: false,
+              },
+            }
+          : fixture(req.url),
+      );
+    });
+    const client = new OllamaClient(port, undefined, "auto", true);
+    expect((await client.modelOptions(model.name)).thinking).toEqual({
+      values: [false, true],
+      default: false,
+    });
+    changed = true;
+    await expect(client.generate(model.name, input)).rejects.toThrow(
+      /supported thinking settings/,
+    );
+    expect(chats).toBe(0);
+    expect(
+      bodies.every(
+        (body) =>
+          body === undefined ||
+          JSON.stringify(body) === JSON.stringify({ model: model.name }),
+      ),
+    ).toBe(true);
+  });
+  it("rejects explicit values when capability metadata is absent and malformed selections before networking", async () => {
+    const routes: string[] = [];
+    const port = await server((req, res) => {
+      routes.push(req.url!);
+      reply(res, fixture(req.url));
+    });
+    for (const bad of [0, {}, [], "", " high", "high\n", "x".repeat(81)])
+      expect(
+        () => new OllamaClient(port, undefined, "auto", bad as boolean),
+      ).toThrow(/thinking setting/);
+    expect(routes).toEqual([]);
+    await expect(
+      new OllamaClient(port, undefined, "auto", false).generate(
+        model.name,
+        input,
+      ),
+    ).rejects.toThrow(/supported thinking settings/);
+    expect(routes).not.toContain("/api/chat");
+  });
+  it("discards malformed capability entries while preserving supported named levels", async () => {
+    const port = await server((req, res) =>
+      reply(
+        res,
+        req.url === "/api/show"
+          ? {
+              ...fixture(req.url),
+              thinking: {
+                values: [
+                  true,
+                  false,
+                  "medium",
+                  "medium",
+                  1,
+                  null,
+                  {},
+                  "",
+                  "bad\n",
+                ],
+                default: "not-advertised",
+              },
+            }
+          : fixture(req.url),
+      ),
+    );
+    expect(
+      (await new OllamaClient(port).modelOptions(model.name)).thinking,
+    ).toEqual({ values: [true, false, "medium"] });
   });
   it("filters cloud aliases and rejects remote metadata before chat", async () => {
     let chat = false;

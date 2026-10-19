@@ -1,6 +1,11 @@
 import * as vscode from "vscode";
 import { randomUUID } from "node:crypto";
 import { OllamaClient, type InferenceProcessor } from "./ollama";
+import {
+  thinkingSelection,
+  type ThinkingRequest,
+  type ThinkingValue,
+} from "../../src/core/localAIThinking";
 import { inputString } from "./protocol";
 import type { AnalysisClient } from "./analysisClient";
 import type {
@@ -32,6 +37,7 @@ export type AssistantResult = Omit<AssistantProposal, "updated"> & {
   elapsedMs: number;
   timeoutSeconds: number;
   processor: InferenceProcessor;
+  thinking: ThinkingRequest;
   validation: AssistantValidation;
   constraint?: AssistantConstraintCheck;
   focus?: { name: string; line: number; endLine: number };
@@ -92,7 +98,11 @@ export class LocalAssistantController implements vscode.Disposable {
       inputs: string,
     ) => Promise<AssistantObservation[]>,
   ) {}
-  private client(processor: InferenceProcessor = "auto", timeoutSeconds = 180) {
+  private client(
+    processor: InferenceProcessor = "auto",
+    timeoutSeconds = 180,
+    thinking: ThinkingValue | null = null,
+  ) {
     if (vscode.env.remoteName)
       throw Error(
         "로컬 AI는 데스크톱의 로컬 작업 공간에서 사용하세요. / Local AI requires a local desktop workspace.",
@@ -103,6 +113,7 @@ export class LocalAssistantController implements vscode.Disposable {
         .get<number>("ollamaPort", 11434),
       timeoutSeconds * 1000,
       processor,
+      thinking,
     );
   }
   async models() {
@@ -110,6 +121,9 @@ export class LocalAssistantController implements vscode.Disposable {
       origin: this.client().origin,
       models: await this.client().models(),
     };
+  }
+  async modelOptions(model: unknown) {
+    return this.client().modelOptions(inputString(model, 200));
   }
   cancel() {
     this.running?.abort();
@@ -229,6 +243,7 @@ export class LocalAssistantController implements vscode.Disposable {
         "진행 중인 요청을 취소하거나 기다려 주세요. / Wait for or cancel the current request.",
       );
     const timeoutSeconds = localAITimeoutSeconds(payload.timeoutSeconds);
+    const thinking = thinkingSelection(payload.thinking);
     const input: AssistantInput = {
       source: doc.getText(),
       language: doc.languageId,
@@ -270,6 +285,7 @@ export class LocalAssistantController implements vscode.Disposable {
           ? "auto"
           : payload.processor) as InferenceProcessor,
         timeoutSeconds,
+        thinking,
       ).generate(
         inputString(payload.model, 200),
         input,
@@ -325,6 +341,7 @@ export class LocalAssistantController implements vscode.Disposable {
         elapsedMs: response.elapsedMs,
         timeoutSeconds: response.timeoutMs / 1000,
         processor: response.processor,
+        thinking: response.thinking,
         validation,
         ...(input.observations
           ? { observations: structuredClone(input.observations) }

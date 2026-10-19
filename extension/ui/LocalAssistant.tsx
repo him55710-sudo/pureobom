@@ -14,6 +14,11 @@ import type {
 import type { InferenceProcessor, LocalModel } from "../src/ollama";
 import type { ViewState } from "../src/protocol";
 import { request } from "./bridge";
+import {
+  thinkingLabel,
+  type ThinkingMetadata,
+  type ThinkingValue,
+} from "../../src/core/localAIThinking";
 import "./local-assistant.css";
 import {
   localAIPhases,
@@ -34,6 +39,8 @@ export function LocalAssistant({
   const [model, setModel] = useState("");
   const [processor, setProcessor] = useState<InferenceProcessor>("auto");
   const [timeoutSeconds, setTimeoutSeconds] = useState(180);
+  const [thinking, setThinking] = useState<ThinkingValue | null>(null);
+  const [thinkingOptions, setThinkingOptions] = useState<ThinkingMetadata>();
   const [origin, setOrigin] = useState("");
   const [task, setTask] = useState<AssistantTask>("explain");
   const [focusChoice, setFocusChoice] = useState(initialFocus);
@@ -86,6 +93,17 @@ export function LocalAssistant({
       ? generated.result
       : undefined;
   const t = (ko: string, en: string) => (lang === "ko" ? ko : en);
+  async function selectModel(name: string) {
+    setModel(name);
+    setThinking(null);
+    setThinkingOptions(undefined);
+    if (!name) return;
+    const options = await request<{ thinking: ThinkingMetadata }>(
+      "localModelOptions",
+      { model: name },
+    );
+    if (mounted.current) setThinkingOptions(options.thinking);
+  }
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -215,7 +233,8 @@ export function LocalAssistant({
               if (!mounted.current) return;
               setModels(next.models);
               setOrigin(next.origin);
-              setModel(next.models[0]?.name || "");
+              await selectModel(next.models[0]?.name || "");
+              if (!mounted.current) return;
               setNotice(
                 next.models.length
                   ? {
@@ -240,8 +259,11 @@ export function LocalAssistant({
               value={model}
               disabled={busy}
               onChange={(e) => {
-                setModel(e.target.value);
-                clearProposal();
+                const name = e.target.value;
+                void run(async () => {
+                  clearProposal();
+                  await selectModel(name);
+                });
               }}
             >
               {models.map((m) => (
@@ -250,6 +272,52 @@ export function LocalAssistant({
                 </option>
               ))}
             </select>
+          </label>
+        ) : null}
+        {model ? (
+          <label>
+            {t("모델 추론 설정", "Model thinking")}
+            <select
+              value={JSON.stringify(thinking)}
+              aria-label={t("모델 추론 설정", "Model thinking")}
+              disabled={busy}
+              aria-describedby="local-thinking-description"
+              onChange={(event) => {
+                setThinking(
+                  JSON.parse(event.target.value) as ThinkingValue | null,
+                );
+                clearProposal();
+              }}
+            >
+              <option value="null">
+                {thinkingLabel(null)[lang]}
+                {thinkingOptions?.default !== undefined
+                  ? ` (${thinkingLabel(thinkingOptions.default)[lang]})`
+                  : ""}
+              </option>
+              {thinkingOptions?.values.map((value) => (
+                <option
+                  key={JSON.stringify(value)}
+                  value={JSON.stringify(value)}
+                >
+                  {thinkingLabel(value)[lang]}
+                </option>
+              ))}
+            </select>
+            <span className="muted" id="local-thinking-description">
+              {t(
+                "모델이 지원하는 설정만 표시합니다. 추론 설정에 따라 답변이 늦어지거나 출력 한도에 도달할 수 있으며, 설명의 정확도는 별도로 확인해야 합니다.",
+                "Only settings advertised by the model are shown. Thinking may increase response time or reach the output limit; check explanation accuracy separately.",
+              )}
+            </span>
+            {!thinkingOptions?.values.length ? (
+              <span className="muted">
+                {t(
+                  "지원 설정이 확인되지 않아 모델 기본값을 사용합니다. 다시 연결하면 정보를 갱신합니다.",
+                  "Supported settings are unavailable; the model default is used. Reconnect to refresh them.",
+                )}
+              </span>
+            ) : null}
           </label>
         ) : null}
         <label>
@@ -594,6 +662,7 @@ export function LocalAssistant({
                     model,
                     processor,
                     timeoutSeconds,
+                    thinking,
                     task,
                     instruction,
                     lang,
@@ -705,6 +774,16 @@ export function LocalAssistant({
             {(result.timeoutSeconds ?? 180) / 60}
             {t("분", " min")}
           </p>
+          {result.thinking && (
+            <p className="muted">
+              {t("요청한 추론 설정", "Requested thinking")}:{" "}
+              {thinkingLabel(result.thinking.requested)[lang]}
+              {result.thinking.requested === null &&
+              result.thinking.modelDefault !== undefined
+                ? ` (${thinkingLabel(result.thinking.modelDefault)[lang]})`
+                : ""}
+            </p>
+          )}
           <p className="local-summary">{result.summary}</p>
           {result.explanation && (
             <>

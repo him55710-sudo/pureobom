@@ -18,6 +18,7 @@ export async function explanationObservationChecks(
     chats = 0;
   let omitExample = false;
   let received: Record<string, any> | undefined;
+  let receivedThinking: unknown;
   const model = {
     name: "fixture:observations",
     size: 1900000000,
@@ -42,16 +43,20 @@ export async function explanationObservationChecks(
           details: { format: "gguf" },
           model_info: { "general.architecture": "fixture" },
           capabilities: ["completion"],
+          thinking: { values: [false, true], default: false },
         }),
       );
     else {
       chats++;
+      receivedThinking = body.think;
       received = JSON.parse(body.messages[1].content);
       res.end(
         JSON.stringify({
           done: true,
           done_reason: "stop",
           message: {
+            thinking:
+              "Controlled internal trace excluded from the returned view",
             content: JSON.stringify({
               summary:
                 "Controlled fixture response, not a semantic quality assessment.",
@@ -153,6 +158,7 @@ export async function explanationObservationChecks(
       focusFunctionId: target().id,
       observationId: observed.id,
       timeoutSeconds: 300,
+      thinking: true,
     };
     await assert.rejects(
       c.assistant.generate(c.state.contextId, {
@@ -165,6 +171,24 @@ export async function explanationObservationChecks(
       0,
       "invalid deadlines are rejected before any model request",
     );
+    await assert.rejects(
+      c.assistant.generate(c.state.contextId, { ...payload, thinking: 1 }),
+    );
+    assert.equal(
+      requests,
+      0,
+      "malformed thinking settings are rejected without networking",
+    );
+    const options = await c.assistant.modelOptions(model.name);
+    assert.deepEqual(options.thinking, {
+      values: [false, true],
+      default: false,
+    });
+    await assert.rejects(
+      c.assistant.generate(c.state.contextId, { ...payload, thinking: "high" }),
+      /supported thinking settings/,
+    );
+    assert.equal(chats, 0, "unsupported choices never transmit source to chat");
     observed.items[0].value = "forged client result";
     const phases: string[] = [];
     const result = await c.assistant.generate(
@@ -195,6 +219,12 @@ export async function explanationObservationChecks(
     assert.equal(result.checks.length, 0);
     assert.equal(result.edits.length, 0);
     assert.equal(result.timeoutSeconds, 300);
+    assert.equal(receivedThinking, true);
+    assert.deepEqual(result.thinking, { requested: true, modelDefault: false });
+    assert.ok(!JSON.stringify(result).includes("Controlled internal trace"));
+    reports.push(
+      "Model thinking: native controller discovers supported settings, rejects malformed and unsupported choices before chat, forwards the explicit boolean and returns request metadata without the internal trace (controlled model response)",
+    );
     assert.equal(
       received!.source.before +
         received!.source.selectedFunction +
