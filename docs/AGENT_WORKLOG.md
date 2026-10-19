@@ -10,6 +10,7 @@
 - **증거 범위:** 핵심 전체 266개, 별도 값 전달 6개가 통과했다. 실제 VS Code 메시지 왕복, 개발/production 설치, 추출 패키지 결과는 [실행별 기록](evidence/local-ai/preview-values-verification.json)을 따른다. React 화면은 실제 worker를 사용하는 모의 VS Code 브라우저 harness에서 검증했다. API·모델 호출이나 임의 코드 실행을 추가하지 않았다. 전체 언어·원격 환경·성능 개선을 주장하지 않는다.
 - **작업 격리:** 동시 작업 중인 기본 checkout을 덮어쓰지 않도록 별도 managed worktree와 `codex/preview-value-preservation` 브랜치를 사용했다. 안정판/Pages는 변경하지 않는다.
 - **경계 후속:** 첫 제품 커밋 `eb82dec`를 공개한 뒤 문자열 노드를 디코더에서 두 번 세는 차이를 검토 중 발견했다. 인코더와 방문량을 통일하고 정확히 20,000노드 왕복·한 노드 초과 거절을 확인했다(값 전달 검사 6개 통과). 위 로컬 전체/설치 근거는 첫 커밋이며 후속 전체 CI와 구분한다.
+- **최종 기능 검증·공개:** `66a6781`의 [Windows·Ubuntu CI](evidence/local-ai/preview-values-ci.json)가 모두 성공했다. 각 핵심 266개·개발/production 설치 각 57개·파일 11개 해시·추출 도구 성공을 실제 로그에서 대조했다. [검토용 PR #1](https://github.com/him55710-sudo/pureobom/pull/1)에 격리 브랜치를 연결했다. 기본 checkout의 동시 작업·안정판·Pages는 그대로이며, 실제 사용자 과제 전체 성공을 의미하지 않는다.
 
 ## 2026-10-20 · 선택 원문 구분·CPU 옵션·실제 설명 오류 보존
 

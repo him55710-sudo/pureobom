@@ -1,0 +1,113 @@
+{
+  "commit": "66a67810ce666fee40066601d306d73fd488d52f",
+  "base": "f1f6b9342b952260c1a3283870d38977d613668d",
+  "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39313385881",
+  "collectedAt": "2026-10-19T19:49:23.771Z",
+  "scope": "Pull-request CI for the final runtime change, including equal encoder/decoder node budgets. Controlled local-model fixtures; private-project probes and human/browser UI checks are separate. No stable release or Pages deployment.",
+  "jobs": [
+    {
+      "id": 118268516835,
+      "name": "verify (ubuntu-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39313385881/job/118268516835",
+      "conclusion": "success",
+      "corePassed": 266,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 57,
+        "timestamp": "2026-10-19T19:46:50.215Z",
+        "checks": [
+          "Project scanning includes ordinary files beneath a hidden workspace root while excluding hidden files and folders inside it",
+          "Preview values: actual worker/controller and two-way VS Code webview JSON transport preserve NaN, infinities, negative-zero inputs/results and present undefined properties; ordinary strings stay distinct in trace, comparison and Markdown without source edits"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 57,
+        "timestamp": "2026-10-19T19:47:47.126Z",
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "72e121bff2dfce331b6eecc5bbbe2a5bec69172e26bfe2a1932d130d0382d2c8",
+        "verifiedFiles": {
+          "out/extension.cjs": "1542f80481d1f6678a8806a81b1cb2e9f8c7ed87d6f9f493c1d6a77b50dffe23",
+          "out/worker.cjs": "c2662995649a8a9c7e937b43e0b264fa89e2cf12a0dfc088f811c010b3348407",
+          "runtime/benchmark.py": "bb136c4c7bdd452aa7a75d216aa5998c41c98fc2cf9cfc089e2edae5ae80c6f9",
+          "runtime/python_source.py": "3b4ddd3535ee4bc0c578bc20463640d94b2f30ef74b463db6f7e1416a04f9ef1",
+          "runtime/go_source.go": "8c49ca4cd6b1e5fdc2b1eae3ea22b9a7c0bed7bb6a1ac0fabfcad7816d29c3ca",
+          "runtime/PureobomJavaSource.java": "6b3ef1aa18ad1b834c0e98ab6c4538d5ece40afd098bc9da6b0e0bb37fe4b9f4",
+          "runtime/PureobomCSharpSource.cs": "86d605f322f2331e864d55613bf0b43948c6dc424b364895c5d344e771d4fdf3",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "1a1cfa1c46ce554075b582a7a9079e4c6a2ed7da46256876a68a64936fa8eba9",
+          "media/view.css": "1d3e65a57ce3d4ce19ba943d1c674e35fbd658d0d29add849b4ca6fa30c804a3"
+        },
+        "extensionMode": "production"
+      },
+      "packaged": {
+        "rust": true,
+        "analysisAndPackage": true,
+        "measurement": true,
+        "python": true,
+        "go": true,
+        "java": true,
+        "csharp": true
+      },
+      "nonfatalHostDiagnostics": {
+        "authenticationProviderTimeout": true,
+        "mutexWarning": false,
+        "dbusConnectionError": true
+      }
+    },
+    {
+      "id": 118268517144,
+      "name": "verify (windows-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39313385881/job/118268517144",
+      "conclusion": "success",
+      "corePassed": 266,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 57,
+        "timestamp": "2026-10-19T19:47:21.968Z",
+        "checks": [
+          "Project scanning includes ordinary files beneath a hidden workspace root while excluding hidden files and folders inside it",
+          "Preview values: actual worker/controller and two-way VS Code webview JSON transport preserve NaN, infinities, negative-zero inputs/results and present undefined properties; ordinary strings stay distinct in trace, comparison and Markdown without source edits"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 57,
+        "timestamp": "2026-10-19T19:48:19.299Z",
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "1e1d788a79009f9a34e15dae8ade045587979e2e9d9b1c9f9512fc4414a1da0a",
+        "verifiedFiles": {
+          "out/extension.cjs": "1542f80481d1f6678a8806a81b1cb2e9f8c7ed87d6f9f493c1d6a77b50dffe23",
+          "out/worker.cjs": "c2662995649a8a9c7e937b43e0b264fa89e2cf12a0dfc088f811c010b3348407",
+          "runtime/benchmark.py": "dc403b72ad1a349071ab7a8543ce44563415e485d85111c9fc8764156b59660b",
+          "runtime/python_source.py": "1e972114a1cc94eb9260c9530955f49a96f473d322fe4209a58ec97d6e34d4cb",
+          "runtime/go_source.go": "a8e185b81d3aa62a9cbfafdec9d8a8926c9ead6bfe4533fe9038d0a7ad714824",
+          "runtime/PureobomJavaSource.java": "6d439b2668972bf3c32e1574ad714d63ed0c5444de5bef80448e72f19f5b7b10",
+          "runtime/PureobomCSharpSource.cs": "ed8a9bc9d9f081dbe5d61d260ea68a70d0403ee4b1469298a1a2a121e7f544ac",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "1a1cfa1c46ce554075b582a7a9079e4c6a2ed7da46256876a68a64936fa8eba9",
+          "media/view.css": "1d3e65a57ce3d4ce19ba943d1c674e35fbd658d0d29add849b4ca6fa30c804a3"
+        },
+        "extensionMode": "production"
+      },
+      "packaged": {
+        "rust": true,
+        "analysisAndPackage": true,
+        "measurement": true,
+        "python": true,
+        "go": true,
+        "java": true,
+        "csharp": true
+      },
+      "nonfatalHostDiagnostics": {
+        "authenticationProviderTimeout": true,
+        "mutexWarning": false,
+        "dbusConnectionError": false
+      }
+    }
+  ]
+}
