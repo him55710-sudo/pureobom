@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ko">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  /><title>실제 프로젝트 · Canvas 검증 기록</title
+  ><style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font:
+        14px/1.5 system-ui,
+        sans-serif;
+      margin: 0;
+      background: #f4f7f6;
+      color: #18302b;
+    }
+    main {
+      max-width: 1080px;
+      margin: 16px auto;
+      padding: 0 24px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+    }
+    h1 {
+      font-size: 24px;
+      letter-spacing: -0.5px;
+      margin: 4px 0 8px;
+    }
+    h2 {
+      font-size: 18px;
+      margin: 0 0 6px;
+    }
+    p {
+      margin: 7px 0;
+    }
+    small {
+      color: #587068;
+    }
+    .badge {
+      background: #fff0d4;
+      color: #734c00;
+      border: 1px solid #d8b46c;
+      border-radius: 20px;
+      padding: 8px 18px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .cards {
+      display: flex;
+      gap: 12px;
+      margin: 12px 0;
+    }
+    .card,
+    section {
+      background: white;
+      border: 1px solid #dbe5e0;
+      border-radius: 12px;
+      padding: 10px 18px;
+    }
+    .card {
+      flex: 1;
+    }
+    .card strong {
+      display: block;
+      font-size: 24px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      text-align: left;
+    }
+    th,
+    td {
+      padding: 4px 9px;
+      border-bottom: 1px solid #e5ebe8;
+    }
+    th {
+      color: #526b61;
+      font-size: 13px;
+    }
+    tbody tr:first-child,
+    tbody tr:nth-child(3),
+    tbody tr:nth-child(4) {
+      background: #fff8eb;
+    }
+    footer {
+      margin: 14px 0;
+      font-size: 13px;
+      color: #51665d;
+    }
+    a {
+      color: #246c55;
+    }
+    section p {
+      font-size: 14px;
+    }
+    @media (max-width: 700px) {
+      main {
+        padding: 12px;
+        margin: 0;
+      }
+      .cards {
+        display: block;
+      }
+      .card {
+        margin: 8px 0;
+      }
+      section {
+        overflow: auto;
+      }
+      header {
+        display: block;
+      }
+      .badge {
+        display: inline-block;
+      }
+    }
+  </style>
+  <main>
+    <header>
+      <div>
+        <small>PUREOBOM · 2026.10.20 · 익명 평가 요약</small>
+        <h1>실제 코드에서 확인한 결과</h1>
+        <p>
+          저장된 로컬 실험 보고서의 집계입니다. 실제 프로젝트 화면과 원문은
+          공개하지 않습니다.
+        </p>
+      </div>
+      <span class="badge">후보 채택 보류</span>
+    </header>
+    <div class="cards">
+      <div class="card"><strong>57개</strong>실행별 화면·상태 관찰 지점</div>
+      <div class="card">
+        <strong>2개 불일치</strong>기본 설정에서 픽셀 차이 재현
+      </div>
+      <div class="card">
+        <strong>원본 보존</strong>격리 후보만 평가 · 배포 변경 없음
+      </div>
+    </div>
+    <section>
+      <h2>첫 실패부터 모든 비교를 보존</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>시도</th>
+            <th>Canvas 조건</th>
+            <th>화면 너비</th>
+            <th>픽셀 불일치</th>
+            <th>DOM·크기 불일치</th>
+            <th>시간 측정 문맥</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>기본 · 최초</td>
+            <td>920px</td>
+            <td>2 / 57</td>
+            <td>0 / 57</td>
+            <td>픽셀 읽기 후</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>기본 · 같은 문맥 재실행</td>
+            <td>920px</td>
+            <td>0 / 57</td>
+            <td>0 / 57</td>
+            <td>픽셀 읽기 후</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>기본 · 새 문맥</td>
+            <td>920px</td>
+            <td>2 / 57</td>
+            <td>0 / 57</td>
+            <td>별도 새 문맥</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>기본 · 새 문맥</td>
+            <td>600px</td>
+            <td>2 / 57</td>
+            <td>0 / 57</td>
+            <td>별도 새 문맥</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>읽기 힌트 true</td>
+            <td>920px</td>
+            <td>0 / 57</td>
+            <td>0 / 57</td>
+            <td>별도 새 문맥</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>읽기 힌트 true</td>
+            <td>600px</td>
+            <td>0 / 57</td>
+            <td>0 / 57</td>
+            <td>별도 새 문맥</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>읽기 힌트 false</td>
+            <td>920px</td>
+            <td>0 / 57</td>
+            <td>0 / 57</td>
+            <td>별도 새 문맥</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>읽기 힌트 false</td>
+            <td>600px</td>
+            <td>0 / 57</td>
+            <td>0 / 57</td>
+            <td>별도 새 문맥</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        같은 57곳을 조건별로 반복했습니다. 독립된 456개 기능 검사로 합산하지
+        않습니다.
+      </p>
+    </section>
+    <footer>
+      <p>
+        <b>판정:</b> 조건에 따라 일치 여부가 달라 원인 확인 전에는 안전한
+        최적화로 채택하지 않습니다.
+      </p>
+      <p>
+        기존 테스트 8개 통과는 원본 기준선입니다. 이 테스트는 변경한 화면 경로를
+        직접 검증하지 않습니다.<br />호출 수는 표본당 3,025 → 23으로 줄었지만,
+        합성 반복 측정이며 앱 속도나 FPS 개선을 뜻하지 않습니다.<br />에이전트가
+        작성한 후보입니다. Ollama 생성·일반 언어 정확도·제삼자 독립 검증의
+        증거가 아닙니다.
+      </p>
+      <p>
+        <a href="canvas-evaluation.json">익명 표본 기록</a> ·
+        <a
+          href="https://github.com/him55710-sudo/pureobom/blob/codex/preview-value-preservation/docs/CANVAS_EVALUATION.md"
+          >방법·해석·남은 범위</a
+        >
+      </p>
+    </footer>
+  </main>
+</html>
