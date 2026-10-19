@@ -5,6 +5,7 @@
 ## 현재 상태
 
 - **계산 출처 이동 후속:** [다른 파일의 정확한 원본 줄 이동](TRACE_NAVIGATION.md)을 연결하고 최신 계산 식별자·원문 일치 확인을 추가했다. 핵심 부분 108개·개발/production 설치 부분 각 3개 통과와 전체 native 실패 2회·직접 UI 연결 실패를 [분리 기록](evidence/local-ai/trace-navigation.json)한다. 프로젝트 전체 검증이나 모델 품질 근거는 아니다.
+- **출처 이동 최종 검증:** 긴 경로 표시를 포함한 `13752f4`의 [Windows·Ubuntu CI](evidence/local-ai/trace-navigation-ci.json)는 각 핵심 304개·개발/production 설치 각 61개·설치 파일 11개 해시·패키지 검사를 통과했다. 위 로컬 전체 실패와 직접 UI 미확인을 해소했다고 하지 않는다.
 - **실제 대상 계산 후속:** [한도 있는 while·배열 콜백](BOUNDED_PREVIEW.md)으로 앞서 확인 불가였던 원래 대상 함수를 제품 worker에서 계산했다. 프로젝트 원래 assertion 3사례와 선정 11사례가 Node와 일치했고 소스를 보존했다. 앞선 미지원 기록은 당시 버전 근거로 유지한다. 전체 언어·모든 입력·모델 설명/수정·성능 최적화의 완료가 아니다.
 - **반복 계산 검증:** `5242fcc`의 [Windows·Ubuntu CI](evidence/local-ai/iteration-preview-ci.json)는 각 핵심 301개·개발/production 설치 각 58개를 통과했다. 로컬 전체 첫 timeout 및 해당 SDK 검사 재실행 17개 통과, 브라우저 연결 실패, 당시 남은 다른 파일 trace 이동 결함은 [상세 기록](BOUNDED_PREVIEW.md)에 분리했다. 이동 결함의 후속 수정은 위 별도 근거를 따른다.
 - **실제 결과 표시 보완:** [계산 값 보존](evidence/local-ai/preview-values.md)으로 JSON 전달 중 NaN/무한대/-0/undefined가 변하는 오류와 숨김 상위 폴더 아래 프로젝트의 소스 누락을 수정했다. 비공개 실제 코드의 지원 가능한 함수에서 선정한 입력 4개는 Node와 일치했지만 원래 요청 대상 함수의 미지원 구문·모델 설명 품질은 남아 있다. 프로젝트 전체 검증이나 최적화 성공은 아니다.

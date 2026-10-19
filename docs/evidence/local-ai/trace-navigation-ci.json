@@ -1,0 +1,115 @@
+{
+  "commit": "13752f4750f0f327beb58d3b95428bb42c26aa62",
+  "base": "f1f6b9342b952260c1a3283870d38977d613668d",
+  "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39319878487",
+  "collectedAt": "2026-10-19T20:37:20.135Z",
+  "scope": "Full Windows and Ubuntu CI for path-aware trace navigation, including the long-path style follow-up. Public fixtures and controlled model replies; not direct UI, actual model quality or whole private-project verification. Stable/Pages unchanged.",
+  "jobs": [
+    {
+      "id": 118290864629,
+      "name": "verify (windows-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39319878487/job/118290864629",
+      "conclusion": "success",
+      "corePassed": 304,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 61,
+        "timestamp": "2026-10-19T20:34:40.751Z",
+        "checks": [
+          "Trace source handles: unknown handles, stale contexts, superseded results and invalid indexes are rejected; clients cannot supply a navigation path",
+          "Trace source freshness: an unopened imported file changed on disk is rejected before showing a stale line, even without an editor change notification",
+          "Trace source navigation: actual worker/controller opens exact imported condition, loop, callback and return lines across files with duplicate basenames; returned-data mutation cannot redirect selection; source text stays unchanged"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 61,
+        "timestamp": "2026-10-19T20:35:51.270Z",
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "6b8f4a011597f9d949a61325645fc89cd808a8dc8c47af36c55e60177546653a",
+        "verifiedFiles": {
+          "out/extension.cjs": "5b52ed36b6963a1e4b81101abb78951c329f3f042bbc2bba8a0007bba0c2f99a",
+          "out/worker.cjs": "94eaa360014861331367bf4a103b420640d200bdf24fae51ffcece5c9ed04e5c",
+          "runtime/benchmark.py": "dc403b72ad1a349071ab7a8543ce44563415e485d85111c9fc8764156b59660b",
+          "runtime/python_source.py": "1e972114a1cc94eb9260c9530955f49a96f473d322fe4209a58ec97d6e34d4cb",
+          "runtime/go_source.go": "a8e185b81d3aa62a9cbfafdec9d8a8926c9ead6bfe4533fe9038d0a7ad714824",
+          "runtime/PureobomJavaSource.java": "6d439b2668972bf3c32e1574ad714d63ed0c5444de5bef80448e72f19f5b7b10",
+          "runtime/PureobomCSharpSource.cs": "ed8a9bc9d9f081dbe5d61d260ea68a70d0403ee4b1469298a1a2a121e7f544ac",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "41d9f8bbb83d557337f610137ef0de207df4634e06b46ddf6b8e86601a5af69f",
+          "media/view.css": "40a42296aa22f213072fe33a2a02f3df0ceda8f4da7cdcc1213d3fb5efe910ae"
+        },
+        "extensionMode": "production",
+        "checks": [
+          "Trace source handles: unknown handles, stale contexts, superseded results and invalid indexes are rejected; clients cannot supply a navigation path",
+          "Trace source freshness: an unopened imported file changed on disk is rejected before showing a stale line, even without an editor change notification",
+          "Trace source navigation: actual worker/controller opens exact imported condition, loop, callback and return lines across files with duplicate basenames; returned-data mutation cannot redirect selection; source text stays unchanged"
+        ]
+      },
+      "packaged": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    },
+    {
+      "id": 118290864663,
+      "name": "verify (ubuntu-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39319878487/job/118290864663",
+      "conclusion": "success",
+      "corePassed": 304,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 61,
+        "timestamp": "2026-10-19T20:33:24.981Z",
+        "checks": [
+          "Trace source handles: unknown handles, stale contexts, superseded results and invalid indexes are rejected; clients cannot supply a navigation path",
+          "Trace source freshness: an unopened imported file changed on disk is rejected before showing a stale line, even without an editor change notification",
+          "Trace source navigation: actual worker/controller opens exact imported condition, loop, callback and return lines across files with duplicate basenames; returned-data mutation cannot redirect selection; source text stays unchanged"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 61,
+        "timestamp": "2026-10-19T20:34:27.247Z",
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "5f6f03c2d3c1fae953790db8864907df996674bdc67dd6f671765cedc95d12b3",
+        "verifiedFiles": {
+          "out/extension.cjs": "5b52ed36b6963a1e4b81101abb78951c329f3f042bbc2bba8a0007bba0c2f99a",
+          "out/worker.cjs": "94eaa360014861331367bf4a103b420640d200bdf24fae51ffcece5c9ed04e5c",
+          "runtime/benchmark.py": "bb136c4c7bdd452aa7a75d216aa5998c41c98fc2cf9cfc089e2edae5ae80c6f9",
+          "runtime/python_source.py": "3b4ddd3535ee4bc0c578bc20463640d94b2f30ef74b463db6f7e1416a04f9ef1",
+          "runtime/go_source.go": "8c49ca4cd6b1e5fdc2b1eae3ea22b9a7c0bed7bb6a1ac0fabfcad7816d29c3ca",
+          "runtime/PureobomJavaSource.java": "6b3ef1aa18ad1b834c0e98ab6c4538d5ece40afd098bc9da6b0e0bb37fe4b9f4",
+          "runtime/PureobomCSharpSource.cs": "86d605f322f2331e864d55613bf0b43948c6dc424b364895c5d344e771d4fdf3",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "41d9f8bbb83d557337f610137ef0de207df4634e06b46ddf6b8e86601a5af69f",
+          "media/view.css": "40a42296aa22f213072fe33a2a02f3df0ceda8f4da7cdcc1213d3fb5efe910ae"
+        },
+        "extensionMode": "production",
+        "checks": [
+          "Trace source handles: unknown handles, stale contexts, superseded results and invalid indexes are rejected; clients cannot supply a navigation path",
+          "Trace source freshness: an unopened imported file changed on disk is rejected before showing a stale line, even without an editor change notification",
+          "Trace source navigation: actual worker/controller opens exact imported condition, loop, callback and return lines across files with duplicate basenames; returned-data mutation cannot redirect selection; source text stays unchanged"
+        ]
+      },
+      "packaged": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    }
+  ]
+}

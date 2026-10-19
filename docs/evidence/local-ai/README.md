@@ -2,6 +2,8 @@
 
 2026-10-20 계산 출처 후속: [파일별 원본 이동](../../TRACE_NAVIGATION.md), [핵심/실제 개발/새 설치 검증과 실패 이력](trace-navigation.json). 이전 반복 계산 버전의 다른 파일 줄 이동 결함을 수정했다. 공개 fixture로 검사했으며 비공개 프로젝트 전체 성공·모델 품질·성능 개선으로 세지 않는다.
 
+긴 경로 표시를 포함한 `13752f4`의 [Windows·Ubuntu 최종 CI](trace-navigation-ci.json)는 각 핵심 304개·개발/production 설치 각 61개·설치 파일 11개 해시·패키지 검사에 성공했다. 로컬 부분 실행/전체 실패와 직접 UI 미확인을 구분한다.
+
 2026-10-20 반복 계산 후속: [한도 있는 반복문·배열 콜백](../../BOUNDED_PREVIEW.md)으로 실제 사용자 코드의 원래 대상 함수가 계산된다. 원래 assertion 3사례와 선정 11사례가 Node와 일치했다. 이전 모델 실패와 전체 언어/연구 타당성은 별도다. [검사 실패를 포함한 실행 기록](iteration-preview.json).
 
 반복 계산 기능 커밋 `5242fcc`의 [Windows·Ubuntu CI](iteration-preview-ci.json): 각 핵심 301개·개발/production 설치 각 58개·설치 파일 11개 해시·추출 도구 성공. 로컬 시간 초과·UI 연결 실패와 남은 다른 파일 trace 이동 결함은 별도로 유지한다.

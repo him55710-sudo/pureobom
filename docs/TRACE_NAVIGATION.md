@@ -20,3 +20,5 @@ node scripts/preview-ui.mjs --trace
 ```
 
 부분 native 실행은 `scope: trace-source-only`와 별도 결과 파일을 사용한다. 기본 `pnpm extension:test`와 설치본 전체 검사에도 같은 검사가 포함된다. 실행별 성공/실패·버전은 [검증 기록](evidence/local-ai/trace-navigation.json)을 따른다. 이전 [반복 계산 CI](evidence/local-ai/iteration-preview-ci.json)는 이 수정 전 소스의 근거다.
+
+긴 경로 버튼 줄바꿈까지 포함한 최종 소스 `13752f4`의 [Windows·Ubuntu CI](https://github.com/him55710-sudo/pureobom/actions/runs/39319878487)는 각 **핵심 304개, 개발 확장 61개, production 설치본 61개**를 통과했다. 각 설치의 파일 11개 해시·패키지 검사와 새 이동 검사 3개의 포함 여부를 실제 로그에서 대조했다. [운영체제별 기록](evidence/local-ai/trace-navigation-ci.json). 로컬 전체 실패 2회와 직접 브라우저 UI 미확인은 별도 한계로 유지한다.

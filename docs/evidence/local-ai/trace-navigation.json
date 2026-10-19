@@ -2,7 +2,7 @@
   "collectedAt": "2026-10-19T20:28:24.172Z",
   "scope": "Path-aware, snapshot-checked trace navigation. Public authored fixtures only. Partial native results are not full-suite passes. No private source, model request, performance improvement or deployment claim.",
   "basedOn": "3b45c19096aacb81da0777d51a121f8aa4f891e0",
-  "runtimeCommit": null,
+  "runtimeCommit": "4544596f0435dbc98be703e28d34f260c86e30c2",
   "logs": [
     {
       "path": "test-results/trace-core.log",
@@ -111,6 +111,23 @@
     "correction": "Trace mode now allocates a free local port like other focused preview modes."
   },
   "ci": {
-    "status": "pending"
+    "status": "passed",
+    "commit": "13752f4750f0f327beb58d3b95428bb42c26aa62",
+    "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39319878487",
+    "evidence": "trace-navigation-ci.json",
+    "perOS": {
+      "core": 304,
+      "development": 61,
+      "installed": 61,
+      "installedFiles": 11
+    }
+  },
+  "followUp": {
+    "commit": "13752f4750f0f327beb58d3b95428bb42c26aa62",
+    "change": "Allow long source-path buttons to wrap within the extension panel.",
+    "build": "passed",
+    "log": "test-results/trace-path-wrap-build.log",
+    "sha256": "39c8dc8734fe470c4903267948412aabb9e83e95cde65998f526487107dc02e8",
+    "directUI": "not_verified"
   }
 }
