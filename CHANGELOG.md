@@ -6,6 +6,8 @@ Go addition in the 0.7 development source: [model-free syntax reading and exact 
 
 ## 0.7.0 — local AI development preview (unreleased)
 
+- Add [structured explanations](docs/STRUCTURED_EXPLANATIONS.md): separate actual input checks from caller requirements, require a response for every attached calculation example and link it to an existing exact source citation. Display host-calculated values beside model prose. Reject missing/duplicate examples and replacement value fields; coverage remains separate from semantic accuracy. Editing and optimization response formats are unchanged.
+
 - Show request-scoped local AI stages and label timeout/network failures with their stage. Keep the default three-minute generation limit and offer explicit five/ten-minute choices with host validation, matching UI deadlines and cancellation. A completed real-project 3B response still contradicted supplied observations; a 4B request timed out. Do not infer explanation correctness from exact citations or attached observations.
 
 - Add [optional calculation observations](docs/EXPLANATION_OBSERVATIONS.md) for selected JS/TS explanations. Calculate user examples without AI, preserve special values, and attach only current host-retained results. Reject mismatched function ranges and stale observations. Actual private-code observations match six native returns; one case is unavailable. Model-quality improvement remains unassessed after separate inference and preflight timeouts.

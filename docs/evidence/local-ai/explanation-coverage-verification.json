@@ -1,0 +1,48 @@
+{
+  "collectedAt": "2026-10-19T21:53:47.524Z",
+  "runtimeCommit": "49b1a2b34f311538503f2e190123041d35d92805",
+  "scope": "Structured explanation contract, complete example indexing and separation of host observations from model prose. Public authored fixtures; real-model semantic evaluation is recorded separately.",
+  "runtimeSourceSha256": {
+    "src/core/localAssistant.ts": "2e575d61eedebc17dd6a0e17a05c7e9178950823ece88bffb7385528abba6afe",
+    "extension/src/ollama.ts": "4507b2443fdf4984548ebabc20dde88f4b963b5cb0faf252ed5dd0a07e042a35",
+    "extension/ui/LocalAssistant.tsx": "fc95a0053e7564ada32b4f63bd89e0ecad1e43a00d0fde9f96fb25c2f555c066",
+    "extension/test/explanationObservations.ts": "b0b8a3e1234d7dc43a67f7e6169a5673a30bf29ef1a44e1000be43862d2ff2a2",
+    "tests/explanation-coverage.test.ts": "334d6a84ad427982f91cc2626906d33b652024709773d2d82de3b2c3a5131de3"
+  },
+  "local": [
+    {
+      "path": "test-results/explanation-coverage-core.log",
+      "sha256": "3f35927d6f78df4ca9f004f91a777c11790fb35e4b3ef789b0a2b238e6775f6b",
+      "result": "42 core checks passed in five files; six new coverage tests."
+    },
+    {
+      "path": "test-results/explanation-coverage-build.log",
+      "sha256": "632566c03aad06254554b6cf93f5ed854a96e9420c4c14a0fe8162c657d2b320",
+      "result": "Extension TypeScript and bundle build passed. The subsequent native-test-only assertions are covered by final runtime CI, not this earlier local bundle."
+    }
+  ],
+  "browser": {
+    "kind": "Actual built UI and worker; simulated editor/model and public source. No native editor screen or actual model inference.",
+    "checks": [
+      "Two independently calculated example inputs are paired with their corresponding model explanation and evidence button.",
+      "Input-check and caller-requirement prose is displayed in separate sections.",
+      "Korean and English views display the corresponding labels and prose.",
+      "Language change hides the previous-language response; input change clears old observations and explanation."
+    ],
+    "screenshots": [
+      {
+        "path": "explanation-coverage-ko.png",
+        "sha256": "9e5d741079b045edd879e106676076f018c070cd76646396b77aff028f13127d"
+      },
+      {
+        "path": "explanation-coverage-en.png",
+        "sha256": "b1461dc262911cbb4d6343c314af1f9394aa95553667d4e16b404df63caa57c0"
+      }
+    ],
+    "cleanup": "Temporary UI tab closed and owned harness stopped."
+  },
+  "verificationBoundary": "Contract validation rejects malformed or incomplete coverage. A structurally valid but factually incorrect sentence is deliberately shown to pass the parser in a test; source quote existence is not semantic entailment.",
+  "finalCI": "explanation-coverage-ci.json",
+  "realModels": "explanation-coverage-models.json",
+  "publication": "Draft development branch; no stable release or Pages deployment."
+}
