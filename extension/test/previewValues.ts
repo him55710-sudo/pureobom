@@ -89,7 +89,11 @@ export async function previewValueChecks(
       '{"ratio": NaN, "reciprocal": -Infinity, "absent": undefined, "literal": null, "text": "NaN", "zero": -0}',
     );
     assert.ok(
-      actual.simulation.trace[0].text.includes('"reciprocal": -Infinity'),
+      actual.simulation.trace.some(
+        (step) =>
+          step.text.startsWith("결과 / return:") &&
+          step.text.includes('"reciprocal": -Infinity'),
+      ),
     );
     assert.equal(displayValue(actual.comparison.rows[0].args), "[-0]");
     const md = scenarioMarkdown(actual.comparison, "en");

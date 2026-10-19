@@ -146,8 +146,12 @@ describe("calculation values across the JSON webview boundary", () => {
     expect(actual.value).toBe(-Infinity);
     expect(Object.is(actual.zero, -0)).toBe(true);
     expect(Object.hasOwn(actual, "missing")).toBe(true);
-    expect(result.trace[0].text).toContain('"value": -Infinity');
-    expect(result.trace[0].text).toContain('"missing": undefined');
+    const returns = result.trace.filter((step) =>
+      step.text.startsWith("결과 / return:"),
+    );
+    expect(returns).toHaveLength(1);
+    expect(returns[0].text).toContain('"value": -Infinity');
+    expect(returns[0].text).toContain('"missing": undefined');
   });
   it("keeps comparison status, displayed inputs/results and exported reports consistent", () => {
     const file = {
