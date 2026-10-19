@@ -17,7 +17,7 @@ export async function previewValueChecks(
 ) {
   const originalEditor = vscode.window.activeTextEditor;
   const source =
-    'export function values(input: number) { return { ratio: input/input, reciprocal: 1/input, absent: undefined, literal: null, text: "NaN", zero: input }; }';
+    'const includeGap = false; export function values(input: number) { return { ratio: input/input, reciprocal: 1/input, absent: undefined, literal: null, text: "NaN", zero: input }; } export function sparse() { return includeGap ? { rows: [,] } : { rows: [] }; }';
   const doc = await vscode.workspace.openTextDocument({
     language: "typescript",
     content: source,
@@ -36,6 +36,20 @@ export async function previewValueChecks(
     ) as { label: string; args: unknown[] }[];
     const simulation = await c.simulate(c.state.contextId, "values", "[-0]");
     const comparison = await c.compare(c.state.contextId, "values", input);
+    const sparseRule = c.state.analysis!.rules.find(
+      (rule) => rule.name === "includeGap",
+    );
+    assert.ok(sparseRule);
+    const sparsePatch = await c.prepare(c.state.contextId, {
+      ruleId: sparseRule.id,
+      value: "true",
+    });
+    const sparseComparison = await c.compare(
+      c.state.contextId,
+      "sparse",
+      [{ label: "array shape", args: [] }],
+      sparsePatch.id,
+    );
     assert.equal(simulation.ok, true);
     panel = vscode.window.createWebviewPanel(
       "pureobom.previewValueTest",
@@ -56,7 +70,11 @@ export async function previewValueChecks(
           if (data?.ready)
             void activePanel.webview
               .postMessage({
-                encoded: encodePreviewMessage({ simulation, comparison }),
+                encoded: encodePreviewMessage({
+                  simulation,
+                  comparison,
+                  sparseComparison,
+                }),
                 plain: simulation,
               })
               .then((sent) => {
@@ -78,6 +96,7 @@ export async function previewValueChecks(
     const actual = decodePreviewMessage(echoed.encoded) as {
       simulation: Simulation;
       comparison: ScenarioReport;
+      sparseComparison: ScenarioReport;
     };
     assert.equal(
       (echoed.plain.result as Record<string, unknown>).ratio,
@@ -102,6 +121,24 @@ export async function previewValueChecks(
     assert.equal(doc.getText(), source);
     reports.push(
       "Preview values: actual worker/controller and two-way VS Code webview JSON transport preserve NaN, infinities, negative-zero inputs/results and present undefined properties; ordinary strings stay distinct in trace, comparison and Markdown without source edits",
+    );
+    const sparse = actual.sparseComparison.rows[0];
+    assert.equal(sparse.status, "changed");
+    const beforeRows = (sparse.before.result as { rows: unknown[] }).rows;
+    const afterRows = (sparse.after!.result as { rows: unknown[] }).rows;
+    assert.equal(beforeRows.length, 0);
+    assert.equal(afterRows.length, 1);
+    assert.equal(Object.hasOwn(afterRows, 0), false);
+    for (const [lang, label] of [
+      ["en", "Changed"],
+      ["ko", "달라짐"],
+    ] as const)
+      assert.ok(
+        scenarioMarkdown(actual.sparseComparison, lang).includes(label),
+      );
+    assert.equal(doc.getText(), source);
+    reports.push(
+      "Sparse comparisons: a real prepared change from an empty nested array to one missing slot is marked changed across worker/controller and two-way webview transport; array length/presence and Korean/English exported status agree without applying the change",
     );
   } finally {
     panel?.dispose();

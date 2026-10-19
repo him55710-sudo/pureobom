@@ -7,7 +7,9 @@ import type { Scenario, ScenarioReport } from "./scenarioModel";
 function fingerprint(value: unknown): string {
   if (value === null) return "null";
   if (Array.isArray(value))
-    return `array:[${value.map(fingerprint).join(",")}]`;
+    return `array:[${Array.from({ length: value.length }, (_, index) =>
+      Object.hasOwn(value, index) ? fingerprint(value[index]) : "empty",
+    ).join(",")}]`;
   if (typeof value === "object")
     return `object:{${Object.entries(value)
       .sort(([a], [b]) => a.localeCompare(b))
