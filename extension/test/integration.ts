@@ -15,6 +15,7 @@ import { webSourceChecks } from "./webSource";
 import { sqlSourceChecks } from "./sqlSource";
 import { functionFormatChecks } from "./formatFunction";
 import { previewValueChecks } from "./previewValues";
+import { iterationPreviewChecks } from "./iterationPreview";
 const reports: string[] = [];
 async function until(
   check: () => boolean,
@@ -728,6 +729,7 @@ export async function run() {
   await sqlSourceChecks(c, ready, reports);
   await functionFormatChecks(c, ready, reports);
   await previewValueChecks(c, ready, reports);
+  await iterationPreviewChecks(c, ready, reports);
   await projectChecks(c, ready, reports);
   await benchmarkChecks(c, ready, reports);
   const report = {

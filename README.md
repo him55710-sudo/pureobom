@@ -102,7 +102,7 @@ This is an **early preview**, not an AI coding agent or a replacement for a deve
 | Languages | JS/TS/JSX/TSX and related extensions; JSON overview. Other imported text is preserved, not explained. |
 | Editing | Literals and comparison operators. No whole-feature generation or multi-file refactoring. |
 | Understanding | Syntax-grounded descriptions, a built-in name glossary and your local project terms; no inferred business intent. |
-| Comparison | Restricted AST interpretation of supported synchronous calculations. No arbitrary code execution, network, DOM, loops or external packages. |
+| Comparison | Restricted AST interpretation of supported synchronous calculations. The 0.7 development branch adds [bounded while loops, local updates and array callbacks](docs/BOUNDED_PREVIEW.md). No arbitrary code execution, network, DOM or external packages. Published 0.6 does not include the iteration addition. |
 | Verification | Syntax checks, limited static hints and VS Code-reported current-file diagnostics. No pre-apply type check, whole-project verification, application tests or security audit. |
 | File limits | Up to 300 imported text files, 512 KB/file and 8 MB total. Exports contain imported files only. |
 | Privacy | Analysis stays on-device. Normal hosted-demo asset requests still reach its host; browser workspaces persist in IndexedDB outside demo mode. |

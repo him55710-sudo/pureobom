@@ -6,6 +6,8 @@ Go addition in the 0.7 development source: [model-free syntax reading and exact 
 
 ## 0.7.0 — local AI development preview (unreleased)
 
+- Add [bounded while loops, local updates and interpreted array callbacks](docs/BOUNDED_PREVIEW.md) to JS/TS previews. Preserve lexical scope, evaluation order and sparse map positions; keep existing execution budgets and explicit unsupported results. The unchanged real-project target now matches Node for three original assertion cases and eleven separately selected inputs. This does not resolve prior model explanation failures or establish an optimization.
+
 - Preserve special calculation values and negative-zero inputs across VS Code JSON messages, result/trace displays and Markdown; distinguish real strings from numeric NaN/infinities. Add Korean/English explanations and scan projects beneath hidden ancestor folders without including hidden project content. [Evidence](docs/evidence/local-ai/preview-values.md) separates four matched actual-code inputs from the still-unavailable requested function and prior model failures.
 
 - Select an analyzed function from the reading view or local explanation panel. Resolve its range in the host, keep full-file context, require an exact source citation overlapping the function, and reject stale selections. Show Korean/English focus labels and distinguish input checks from caller preconditions in the prompt. [Actual-project attempts](docs/evidence/local-ai/focused-explanation.md) timed out; model explanation quality remains unverified. Use neutral default names for generic totals and amounts instead of implying payment-specific meaning.

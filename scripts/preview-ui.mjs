@@ -15,6 +15,7 @@ const { demo } = await import(
   `data:text/javascript;base64,${Buffer.from(demoBundle.outputFiles[0].text).toString("base64")}`
 );
 const values = process.argv.includes("--values");
+const iteration = process.argv.includes("--iteration");
 const transportBundle = await build({
   entryPoints: ["src/core/previewValues.ts"],
   bundle: true,
@@ -25,15 +26,23 @@ const { encodePreviewMessage, decodePreviewMessage, usesPreviewTransport } =
   await import(
     `data:text/javascript;base64,${Buffer.from(transportBundle.outputFiles[0].text).toString("base64")}`
   );
-const files = values
+const files = iteration
   ? [
       {
-        path: "values.ts",
+        path: "iteration.ts",
         content:
-          'export function calculate(input: number) { return { input, ratio: input / input, reciprocal: 1 / input, absent: undefined, literal: null, text: "NaN", negativeZero: -0, nested: [undefined, "[NaN]"] }; }\n',
+          "const scale=2; export function calculate(count:number){let i=0,total=0;while(i<count){i++;if(i===2)continue;total+=i;}const values=[total,count].map(x=>x*scale);return {values,last:values.at(-1)};}",
       },
     ]
-  : structuredClone(demo);
+  : values
+    ? [
+        {
+          path: "values.ts",
+          content:
+            'export function calculate(input: number) { return { input, ratio: input / input, reciprocal: 1 / input, absent: undefined, literal: null, text: "NaN", negativeZero: -0, nested: [undefined, "[NaN]"] }; }\n',
+        },
+      ]
+    : structuredClone(demo);
 const worker = new Worker(resolve("extension/out/worker.cjs"));
 let seq = 0,
   version = 1,
@@ -168,6 +177,6 @@ const server = createServer(async (req, res) => {
     res.end(String(e));
   }
 });
-server.listen(values ? 0 : 4175, "127.0.0.1", () =>
+server.listen(values || iteration ? 0 : 4175, "127.0.0.1", () =>
   console.log(`UX preview: http://127.0.0.1:${server.address().port}`),
 );
