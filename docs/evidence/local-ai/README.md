@@ -2,6 +2,8 @@
 
 2026-10-20 반복 계산 후속: [한도 있는 반복문·배열 콜백](../../BOUNDED_PREVIEW.md)으로 실제 사용자 코드의 원래 대상 함수가 계산된다. 원래 assertion 3사례와 선정 11사례가 Node와 일치했다. 이전 모델 실패와 전체 언어/연구 타당성은 별도다. [검사 실패를 포함한 실행 기록](iteration-preview.json).
 
+반복 계산 기능 커밋 `5242fcc`의 [Windows·Ubuntu CI](iteration-preview-ci.json): 각 핵심 301개·개발/production 설치 각 58개·설치 파일 11개 해시·추출 도구 성공. 로컬 시간 초과·UI 연결 실패와 남은 다른 파일 trace 이동 결함은 별도로 유지한다.
+
 2026-10-20 계산 표시 후속: [특수 값 보존·프로젝트 경로 수정·실제 코드 대조](preview-values.md). 변경하지 않은 비공개 코드의 지원 가능한 함수에서 선정한 입력 4개가 Node와 일치했다. 원래 요청 대상 함수는 계속 확인 불가다. 모델 평가·프로젝트 원래 테스트와 합산하지 않는다. [수정 전 공개 예제](preview-values-before.json), [실행별 실패·성공 기록](preview-values-verification.json), [한국어](preview-values-ko.jpg)/[영어](preview-values-en.jpg) 화면을 구분한다.
 
 값 전달 한도 보완까지 포함한 `66a6781`의 [Windows·Ubuntu CI](preview-values-ci.json): 각 핵심 266개·개발/설치 각 57개·production 모드·파일 11개 해시·추출 도구 성공. [격리 변경안 PR #1](https://github.com/him55710-sudo/pureobom/pull/1)에 공개했으며 안정판 배포나 실제 사용자 과제 완료로 처리하지 않는다.

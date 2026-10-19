@@ -5,6 +5,7 @@
 ## 현재 상태
 
 - **실제 대상 계산 후속:** [한도 있는 while·배열 콜백](BOUNDED_PREVIEW.md)으로 앞서 확인 불가였던 원래 대상 함수를 제품 worker에서 계산했다. 프로젝트 원래 assertion 3사례와 선정 11사례가 Node와 일치했고 소스를 보존했다. 앞선 미지원 기록은 당시 버전 근거로 유지한다. 전체 언어·모든 입력·모델 설명/수정·성능 최적화의 완료가 아니다.
+- **반복 계산 검증:** `5242fcc`의 [Windows·Ubuntu CI](evidence/local-ai/iteration-preview-ci.json)는 각 핵심 301개·개발/production 설치 각 58개를 통과했다. 로컬 전체 첫 timeout 및 해당 SDK 검사 재실행 17개 통과, 브라우저 연결 실패, 다른 파일 trace 줄 이동의 남은 결함은 [상세 기록](BOUNDED_PREVIEW.md)에 분리했다.
 - **실제 결과 표시 보완:** [계산 값 보존](evidence/local-ai/preview-values.md)으로 JSON 전달 중 NaN/무한대/-0/undefined가 변하는 오류와 숨김 상위 폴더 아래 프로젝트의 소스 누락을 수정했다. 비공개 실제 코드의 지원 가능한 함수에서 선정한 입력 4개는 Node와 일치했지만 원래 요청 대상 함수의 미지원 구문·모델 설명 품질은 남아 있다. 프로젝트 전체 검증이나 최적화 성공은 아니다.
 - **표시 보완 검증:** 기능 커밋 `66a6781`의 [Windows·Ubuntu CI](evidence/local-ai/preview-values-ci.json)는 각 핵심 266개, 개발/production 설치 각 57개와 추출 도구 검사를 통과했다. [PR #1](https://github.com/him55710-sudo/pureobom/pull/1)의 격리 변경안이며 기본 브랜치 반영·안정 릴리스 배포와 구분한다.
 - **0.7 개발 소스:** 로컬 Ollama 연결, 정확한 원문에 연결한 다중 범위 편집, native diff·적용·undo, 기존 프로젝트 명령 실행, 전후 시간·메모리 측정이 있다. 공개 안정판과 Pages 데모는 **0.6.0**이며 새 기능 배포와 구분한다.

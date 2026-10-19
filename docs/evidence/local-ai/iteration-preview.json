@@ -74,6 +74,28 @@
     "status": "not_run_locally"
   },
   "ci": {
-    "status": "pending"
-  }
+    "status": "passed",
+    "evidence": "iteration-preview-ci.json",
+    "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39316887882",
+    "perOs": {
+      "core": 301,
+      "development": 58,
+      "installed": 58
+    },
+    "installedFilesVerified": 11,
+    "scope": "Windows and Ubuntu. Later documentation commits are separate from this tested runtime commit."
+  },
+  "sdkRerun": {
+    "passed": 17,
+    "files": 2,
+    "sourceAndTimeoutChanges": false,
+    "logSha256": "0fbb9e2e4bbec79b5cf70266ccd64283c05632ce7e666b241f2e9d581bd12e7d",
+    "note": "Separate rerun of only the failed Java/C# files; original full-run failure preserved."
+  },
+  "runtimeCommit": "5242fcc38ef28b05b16c8d2330b6321df3207765",
+  "remainingKnownIssues": [
+    "Other-file trace line buttons currently target the active document; file-aware navigation needs a separate fix.",
+    "Direct browser UI verification did not complete.",
+    "Model explanation/edit quality, broader syntax/languages and optimization remain incomplete."
+  ]
 }
