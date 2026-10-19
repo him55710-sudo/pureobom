@@ -1,6 +1,7 @@
 import ts from "typescript";
 import { diagnostics, parse, resolveImport } from "./analyze";
 import type { Simulation, SourceFile, Trace } from "./types";
+import { displayValue, encodePreviewMessage } from "./previewValues";
 
 // A deliberately small interpreter. Uploaded code never reaches eval, Function, DOM or network APIs.
 export function simulate(
@@ -325,7 +326,7 @@ export function simulate(
         const value = s.expression ? expr(s.expression, sf, env) : undefined;
         trace.push({
           line,
-          text: `${sf.fileName} · 결과 / return: ${JSON.stringify(value)}`,
+          text: `${sf.fileName} · 결과 / return: ${displayValue(value)}`,
         });
         return { value };
       }
@@ -469,6 +470,8 @@ export function simulate(
   }
   try {
     const result = invoke(get(path), functionName, args);
+    // The same bounded value must be displayable by both worker and JSON UIs.
+    encodePreviewMessage(result);
     return { ok: true, result, trace };
   } catch (e) {
     return {

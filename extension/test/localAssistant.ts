@@ -374,7 +374,21 @@ export async function localAssistantChecks(
     );
     await ready();
     await assert.rejects(() => c.assistant.preview(stale.id, staleContext));
+    await vscode.window.showTextDocument(doc, {
+      viewColumn: vscode.ViewColumn.One,
+      preserveFocus: false,
+    });
+    await vscode.commands.executeCommand(
+      "workbench.action.focusActiveEditorGroup",
+    );
+    assert.equal(vscode.window.activeTextEditor?.document, doc);
     await vscode.commands.executeCommand("undo");
+    assert.equal(
+      doc.getText(),
+      source,
+      "restore the intervening fixture edit before cancellation",
+    );
+    await c.refresh();
     await ready();
     mode = "hold";
     chatSeen = false;

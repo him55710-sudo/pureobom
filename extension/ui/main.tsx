@@ -11,6 +11,8 @@ import { LocalAssistant } from "./LocalAssistant";
 import { ProjectChecks } from "./ProjectChecks";
 import type { ScenarioReport } from "../../src/core/scenarioModel";
 import type { Lang, Rule, Simulation, Words } from "../../src/core/types";
+import { displayValue } from "../../src/core/previewValues";
+import { PreviewValueHelp } from "../../src/components/PreviewValueHelp";
 import type { FormatSummary, PatchSummary, ViewState } from "../src/protocol";
 import { host, request } from "./bridge";
 import "./style.css";
@@ -770,9 +772,12 @@ function App() {
             <>
               <pre>
                 {simulation.ok
-                  ? (JSON.stringify(simulation.result, null, 2) ?? "undefined")
+                  ? displayValue(simulation.result)
                   : simulation.error}
               </pre>
+              {simulation.ok && (
+                <PreviewValueHelp values={[simulation.result]} lang={lang} />
+              )}
               <ol>
                 {simulation.trace.map((step, i) => (
                   <li key={i}>

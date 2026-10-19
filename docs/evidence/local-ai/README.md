@@ -1,5 +1,7 @@
 # 로컬 AI 검증 자료 · 2026-10-16
 
+2026-10-20 계산 표시 후속: [특수 값 보존·프로젝트 경로 수정·실제 코드 대조](preview-values.md). 변경하지 않은 비공개 코드의 지원 가능한 함수에서 선정한 입력 4개가 Node와 일치했다. 원래 요청 대상 함수는 계속 확인 불가다. 모델 평가·프로젝트 원래 테스트와 합산하지 않는다. [수정 전 공개 예제](preview-values-before.json), [실행별 실패·성공 기록](preview-values-verification.json), [한국어](preview-values-ko.jpg)/[영어](preview-values-en.jpg) 화면을 구분한다.
+
 2026-10-20 CPU 후속: [같은 실제 과제의 원문 구분·CPU 요청](focused-context-cpu.md). 세 번 완성 응답을 받았으나 인용 또는 의미 검토에서 모두 실패했다. 인용 통과와 설명 정확성을 분리한다. 한국어/영어 CPU 선택과 이전 결과 해제를 확인했으며, 기존 timeout과 포매터 성공은 그대로 보존한다.
 
 CPU 옵션 제품 커밋 `954d6cf`의 [Windows·Ubuntu CI](focused-context-cpu-ci.json): 각 핵심 **260개**, 개발/설치 각 **55개**, production 모드·파일 11개 해시·추출 도구 검사를 통과했다. 실제 사용자 코드의 모델 응답은 별도 평가이며 이 CI의 통과 수에 넣지 않는다.

@@ -6,7 +6,7 @@ import { resolve } from "node:path";
 const installed = process.argv.includes("--installed");
 const workspaces = resolve("test-results/extension-workspaces");
 await mkdir(workspaces, { recursive: true });
-const workspace = await mkdtemp(resolve(workspaces, "run-"));
+const workspace = await mkdtemp(resolve(workspaces, ".run-"));
 await writeFile(
   resolve(workspace, "tsconfig.json"),
   JSON.stringify({
@@ -25,6 +25,12 @@ await writeFile(
   `import { helper } from './helper';\nconst freeShippingThreshold = 50000;\nconst shippingFee = 3000;\nexport function calculateShipping(subtotal: number) {\n  if (subtotal < 0) throw new Error('negative');\n  if (subtotal >= freeShippingThreshold) return 0;\n  return shippingFee;\n}\n`,
 );
 await writeFile(resolve(workspace, "helper.ts"), "export const helper = 1;\n");
+await mkdir(resolve(workspace, ".private"));
+await writeFile(
+  resolve(workspace, ".private/hidden.ts"),
+  "export const hidden = 1;\n",
+);
+await writeFile(resolve(workspace, ".hidden.ts"), "export const hidden = 2;\n");
 await mkdir(resolve(workspace, ".vscode"), { recursive: true });
 await writeFile(
   resolve(workspace, ".vscode/tasks.json"),

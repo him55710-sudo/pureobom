@@ -1,7 +1,7 @@
 // Local browser harness for inspecting the real extension UI. VS Code operations
 // are simulated here; source analysis, patches and scenarios use the real worker.
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
+import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { Worker } from "node:worker_threads";
 import { resolve } from "node:path";
 import { build } from "esbuild";
@@ -14,7 +14,26 @@ const demoBundle = await build({
 const { demo } = await import(
   `data:text/javascript;base64,${Buffer.from(demoBundle.outputFiles[0].text).toString("base64")}`
 );
-const files = structuredClone(demo);
+const values = process.argv.includes("--values");
+const transportBundle = await build({
+  entryPoints: ["src/core/previewValues.ts"],
+  bundle: true,
+  format: "esm",
+  write: false,
+});
+const { encodePreviewMessage, decodePreviewMessage, usesPreviewTransport } =
+  await import(
+    `data:text/javascript;base64,${Buffer.from(transportBundle.outputFiles[0].text).toString("base64")}`
+  );
+const files = values
+  ? [
+      {
+        path: "values.ts",
+        content:
+          'export function calculate(input: number) { return { input, ratio: input / input, reciprocal: 1 / input, absent: undefined, literal: null, text: "NaN", negativeZero: -0, nested: [undefined, "[NaN]"] }; }\n',
+      },
+    ]
+  : structuredClone(demo);
 const worker = new Worker(resolve("extension/out/worker.cjs"));
 let seq = 0,
   version = 1,
@@ -48,6 +67,8 @@ async function state() {
   };
 }
 async function rpc(r) {
+  if (usesPreviewTransport(r.action))
+    r.payload = decodePreviewMessage(r.payload);
   let result, next;
   if (["ready", "refresh", "example", "scan"].includes(r.action))
     next = await state();
@@ -90,12 +111,23 @@ async function rpc(r) {
     });
   else if (r.action === "source" || r.action === "preview")
     result = { previewOnly: true };
-  else if (r.action === "projectTasks") result = [];
+  else if (r.action === "report" && values) {
+    await mkdir("test-results/preview-values-ui", { recursive: true });
+    await writeFile(
+      "test-results/preview-values-ui/report.md",
+      r.payload.content,
+    );
+  } else if (r.action === "projectTasks") result = [];
   else if (r.action === "localModels")
     result = { models: [], origin: "http://127.0.0.1:11434" };
   else
     throw Error("브라우저 UX 미리보기에서는 지원하지 않는 VS Code 작업입니다.");
-  return { result, state: next };
+  return {
+    result: usesPreviewTransport(r.action)
+      ? encodePreviewMessage(result)
+      : result,
+    state: next,
+  };
 }
 const page = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>풀어봄 · UX preview</title><link rel="stylesheet" href="/view.css"><style>
 html{--vscode-font-family: "Segoe UI", "Malgun Gothic", sans-serif;--vscode-font-size:13px;--vscode-editor-font-family:Consolas,monospace;--vscode-editor-background:#fcfcfa;--vscode-foreground:#253830;--vscode-descriptionForeground:#6e7972;--vscode-panel-border:#dce2dc;--vscode-sideBar-background:#f1f4ef;--vscode-textLink-foreground:#267460;--vscode-button-background:#267460;--vscode-button-foreground:white;--vscode-button-hoverBackground:#1e604e;--vscode-button-secondaryBackground:#ecf1eb;--vscode-button-secondaryForeground:#253830;--vscode-button-secondaryHoverBackground:#e4ebe3;--vscode-input-background:#fff;--vscode-input-foreground:#253830;--vscode-focusBorder:#267460;color-scheme:light}.preview-label{padding:7px 24px;font:10px system-ui;color:#6e7972;background:#edf1eb;border-bottom:1px solid #dce2dc}.app{max-width:1060px}
@@ -136,6 +168,6 @@ const server = createServer(async (req, res) => {
     res.end(String(e));
   }
 });
-server.listen(4175, "127.0.0.1", () =>
-  console.log("UX preview: http://127.0.0.1:4175"),
+server.listen(values ? 0 : 4175, "127.0.0.1", () =>
+  console.log(`UX preview: http://127.0.0.1:${server.address().port}`),
 );

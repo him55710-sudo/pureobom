@@ -14,6 +14,7 @@ import { rustSourceChecks } from "./rustSource";
 import { webSourceChecks } from "./webSource";
 import { sqlSourceChecks } from "./sqlSource";
 import { functionFormatChecks } from "./formatFunction";
+import { previewValueChecks } from "./previewValues";
 const reports: string[] = [];
 async function until(
   check: () => boolean,
@@ -149,6 +150,15 @@ export async function run() {
 
   await c.scan();
   await ready();
+  const scanned = c.state.project!.files.map((file) => file.path);
+  assert.ok(scanned.some((path) => path.endsWith("helper.ts")));
+  assert.equal(
+    scanned.some((path) => path.endsWith("hidden.ts")),
+    false,
+  );
+  reports.push(
+    "Project scanning includes ordinary files beneath a hidden workspace root while excluding hidden files and folders inside it",
+  );
   const rule = () =>
     c.state.analysis!.rules.find((r) => r.name === "freeShippingThreshold")!;
   const prepared = await c.prepare(c.state.contextId, {
@@ -182,6 +192,7 @@ export async function run() {
   assert.deepEqual(
     comparison.rows.map((r) => r.status),
     ["same", "changed", "same"],
+    JSON.stringify(comparison.rows),
   );
   assert.equal(comparison.rows[1].before.result, 0);
   assert.equal(comparison.rows[1].after?.result, 3000);
@@ -716,6 +727,7 @@ export async function run() {
   await webSourceChecks(c, ready, reports);
   await sqlSourceChecks(c, ready, reports);
   await functionFormatChecks(c, ready, reports);
+  await previewValueChecks(c, ready, reports);
   await projectChecks(c, ready, reports);
   await benchmarkChecks(c, ready, reports);
   const report = {

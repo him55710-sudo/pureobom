@@ -531,7 +531,16 @@ export class Controller implements vscode.Disposable {
     let total = 0,
       skipped = 0;
     for (const uri of uris.slice(0, 300)) {
-      if (/(?:^|\/)(?:\.[^/]+|package-lock\.json)(?:\/|$)/.test(uri.path)) {
+      const folder = vscode.workspace.getWorkspaceFolder(uri);
+      const localPath = folder
+        ? uri.path.slice(folder.uri.path.replace(/\/$/, "").length + 1)
+        : undefined;
+      // Only exclude hidden entries inside the selected project. A hidden
+      // ancestor (for example .codex/worktrees) is not project content.
+      if (
+        !localPath ||
+        /(?:^|\/)(?:\.[^/]+|package-lock\.json)(?:\/|$)/.test(localPath)
+      ) {
         skipped++;
         continue;
       }

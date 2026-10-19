@@ -124,6 +124,9 @@
 .scenario-results tr[data-status="changed"] {
   background: var(--vscode-diffEditor-insertedTextBackground, #eaf7ee);
 }
+.scenario-results td:first-child {
+  min-width: 6rem;
+}
 .scenario-status {
   font-size: 11px;
   white-space: nowrap;

@@ -1,0 +1,122 @@
+{
+  "collectedAt": "2026-10-19T19:39:36.005Z",
+  "branch": "codex/preview-value-preservation",
+  "sourceBase": "f1f6b93",
+  "version": "0.7.0 development; stable/Pages remain 0.6.0",
+  "scope": "Limited JS/TS interpreter, exact data value display/JSON transport and workspace scan. No new model calls, arbitrary source execution feature, performance claim, universal language support or release deployment.",
+  "core": {
+    "passed": 266,
+    "files": 28,
+    "logSha256": "8a052ece614cc40e0b4509ee443da6673451b18e1d5040803bc352b075548554"
+  },
+  "focusedFinal": {
+    "passed": 6,
+    "logSha256": "3b4168fc3b97f36182acbec4d17a5ce8c194e3cb3a25739207e5f69a0ef3bd54"
+  },
+  "failures": [
+    {
+      "exitCode": 1,
+      "reason": "Existing scenario comparison returned unavailable because scan excluded source beneath a hidden ancestor folder.",
+      "logSha256": "1ad93be8bf1652f443c02f3e73cce0931895c064c357d819acb03acb316e0f8b"
+    },
+    {
+      "exitCode": 1,
+      "reason": "Same failure; diagnostic confirmed unresolved local import after scan.",
+      "logSha256": "8acc8dba240d84b5d51b2e9d517ae93fc31777c6e49564764a9e46caba886cda"
+    },
+    {
+      "exitCode": 1,
+      "reason": "Scan fixed; existing Python fixture retained an intervening edit after undo. Fixture now explicitly focuses the editor and immediately asserts restoration.",
+      "logSha256": "e7f26c12c25ee124b3117e6b294fdf977eb5ca0208114ebda281caac4c07afd1"
+    }
+  ],
+  "development": {
+    "passed": 57,
+    "vscode": "1.96.4",
+    "timestamp": "2026-10-19T19:37:27.552Z",
+    "logSha256": "36f2cc1c3429091358136c5b61e06c184a27be0eeca18a7f36a6b2d69f746f2c",
+    "evidence": "preview-values-development-integration.json",
+    "note": "Followed by a UI-only change to collect help labels per result; production installation tests use that final UI build."
+  },
+  "installed": {
+    "passed": 57,
+    "vscode": "1.96.4",
+    "timestamp": "2026-10-19T19:39:24.426Z",
+    "kind": "installed-vsix",
+    "version": "0.7.0",
+    "vsixSha256": "adf7a9d2edbb3a76fd72c6e46f947adb7322c1106fbc2020f6d56a0be71af7c1",
+    "verifiedFiles": {
+      "out/extension.cjs": "f0fba262b17122a7fb1ac3106095cca449f6d8f5d58b562fecc22f87ef74f90f",
+      "out/worker.cjs": "c2662995649a8a9c7e937b43e0b264fa89e2cf12a0dfc088f811c010b3348407",
+      "runtime/benchmark.py": "dc403b72ad1a349071ab7a8543ce44563415e485d85111c9fc8764156b59660b",
+      "runtime/python_source.py": "1e972114a1cc94eb9260c9530955f49a96f473d322fe4209a58ec97d6e34d4cb",
+      "runtime/go_source.go": "a8e185b81d3aa62a9cbfafdec9d8a8926c9ead6bfe4533fe9038d0a7ad714824",
+      "runtime/PureobomJavaSource.java": "6d439b2668972bf3c32e1574ad714d63ed0c5444de5bef80448e72f19f5b7b10",
+      "runtime/PureobomCSharpSource.cs": "ed8a9bc9d9f081dbe5d61d260ea68a70d0403ee4b1469298a1a2a121e7f544ac",
+      "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+      "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+      "media/view.js": "eabbb9a1b02ffa8a026c0414624cb0c38fed19fbc9931f3aa0c7f360c1143786",
+      "media/view.css": "1d3e65a57ce3d4ce19ba943d1c674e35fbd658d0d29add849b4ca6fa30c804a3"
+    },
+    "extensionMode": "production",
+    "logSha256": "fca88576f84410455dea1e74b63ca8d99137b4e8eec7a0a2bb08f62800553f4b",
+    "evidence": "preview-values-installed-integration.json"
+  },
+  "builds": {
+    "web": {
+      "success": true,
+      "logSha256": "b9d232c12eb66a0876d4d369004e3fb471df2ae0110c5fdb1572a0789b610a45"
+    },
+    "extension": {
+      "success": true,
+      "logSha256": "4d17a165d14301972780b7ae826c9b9ff57070c2378957135eca5d9bae66ef94"
+    }
+  },
+  "ui": {
+    "harness": "Real built extension React UI and product worker; simulated VS Code editor/transport in a local browser.",
+    "languages": [
+      "ko",
+      "en"
+    ],
+    "screenshotFiles": [
+      "preview-values-ko.jpg",
+      "preview-values-en.jpg"
+    ],
+    "checks": [
+      "negative-zero scenario input",
+      "non-finite numbers and undefined distinct from null and ordinary strings",
+      "Korean scenario Markdown export",
+      "English advanced result and trace"
+    ],
+    "source": "Public values.ts fixture from scripts/preview-ui.mjs --values",
+    "finalLayout": "Input column minimum width verified after rebuild; later per-result help collection does not change these small-result screenshots."
+  },
+  "actualPrivateProject": {
+    "originalSourceUnchanged": true,
+    "supportedFunctionsCompared": 1,
+    "inputsSelectedByAgent": 4,
+    "matchingNodeAndProductWorkerResultsAfterJsonTransport": 4,
+    "projectAuthoredTests": false,
+    "originallyRequestedFunction": "unavailable: unsupported syntax",
+    "modelQuality": "not evaluated by this probe; earlier failures preserved",
+    "privateSourceInputsOutputsPublished": false
+  },
+  "hostDiagnostics": {
+    "mutexWarning": true,
+    "authenticationProviderTimeout": true,
+    "note": "Non-fatal host diagnostics on successful runs; not counted as product check failures."
+  },
+  "packageExtraction": {
+    "status": "passed",
+    "logSha256": "bd6e6979ddd5e0783ce9839265164ab22f49f54ffe7e7fbddb6c245c69ea3a97",
+    "tools": [
+      "Rust WASM",
+      "Python measurement worker",
+      "Python AST reader",
+      "Go AST reader",
+      "Java AST reader",
+      "C# Roslyn reader"
+    ],
+    "checksumsSourceManifestAssetsLicensesVsixAndWorker": true
+  }
+}

@@ -8,6 +8,8 @@ import type {
 } from "../core/types";
 import { request } from "../client";
 import { Icon } from "./Icon";
+import { displayValue } from "../core/previewValues";
+import { PreviewValueHelp } from "./PreviewValueHelp";
 export function Simulator({
   files,
   path,
@@ -76,21 +78,7 @@ export function Simulator({
       setBusy(false);
     }
   }
-  const output = (r: Simulation) =>
-    r.ok
-      ? r.result === undefined
-        ? "undefined"
-        : JSON.stringify(
-            r.result,
-            (_key, value) =>
-              typeof value === "number" && !Number.isFinite(value)
-                ? `[${String(value)}]`
-                : value === undefined
-                  ? "[undefined]"
-                  : value,
-            2,
-          )
-      : r.error;
+  const output = (r: Simulation) => (r.ok ? displayValue(r.result) : r.error);
   return (
     <div className="simulator">
       <div className="section-heading">
@@ -156,6 +144,12 @@ export function Simulator({
               </pre>
             </div>
           )}
+          <PreviewValueHelp
+            values={[result.before, result.after]
+              .filter((r) => r?.ok)
+              .map((r) => r!.result)}
+            lang={lang}
+          />
           <details>
             <summary>{ko ? "판단 과정 보기" : "View decision trace"}</summary>
             {(result.after || result.before).trace.map((t, i) => (

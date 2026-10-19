@@ -6,6 +6,8 @@ Go addition in the 0.7 development source: [model-free syntax reading and exact 
 
 ## 0.7.0 — local AI development preview (unreleased)
 
+- Preserve special calculation values and negative-zero inputs across VS Code JSON messages, result/trace displays and Markdown; distinguish real strings from numeric NaN/infinities. Add Korean/English explanations and scan projects beneath hidden ancestor folders without including hidden project content. [Evidence](docs/evidence/local-ai/preview-values.md) separates four matched actual-code inputs from the still-unavailable requested function and prior model failures.
+
 - Select an analyzed function from the reading view or local explanation panel. Resolve its range in the host, keep full-file context, require an exact source citation overlapping the function, and reject stale selections. Show Korean/English focus labels and distinguish input checks from caller preconditions in the prompt. [Actual-project attempts](docs/evidence/local-ai/focused-explanation.md) timed out; model explanation quality remains unverified. Use neutral default names for generic totals and amounts instead of implying payment-specific meaning.
 
 - Add [bundled Rust source reading and exact literal edits](docs/RUST_SOURCE.md) in desktop VS Code, without an API, model or Rust SDK. Preserve source positions, numeric suffixes and raw strings; show match arms and parser limits. Validate Rust AI proposals syntactically. Windows/Ubuntu development and installed flows pass. The original humantime tests pass 42 → fail 8 after a deliberate constant edit → pass 42 after native undo in a separate Windows run. Parser-level types, ownership, general compilation and optimization remain unchecked.

@@ -6,6 +6,11 @@ import { inputString, requestMessage } from "./protocol";
 import type { Scenario } from "../../src/core/scenarioModel";
 import { interfaceDemo } from "../../src/interfaceDemo";
 import { productResource } from "../../src/product";
+import {
+  decodePreviewMessage,
+  encodePreviewMessage,
+  usesPreviewTransport,
+} from "../../src/core/previewValues";
 
 export function activate(context: vscode.ExtensionContext) {
   const controller = new Controller(
@@ -70,7 +75,12 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         const r = requestMessage(raw);
         id = r.id;
-        const p = r.payload || {};
+        const decoded = usesPreviewTransport(r.action)
+          ? decodePreviewMessage(r.payload)
+          : r.payload || {};
+        if (!decoded || typeof decoded !== "object" || Array.isArray(decoded))
+          throw Error("Invalid request payload");
+        const p = decoded as Record<string, unknown>;
         let result: unknown;
         switch (r.action) {
           case "benchmarkPrepare":
@@ -252,7 +262,9 @@ export function activate(context: vscode.ExtensionContext) {
         await currentPanel.webview.postMessage({
           type: "response",
           id,
-          result,
+          result: usesPreviewTransport(r.action)
+            ? encodePreviewMessage(result)
+            : result,
         });
       } catch (e) {
         await currentPanel.webview.postMessage({

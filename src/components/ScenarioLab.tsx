@@ -8,6 +8,7 @@ import {
 } from "../core/scenarioModel";
 import { scenarioMarkdown, scenarioStatus } from "../core/report";
 import "./scenario.css";
+import { PreviewValueHelp } from "./PreviewValueHelp";
 
 type Props = {
   fn: FunctionInfo;
@@ -329,6 +330,14 @@ export function ScenarioLab({
               </tbody>
             </table>
           </div>
+          <PreviewValueHelp
+            values={result.rows.flatMap((row) =>
+              [row.before, row.after]
+                .filter((r) => r?.ok)
+                .map((r) => r!.result),
+            )}
+            lang={lang}
+          />
           <button
             type="button"
             className="scenario-export"
