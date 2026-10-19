@@ -1,0 +1,115 @@
+{
+  "commit": "fd9d0b279209171dccd420e48485f414a7123a78",
+  "base": "51cfdc8232297d0a3d895b9e51f6c54076371995",
+  "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39327719861",
+  "collectedAt": "2026-10-19T21:35:34.982Z",
+  "scope": "Full Windows and Ubuntu CI for actual request phases and user-selected local response deadlines. Public authored fixtures and controlled model responses; real-model semantic quality, private-project correctness and performance improvements are separate evaluations. Stable release and Pages remain unchanged.",
+  "jobs": [
+    {
+      "id": 118317754143,
+      "name": "verify (windows-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39327719861/job/118317754143",
+      "conclusion": "success",
+      "corePassed": 318,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 64,
+        "timestamp": "2026-10-19T21:32:45.875Z",
+        "checks": [
+          "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+          "Explanation observations: host-retained results, progress phases and a selected time limit reach the actual local-model client and returned view; invalid limits and fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+          "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 64,
+        "timestamp": "2026-10-19T21:34:10.457Z",
+        "checks": [
+          "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+          "Explanation observations: host-retained results, progress phases and a selected time limit reach the actual local-model client and returned view; invalid limits and fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+          "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+        ],
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "810ad1101d90ad6c795863b9d22e036f3f99c0fa57e1cf545904db4467517db1",
+        "verifiedFiles": {
+          "out/extension.cjs": "ba6ebd59f72a867fe4734159535654c36645f953a92050029ee53248083a5aaf",
+          "out/worker.cjs": "93cd569975d9ac251db261f2b0c9ea125163555489002c9a715ed8ec2c95fbfc",
+          "runtime/benchmark.py": "dc403b72ad1a349071ab7a8543ce44563415e485d85111c9fc8764156b59660b",
+          "runtime/python_source.py": "1e972114a1cc94eb9260c9530955f49a96f473d322fe4209a58ec97d6e34d4cb",
+          "runtime/go_source.go": "a8e185b81d3aa62a9cbfafdec9d8a8926c9ead6bfe4533fe9038d0a7ad714824",
+          "runtime/PureobomJavaSource.java": "6d439b2668972bf3c32e1574ad714d63ed0c5444de5bef80448e72f19f5b7b10",
+          "runtime/PureobomCSharpSource.cs": "ed8a9bc9d9f081dbe5d61d260ea68a70d0403ee4b1469298a1a2a121e7f544ac",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "d99ec5d40c6e4cb4951cbca1c18dac7e3b08ba1400a0d941788a2b7c7b9df997",
+          "media/view.css": "40a42296aa22f213072fe33a2a02f3df0ceda8f4da7cdcc1213d3fb5efe910ae"
+        },
+        "extensionMode": "production"
+      },
+      "packageChecks": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    },
+    {
+      "id": 118317754564,
+      "name": "verify (ubuntu-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39327719861/job/118317754564",
+      "conclusion": "success",
+      "corePassed": 318,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 64,
+        "timestamp": "2026-10-19T21:30:53.156Z",
+        "checks": [
+          "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+          "Explanation observations: host-retained results, progress phases and a selected time limit reach the actual local-model client and returned view; invalid limits and fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+          "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 64,
+        "timestamp": "2026-10-19T21:31:45.879Z",
+        "checks": [
+          "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+          "Explanation observations: host-retained results, progress phases and a selected time limit reach the actual local-model client and returned view; invalid limits and fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+          "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+        ],
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "4c75ef5edb8191dd2a924f42237db3e4ff83ae04c5ff67dd202a064c357e80e6",
+        "verifiedFiles": {
+          "out/extension.cjs": "ba6ebd59f72a867fe4734159535654c36645f953a92050029ee53248083a5aaf",
+          "out/worker.cjs": "93cd569975d9ac251db261f2b0c9ea125163555489002c9a715ed8ec2c95fbfc",
+          "runtime/benchmark.py": "bb136c4c7bdd452aa7a75d216aa5998c41c98fc2cf9cfc089e2edae5ae80c6f9",
+          "runtime/python_source.py": "3b4ddd3535ee4bc0c578bc20463640d94b2f30ef74b463db6f7e1416a04f9ef1",
+          "runtime/go_source.go": "8c49ca4cd6b1e5fdc2b1eae3ea22b9a7c0bed7bb6a1ac0fabfcad7816d29c3ca",
+          "runtime/PureobomJavaSource.java": "6b3ef1aa18ad1b834c0e98ab6c4538d5ece40afd098bc9da6b0e0bb37fe4b9f4",
+          "runtime/PureobomCSharpSource.cs": "86d605f322f2331e864d55613bf0b43948c6dc424b364895c5d344e771d4fdf3",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "d99ec5d40c6e4cb4951cbca1c18dac7e3b08ba1400a0d941788a2b7c7b9df997",
+          "media/view.css": "40a42296aa22f213072fe33a2a02f3df0ceda8f4da7cdcc1213d3fb5efe910ae"
+        },
+        "extensionMode": "production"
+      },
+      "packageChecks": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    }
+  ]
+}

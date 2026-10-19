@@ -1,5 +1,5 @@
 {
-  "collectedAt": "2026-10-19T21:19:30.504Z",
+  "collectedAt": "2026-10-19T21:37:06.334Z",
   "scope": "Same private project, unchanged original source, original question and seven previously selected calculation observations. No private identifiers, source, concrete inputs/results or raw model responses included.",
   "attempts": [
     {
@@ -115,9 +115,156 @@
           "elapsedMs": 180008
         }
       ]
+    },
+    {
+      "model": "qwen3.5:4b",
+      "sourceUnchanged": true,
+      "observationsPrepared": true,
+      "nativeReturnedMatches": 6,
+      "nativeExceptionProductUnavailable": 1,
+      "processor": "cpu",
+      "outcome": "semantic-failed",
+      "clientElapsedMs": 242387,
+      "contextSize": 16384,
+      "outputTokenLimit": 4096,
+      "timeoutMs": 300000,
+      "exactCitationCount": 4,
+      "semanticReview": {
+        "kind": "Agent review against unchanged source and native observations; not an independent third-party evaluation.",
+        "findings": [
+          "The summary incorrectly attributes the empty-input failure to division and a numeric return; source access fails earlier.",
+          "It invents coordinate roles for data indexes and describes a single coordinate despite returning three components.",
+          "It conflates an empty collection with any collection shorter than two elements.",
+          "Singleton behavior and the supplied successful duplicate-position case are not explained adequately.",
+          "An out-of-range input is unnecessarily treated as a caller requirement even though the function clamps it.",
+          "Exact source citations pass, but the requested separation of actual input validation and caller preconditions remains inadequate."
+        ]
+      },
+      "stages": [
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 14
+        },
+        {
+          "route": "/api/tags",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 77
+        },
+        {
+          "route": "/api/show",
+          "timeoutMs": 10000,
+          "outcome": "received",
+          "elapsedMs": 213
+        },
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 2
+        },
+        {
+          "route": "/api/chat",
+          "timeoutMs": 300000,
+          "outcome": "received",
+          "elapsedMs": 242386
+        }
+      ],
+      "server": {
+        "done": true,
+        "doneReason": "stop",
+        "promptTokens": 2008,
+        "outputTokens": 696,
+        "totalDurationNs": 242378414900
+      },
+      "sameChatBodyAsDefaultDeadline": true
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "sourceUnchanged": true,
+      "observationsPrepared": true,
+      "nativeReturnedMatches": 6,
+      "nativeExceptionProductUnavailable": 1,
+      "processor": "cpu",
+      "outcome": "semantic-failed",
+      "clientElapsedMs": 314736,
+      "contextSize": 16384,
+      "outputTokenLimit": 4096,
+      "timeoutMs": 600000,
+      "exactCitationCount": 3,
+      "semanticReview": {
+        "kind": "Agent review against unchanged source and native observations; not an independent third-party evaluation.",
+        "findings": [
+          "The main interpolation behavior and out-of-range handling are described correctly for the supplied valid observations.",
+          "The summary groups empty input with possible unexpected returned results, without identifying the earlier property-access exception demonstrated by native execution.",
+          "The explicitly requested singleton behavior is omitted despite its supplied observation.",
+          "Duplicate-position behavior is left as a vague warning instead of distinguishing the supplied contrasting cases and the selected interval condition.",
+          "Actual runtime input checks and caller preconditions are not explicitly separated; the ordering precondition is omitted.",
+          "Source citations pass, but requested boundary-case coverage does not. The answer also adds future checks despite the explanation-only instruction."
+        ]
+      },
+      "stages": [
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 9
+        },
+        {
+          "route": "/api/tags",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 57
+        },
+        {
+          "route": "/api/show",
+          "timeoutMs": 10000,
+          "outcome": "received",
+          "elapsedMs": 124
+        },
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 2
+        },
+        {
+          "route": "/api/chat",
+          "timeoutMs": 600000,
+          "outcome": "received",
+          "elapsedMs": 314734
+        }
+      ],
+      "server": {
+        "done": true,
+        "doneReason": "stop",
+        "promptTokens": 2024,
+        "outputTokens": 482,
+        "totalDurationNs": 314721296000
+      },
+      "startedAt": "2026-10-19T21:29:54.250Z"
     }
   ],
-  "conclusion": "Calculation observations do not ensure the model uses them correctly. One completed answer contradicts observations; the other times out. No model-quality improvement or optimization established.",
-  "execution": "Own cloud-disabled loopback CPU server; existing models, no paid API, no downloads, no alteration of other Ollama servers.",
-  "implementation": "3B used committed observation runtime 7a6e368 / documentation HEAD 51cfdc8. 4B used the same prompt and limits plus uncommitted request-phase diagnostics; no prompt change."
+  "conclusion": "Four requests on one unchanged source/question/observation set: three completed answers fail the requested semantic coverage review; one default-deadline request timed out. The 7B answer describes the main behavior and range handling correctly but omits required edge cases. Exact citations and more waiting time do not establish task success. No general model-quality improvement or optimization established.",
+  "execution": "Own cloud-disabled loopback CPU server; existing models, no paid API, no downloads, no alteration of other Ollama servers. Evaluation requests have ended and both owned server process trees were terminated after fresh executable-path checks.",
+  "implementation": "3B used committed observation runtime 7a6e368 / documentation HEAD 51cfdc8. 4B used the same prompt and limits plus uncommitted request-phase diagnostics; no prompt change. Extended deadline requests use the selectable-deadline implementation committed as fd9d0b2 (the 300-second run started before that commit).",
+  "reviewProtocol": {
+    "kind": "Agent review, not independent third-party evaluation or a statistical accuracy benchmark.",
+    "reference": "Unchanged original source, a fixed evaluation question and seven previously selected observations checked against direct native execution.",
+    "criteria": [
+      "Explain the selected function purpose and returned data without inventing domain roles.",
+      "Distinguish source-performed input validation from unchecked caller requirements.",
+      "Answer the requested boundary cases and separate returned results from exceptions.",
+      "Respect explanation-only scope; exact source citations are a separate automated gate."
+    ],
+    "counts": {
+      "requests": 4,
+      "completed": 3,
+      "generationTimeouts": 1,
+      "completedMeetingRequestedTask": 0
+    },
+    "limitations": "One function and one Korean question with reused cases. Model sizes, cache state and elapsed time are not a controlled speed comparison. No whole-project, other-language or scientific-validity inference."
+  }
 }
