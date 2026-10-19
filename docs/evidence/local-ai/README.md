@@ -2,6 +2,8 @@
 
 2026-10-20 설명 근거 후속: [사용자 예시를 AI 없이 계산하고 설명에 첨부](../../EXPLANATION_OBSERVATIONS.md), [부분 개발/설치 검사·실제 코드 대조·모델 실패 기록](explanation-observations.json). 실제 코드 반환 6개 일치와 확인 불가 1개를 모델 품질이나 기존 프로젝트 테스트 성공으로 합산하지 않는다. 한국어/영어 UI는 공개 fixture이며 비공개 소스를 포함하지 않는다.
 
+기능 소스 `7a6e368`의 [Windows·Ubuntu CI](explanation-observations-ci.json)는 각 핵심 312개·개발/production 설치 각 64개·설치 파일 11개 해시·패키지 검사에 성공했다. 부분 실행·실제 모델 실패·직접 브라우저 조작 근거는 따로 유지한다.
+
 2026-10-20 계산 출처 후속: [파일별 원본 이동](../../TRACE_NAVIGATION.md), [핵심/실제 개발/새 설치 검증과 실패 이력](trace-navigation.json). 이전 반복 계산 버전의 다른 파일 줄 이동 결함을 수정했다. 공개 fixture로 검사했으며 비공개 프로젝트 전체 성공·모델 품질·성능 개선으로 세지 않는다.
 
 긴 경로 표시를 포함한 `13752f4`의 [Windows·Ubuntu 최종 CI](trace-navigation-ci.json)는 각 핵심 304개·개발/production 설치 각 61개·설치 파일 11개 해시·패키지 검사에 성공했다. 로컬 부분 실행/전체 실패와 직접 UI 미확인을 구분한다.

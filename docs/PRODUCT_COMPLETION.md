@@ -5,6 +5,7 @@
 ## 현재 상태
 
 - **설명 근거 보강:** [AI 없는 예시 계산과 선택적 첨부](EXPLANATION_OBSERVATIONS.md)를 추가했다. 실제 사용자 코드의 선정 입력은 반환 6개가 Node와 일치, 1개는 확인 불가였으며 원문은 보존했다. 공개 fixture로 핵심 부분 68개·실제 개발/설치 부분 각 3개와 한/영 브라우저 UI를 검증했다. 7B 생성 timeout과 3B 연결 확인 timeout으로 모델 설명 개선은 미평가다. [실행 기록](evidence/local-ai/explanation-observations.json).
+- **예시 첨부 최종 검증:** `7a6e368`의 [Windows·Ubuntu CI](evidence/local-ai/explanation-observations-ci.json)는 각 핵심 312개·개발/production 설치 각 64개·설치 파일 11개 해시·패키지 검사를 통과했다. 실제 모델 품질이나 모든 언어의 계산 지원을 증명하지 않는다.
 
 - **계산 출처 이동 후속:** [다른 파일의 정확한 원본 줄 이동](TRACE_NAVIGATION.md)을 연결하고 최신 계산 식별자·원문 일치 확인을 추가했다. 핵심 부분 108개·개발/production 설치 부분 각 3개 통과와 전체 native 실패 2회·직접 UI 연결 실패를 [분리 기록](evidence/local-ai/trace-navigation.json)한다. 프로젝트 전체 검증이나 모델 품질 근거는 아니다.
 - **출처 이동 최종 검증:** 긴 경로 표시를 포함한 `13752f4`의 [Windows·Ubuntu CI](evidence/local-ai/trace-navigation-ci.json)는 각 핵심 304개·개발/production 설치 각 61개·설치 파일 11개 해시·패키지 검사를 통과했다. 위 로컬 전체 실패와 직접 UI 미확인을 해소했다고 하지 않는다.

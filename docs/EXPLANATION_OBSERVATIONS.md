@@ -29,6 +29,8 @@ JS/JSX/TS/TSX의 [지원되는 계산 구문](BOUNDED_PREVIEW.md)에 한한다. 
 
 핵심 부분 검사 68개(새 검사 8개 포함), 웹·확장 빌드, 실제 VS Code 개발 호스트와 새 production 설치본의 부분 검사 각 3개가 통과했다. 설치 파일 11개 해시를 확인했다. 공개 고정 코드와 제어된 HTTP 모델 응답으로 전달·변조 거절·오래된 근거 차단을 검사한 결과이며 실제 모델 품질과 구분한다. [실행별 원자료](evidence/local-ai/explanation-observations.json).
 
+최종 기능 소스 `7a6e368`의 [Windows·Ubuntu CI](https://github.com/him55710-sudo/pureobom/actions/runs/39323929101)는 각 **핵심 312개·개발 확장 64개·production 설치본 64개**를 통과했다. 실제 로그에서 새 예시 검사 3개의 포함 여부, 설치 파일 11개 해시와 패키지 검사 7개를 대조했다. [운영체제별 기록](evidence/local-ai/explanation-observations-ci.json). 로컬 부분 검사나 모델 실패를 이 결과로 대체하지 않는다.
+
 브라우저에서는 실제 빌드 UI/worker와 공개 예제, 모의 편집기·모델 응답을 사용했다. 모델 연결 전 계산, 입력 변경 시 결과 해제, 한국어/영어 안내, 첨부 표시와 다른 함수 선택 시 이전 결과 해제를 조작해 확인했다. native VS Code 화면 클릭 검증으로 바꾸어 부르지 않는다.
 
 ![공개 예제의 한국어 계산 화면](evidence/local-ai/observations-ko.png)

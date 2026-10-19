@@ -144,10 +144,23 @@
     ],
     "nativeScreenClickVerification": false,
     "realModelInference": false,
-    "screenshots": ["observations-ko.png", "observations-en.png"]
+    "screenshots": [
+      "observations-ko.png",
+      "observations-en.png"
+    ]
   },
   "ci": {
-    "status": "not_run_yet",
-    "scope": "Full CI will be recorded separately against the final commit."
-  }
+    "status": "passed",
+    "commit": "7a6e36818b753be88f41c39caa005664b7a990e4",
+    "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39323929101",
+    "evidence": "explanation-observations-ci.json",
+    "perOS": {
+      "core": 312,
+      "development": 64,
+      "installed": 64,
+      "installedFiles": 11,
+      "packageChecks": 7
+    }
+  },
+  "runtimeCommit": "7a6e36818b753be88f41c39caa005664b7a990e4"
 }
