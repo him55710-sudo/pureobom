@@ -11,6 +11,12 @@
 .local-assistant label {
   margin-top: 16px;
 }
+.local-assistant label > .muted {
+  display: block;
+  margin-top: 6px;
+  font-weight: normal;
+  line-height: 1.5;
+}
 .local-assistant p,
 .local-assistant li {
   overflow-wrap: anywhere;
