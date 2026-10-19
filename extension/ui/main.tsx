@@ -789,7 +789,7 @@ function App() {
                     {step.text}{" "}
                     {step.path && (
                       <button
-                        className="line-link"
+                        className="line-link trace-source-link"
                         disabled={disabled}
                         aria-label={`${t("원본 코드 보기", "View source")}: ${step.path}, ${t("줄", "line")} ${step.line}`}
                         onClick={() =>
