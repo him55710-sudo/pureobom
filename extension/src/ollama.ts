@@ -1,5 +1,10 @@
 import { request as httpRequest } from "node:http";
 import {
+  localAIPhases,
+  type LocalAIPhase,
+  type LocalAIProgress,
+} from "../../src/core/localAIProgress";
+import {
   assistantMessages,
   assistantContextSize,
   assistantLimits,
@@ -21,6 +26,26 @@ const localName = (s: unknown): s is string =>
   /^[a-zA-Z0-9][a-zA-Z0-9._:/-]*$/.test(s) &&
   !/cloud|https?:|@/i.test(s);
 
+const routePhases = {
+  "/api/status": "connection",
+  "/api/tags": "models",
+  "/api/show": "model",
+  "/api/chat": "generation",
+} as const;
+
+export class OllamaRequestError extends Error {
+  constructor(
+    readonly phase: LocalAIPhase,
+    readonly reason: "timeout" | "request",
+    detail: string,
+    readonly timeoutMs?: number,
+  ) {
+    const label = localAIPhases[phase];
+    super(`${label.ko} / ${label.en}: ${detail}`);
+    this.name = "OllamaRequestError";
+  }
+}
+
 /** Node's direct HTTP client: fixed numeric loopback, no proxy discovery or redirects. */
 export class OllamaClient {
   readonly origin: string;
@@ -31,6 +56,8 @@ export class OllamaClient {
   ) {
     if (!Number.isInteger(port) || port < 1024 || port > 65535)
       throw Error("Invalid local Ollama port");
+    if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 600000)
+      throw Error("Invalid local Ollama time limit");
     if (!["auto", "cpu"].includes(processor))
       throw Error(
         "연산 장치를 다시 선택하세요. / Select a valid inference processor.",
@@ -38,14 +65,27 @@ export class OllamaClient {
     this.origin = `http://127.0.0.1:${port}`;
   }
   private json(
-    route: string,
+    route: keyof typeof routePhases,
     body: unknown,
     signal?: AbortSignal,
     timeout = this.timeoutMs,
+    onProgress?: LocalAIProgress,
   ): Promise<Record<string, any>> {
     return new Promise((resolve, reject) => {
       if (signal?.aborted) {
         reject(Error("요청을 취소했습니다. / Request cancelled."));
+        return;
+      }
+      const phase = routePhases[route];
+      onProgress?.(phase);
+      if (signal?.aborted) {
+        reject(
+          new OllamaRequestError(
+            phase,
+            "request",
+            "요청을 취소했습니다. / Request cancelled.",
+          ),
+        );
         return;
       }
       let settled = false;
@@ -56,7 +96,13 @@ export class OllamaClient {
         settled = true;
         clearTimeout(timer);
         signal?.removeEventListener("abort", cancel);
-        error ? reject(error) : resolve(value!);
+        error
+          ? reject(
+              error instanceof OllamaRequestError
+                ? error
+                : new OllamaRequestError(phase, "request", error.message),
+            )
+          : resolve(value!);
       };
       const req = httpRequest(
         {
@@ -130,8 +176,11 @@ export class OllamaClient {
       };
       const timer = setTimeout(() => {
         done(
-          Error(
-            "로컬 모델 응답 시간이 초과되었습니다. / Local model request timed out.",
+          new OllamaRequestError(
+            phase,
+            "timeout",
+            `${timeout / 1000}초 제한을 넘었습니다. / Request timed out after ${timeout / 1000}s.`,
+            timeout,
           ),
         );
         req.destroy();
@@ -147,16 +196,31 @@ export class OllamaClient {
       req.end(bytes);
     });
   }
-  private async localOnly(signal?: AbortSignal) {
-    const status = await this.json("/api/status", undefined, signal, 5000);
+  private async localOnly(signal?: AbortSignal, onProgress?: LocalAIProgress) {
+    const status = await this.json(
+      "/api/status",
+      undefined,
+      signal,
+      5000,
+      onProgress,
+    );
     if (object(status.cloud).disabled !== true)
       throw Error(
         "Ollama를 OLLAMA_NO_CLOUD=1로 실행하고 다시 연결하세요. / Start Ollama with OLLAMA_NO_CLOUD=1 and reconnect.",
       );
   }
-  async models(signal?: AbortSignal): Promise<LocalModel[]> {
-    await this.localOnly(signal);
-    const result = await this.json("/api/tags", undefined, signal, 5000);
+  async models(
+    signal?: AbortSignal,
+    onProgress?: LocalAIProgress,
+  ): Promise<LocalModel[]> {
+    await this.localOnly(signal, onProgress);
+    const result = await this.json(
+      "/api/tags",
+      undefined,
+      signal,
+      5000,
+      onProgress,
+    );
     if (!Array.isArray(result.models)) throw Error("Invalid Ollama model list");
     return result.models
       .filter((raw: unknown) => {
@@ -183,13 +247,16 @@ export class OllamaClient {
     modelName: string,
     input: AssistantInput,
     signal?: AbortSignal,
+    onProgress?: LocalAIProgress,
   ) {
     validateAssistantInput(input);
     if (!localName(modelName))
       throw Error(
         "설치된 로컬 모델을 선택하세요. / Select an installed local model.",
       );
-    const model = (await this.models(signal)).find((m) => m.name === modelName);
+    const model = (await this.models(signal, onProgress)).find(
+      (m) => m.name === modelName,
+    );
     if (!model)
       throw Error(
         "선택한 로컬 모델이 없습니다. / Selected local model is unavailable.",
@@ -199,6 +266,7 @@ export class OllamaClient {
       { model: model.name },
       signal,
       10000,
+      onProgress,
     );
     if (
       info.remote_host ||
@@ -212,7 +280,7 @@ export class OllamaClient {
         "로컬 텍스트 모델임을 확인할 수 없습니다. / Could not verify a local text model.",
       );
     // Verify local-only mode again immediately before any source leaves the extension.
-    await this.localOnly(signal);
+    await this.localOnly(signal, onProgress);
     const messages = assistantMessages(input);
     const contextSize = assistantContextSize(messages);
     // Reserve our bounded output for the final structured answer. Only request
@@ -241,6 +309,8 @@ export class OllamaClient {
         keep_alive: "5m",
       },
       signal,
+      this.timeoutMs,
+      onProgress,
     );
     if (
       result.remote_host ||
@@ -253,9 +323,11 @@ export class OllamaClient {
       throw Error(
         "완성된 로컬 응답이 아닙니다. / Incomplete or non-local model response.",
       );
+    onProgress?.("validation");
     return {
       model,
       elapsedMs: Date.now() - started,
+      timeoutMs: this.timeoutMs,
       contextSize,
       processor: this.processor,
       proposal: parseAssistantProposal(result.message.content, input),

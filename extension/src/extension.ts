@@ -128,7 +128,17 @@ export function activate(context: vscode.ExtensionContext) {
             result = await controller.assistant.models();
             break;
           case "localGenerate":
-            result = await controller.assistant.generate(r.contextId, p);
+            result = await controller.assistant.generate(
+              r.contextId,
+              p,
+              (phase) => {
+                void currentPanel.webview.postMessage({
+                  type: "progress",
+                  id,
+                  phase,
+                });
+              },
+            );
             break;
           case "localObserve":
             result = await controller.assistant.observe(r.contextId, p);

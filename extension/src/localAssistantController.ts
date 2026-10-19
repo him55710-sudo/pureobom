@@ -15,6 +15,10 @@ import {
 } from "../../src/core/localAssistant";
 import { validatePython } from "./pythonValidation";
 import type { ChangeFacts } from "../../src/core/changeFacts";
+import {
+  localAITimeoutSeconds,
+  type LocalAIProgress,
+} from "../../src/core/localAIProgress";
 
 export type AssistantValidation = {
   status: "syntax-passed" | "syntax-failed" | "unavailable";
@@ -26,6 +30,7 @@ export type AssistantResult = Omit<AssistantProposal, "updated"> & {
   model: string;
   digest: string;
   elapsedMs: number;
+  timeoutSeconds: number;
   processor: InferenceProcessor;
   validation: AssistantValidation;
   constraint?: AssistantConstraintCheck;
@@ -87,7 +92,7 @@ export class LocalAssistantController implements vscode.Disposable {
       inputs: string,
     ) => Promise<AssistantObservation[]>,
   ) {}
-  private client(processor: InferenceProcessor = "auto") {
+  private client(processor: InferenceProcessor = "auto", timeoutSeconds = 180) {
     if (vscode.env.remoteName)
       throw Error(
         "로컬 AI는 데스크톱의 로컬 작업 공간에서 사용하세요. / Local AI requires a local desktop workspace.",
@@ -96,7 +101,7 @@ export class LocalAssistantController implements vscode.Disposable {
       vscode.workspace
         .getConfiguration("pureobom")
         .get<number>("ollamaPort", 11434),
-      undefined,
+      timeoutSeconds * 1000,
       processor,
     );
   }
@@ -165,6 +170,7 @@ export class LocalAssistantController implements vscode.Disposable {
   async generate(
     context: string | undefined,
     payload: Record<string, unknown>,
+    onProgress?: LocalAIProgress,
   ): Promise<AssistantResult> {
     const doc = this.current(context);
     if (!vscode.workspace.isTrusted)
@@ -175,6 +181,7 @@ export class LocalAssistantController implements vscode.Disposable {
       throw Error(
         "진행 중인 요청을 취소하거나 기다려 주세요. / Wait for or cancel the current request.",
       );
+    const timeoutSeconds = localAITimeoutSeconds(payload.timeoutSeconds);
     const input: AssistantInput = {
       source: doc.getText(),
       language: doc.languageId,
@@ -215,7 +222,13 @@ export class LocalAssistantController implements vscode.Disposable {
         (payload.processor === undefined
           ? "auto"
           : payload.processor) as InferenceProcessor,
-      ).generate(inputString(payload.model, 200), input, controller.signal);
+        timeoutSeconds,
+      ).generate(
+        inputString(payload.model, 200),
+        input,
+        controller.signal,
+        onProgress,
+      );
       const validation: AssistantValidation = response.proposal.edits.length
         ? doc.languageId === "python"
           ? await validatePython(response.proposal.updated)
@@ -263,6 +276,7 @@ export class LocalAssistantController implements vscode.Disposable {
         model: response.model.name,
         digest: response.model.digest,
         elapsedMs: response.elapsedMs,
+        timeoutSeconds: response.timeoutMs / 1000,
         processor: response.processor,
         validation,
         ...(input.observations

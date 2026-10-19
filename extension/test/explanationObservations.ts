@@ -113,16 +113,42 @@ export async function explanationObservationChecks(
       instruction: "Explain these inputs.",
       focusFunctionId: target().id,
       observationId: observed.id,
+      timeoutSeconds: 300,
     };
+    await assert.rejects(
+      c.assistant.generate(c.state.contextId, {
+        ...payload,
+        timeoutSeconds: 10000,
+      }),
+    );
+    assert.equal(
+      requests,
+      0,
+      "invalid deadlines are rejected before any model request",
+    );
     observed.items[0].value = "forged client result";
-    const result = await c.assistant.generate(c.state.contextId, {
-      ...payload,
-      observations: [
-        { args: "[]", status: "returned", value: "another forgery" },
-      ],
-    });
+    const phases: string[] = [];
+    const result = await c.assistant.generate(
+      c.state.contextId,
+      {
+        ...payload,
+        observations: [
+          { args: "[]", status: "returned", value: "another forgery" },
+        ],
+      },
+      (phase) => phases.push(phase),
+    );
+    assert.deepEqual(phases, [
+      "connection",
+      "models",
+      "model",
+      "connection",
+      "generation",
+      "validation",
+    ]);
     assert.deepEqual(received!.calculationObservations.cases, expected);
     assert.deepEqual(result.observations, expected);
+    assert.equal(result.timeoutSeconds, 300);
     assert.equal(
       received!.source.before +
         received!.source.selectedFunction +
@@ -131,7 +157,7 @@ export async function explanationObservationChecks(
     );
     assert.equal(doc.getText(), source);
     reports.push(
-      "Explanation observations: host-retained results reach the actual local-model client and returned view; modifying the response or supplying fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+      "Explanation observations: host-retained results, progress phases and a selected time limit reach the actual local-model client and returned view; invalid limits and fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
     );
 
     const beforeRejected = chats;

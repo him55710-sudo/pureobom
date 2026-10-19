@@ -4,6 +4,8 @@
 
 ## 현재 상태
 
+- **실제 모델·지연 후속:** [같은 과제에 계산 예시를 첨부한 3B 답변](evidence/local-ai/observed-explanation-models.json)은 완성됐지만 의미 검토에 실패했고 4B는 생성 timeout이었다. 연결/모델/생성/검사 단계를 표시하고 오류에 실패 단계를 남긴다. 기본 3분을 유지하며 [사용자가 5·10분을 선택](LOCAL_AI.md)할 수 있게 했다. 오래 기다림과 모델 정확성을 구분한다.
+
 - **설명 근거 보강:** [AI 없는 예시 계산과 선택적 첨부](EXPLANATION_OBSERVATIONS.md)를 추가했다. 실제 사용자 코드의 선정 입력은 반환 6개가 Node와 일치, 1개는 확인 불가였으며 원문은 보존했다. 공개 fixture로 핵심 부분 68개·실제 개발/설치 부분 각 3개와 한/영 브라우저 UI를 검증했다. 7B 생성 timeout과 3B 연결 확인 timeout으로 모델 설명 개선은 미평가다. [실행 기록](evidence/local-ai/explanation-observations.json).
 - **예시 첨부 최종 검증:** `7a6e368`의 [Windows·Ubuntu CI](evidence/local-ai/explanation-observations-ci.json)는 각 핵심 312개·개발/production 설치 각 64개·설치 파일 11개 해시·패키지 검사를 통과했다. 실제 모델 품질이나 모든 언어의 계산 지원을 증명하지 않는다.
 

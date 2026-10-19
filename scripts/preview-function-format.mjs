@@ -4,13 +4,16 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { Worker } from "node:worker_threads";
 const rust = process.argv.includes("--rust");
-const focus = process.argv.includes("--focus");
+const progress = process.argv.includes("--progress");
+const focus = process.argv.includes("--focus") || progress;
 const folder = resolve(
-  focus
-    ? "test-results/focused-explanation-ui"
-    : rust
-      ? "test-results/rust-source-ui"
-      : "test-results/function-format-ui",
+  progress
+    ? "test-results/local-ai-progress-ui"
+    : focus
+      ? "test-results/focused-explanation-ui"
+      : rust
+        ? "test-results/rust-source-ui"
+        : "test-results/function-format-ui",
 );
 const path = rust ? "sample.rs" : "sample.ts";
 await mkdir(folder, { recursive: true });
@@ -109,6 +112,7 @@ async function rpc(r) {
         digest: "a".repeat(64),
         elapsedMs: 1,
         processor: r.payload.processor || "auto",
+        timeoutSeconds: r.payload.timeoutSeconds ?? 180,
         summary: ko
           ? "선택한 함수의 설명을 표시하는 화면 검증용 응답입니다. 실제 모델의 설명 품질 검증이 아닙니다."
           : "Controlled response for verifying the selected-function display. This does not evaluate a real model.",
@@ -191,7 +195,26 @@ const fixtureTitle = focus
   : rust
     ? "Rust source"
     : "Function layout";
-const page = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${fixtureTitle} UI verification</title><link rel="stylesheet" href="/view.css"><link rel="stylesheet" href="/theme.css"><body><p style="padding:12px;margin:0;background:#fff4d4;color:#433716">UI verification fixture — actual extension UI and worker; simulated editor, public sample code.${focus ? " Controlled model replies; no model inference." : ""}</p><div id="root"></div><script>window.acquireVsCodeApi=()=>({getState:()=>({}),setState:()=>{},postMessage:async m=>{const r=await(await fetch('/rpc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(m)})).json();if(r.state)window.postMessage({type:'state',state:r.state},location.origin);window.postMessage({type:'response',id:m.id,result:r.result,error:r.error},location.origin)}});</script><script src="/view.js"></script></body></html>`;
+const simulatedProgress = progress
+  ? `
+if(m.action==='localCancel') {
+  window.fixtureCancelled=true;
+  window.postMessage({type:'response',id:m.id,result:{}},location.origin);
+  return;
+}
+if(m.action==='localGenerate') {
+  window.fixtureCancelled=false;
+  for(const phase of ['connection','models','model','connection','generation','validation']) {
+    window.postMessage({type:'progress',id:m.id,phase},location.origin);
+    await new Promise(resolve=>setTimeout(resolve,phase==='generation'?12000:1500));
+    if(window.fixtureCancelled) {
+      window.postMessage({type:'response',id:m.id,error:'모의 요청을 취소했습니다. / Fixture request cancelled.'},location.origin);
+      return;
+    }
+  }
+}`
+  : "";
+const page = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${fixtureTitle} UI verification</title><link rel="stylesheet" href="/view.css"><link rel="stylesheet" href="/theme.css"><body><p style="padding:12px;margin:0;background:#fff4d4;color:#433716">UI verification fixture — actual extension UI and worker; simulated editor, public sample code.${focus ? " Controlled model replies; no model inference." : ""}</p><div id="root"></div><script>window.acquireVsCodeApi=()=>({getState:()=>({}),setState:()=>{},postMessage:async m=>{${simulatedProgress}const r=await(await fetch('/rpc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(m)})).json();if(r.state)window.postMessage({type:'state',state:r.state},location.origin);window.postMessage({type:'response',id:m.id,result:r.result,error:r.error},location.origin)}});</script><script src="/view.js"></script></body></html>`;
 const server = createServer(async (req, res) => {
   try {
     if (req.url === "/rpc" && req.method === "POST") {

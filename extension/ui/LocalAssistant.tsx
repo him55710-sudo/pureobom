@@ -15,6 +15,11 @@ import type { InferenceProcessor, LocalModel } from "../src/ollama";
 import type { ViewState } from "../src/protocol";
 import { request } from "./bridge";
 import "./local-assistant.css";
+import {
+  localAIPhases,
+  localAITimeoutChoices,
+  type LocalAIPhase,
+} from "../../src/core/localAIProgress";
 
 export function LocalAssistant({
   state,
@@ -28,6 +33,7 @@ export function LocalAssistant({
   const [models, setModels] = useState<LocalModel[]>([]);
   const [model, setModel] = useState("");
   const [processor, setProcessor] = useState<InferenceProcessor>("auto");
+  const [timeoutSeconds, setTimeoutSeconds] = useState(180);
   const [origin, setOrigin] = useState("");
   const [task, setTask] = useState<AssistantTask>("explain");
   const [focusChoice, setFocusChoice] = useState(initialFocus);
@@ -53,6 +59,12 @@ export function LocalAssistant({
   const [busy, setBusy] = useState(false);
   const [generationStarted, setGenerationStarted] = useState<number>();
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [progress, setProgress] = useState<{
+    context: string;
+    phase: LocalAIPhase;
+  }>();
+  const phase =
+    progress?.context === state.contextId ? progress.phase : undefined;
   const [error, setError] = useState("");
   const [notice, setNotice] = useState<Words>();
   const [generated, setGenerated] = useState<{
@@ -105,6 +117,7 @@ export function LocalAssistant({
     setError("");
     setNotice(undefined);
     if (generating) {
+      setProgress(undefined);
       setElapsedSeconds(0);
       setGenerationStarted(Date.now());
     }
@@ -123,6 +136,7 @@ export function LocalAssistant({
       if (mounted.current) {
         setBusy(false);
         setGenerationStarted(undefined);
+        setProgress(undefined);
       }
     }
   }
@@ -259,6 +273,31 @@ export function LocalAssistant({
             {t(
               "응답이 느리면 CPU 요청과 비교해 보세요. 이 요청의 실행 옵션이며, 속도는 PC와 모델에 따라 다릅니다.",
               "If responses are slow, compare a CPU request. This is an option for this request; speed depends on your PC and model.",
+            )}
+          </span>
+        </label>
+        <label>
+          {t("답변 생성 대기 한도", "Response time limit")}
+          <select
+            value={timeoutSeconds}
+            disabled={busy}
+            onChange={(event) => {
+              setTimeoutSeconds(Number(event.target.value));
+              clearProposal();
+            }}
+          >
+            {localAITimeoutChoices.map((seconds) => (
+              <option key={seconds} value={seconds}>
+                {seconds / 60}
+                {t("분", " minutes")}
+                {seconds === 180 ? t(" (기본)", " (default)") : ""}
+              </option>
+            ))}
+          </select>
+          <span className="muted">
+            {t(
+              "느린 PC에서는 대기 시간을 늘릴 수 있습니다. 연결 확인 시간은 별도이며, 기다리는 동안 취소할 수 있습니다.",
+              "Allow more time on a slow PC. Connection checks have separate limits; you can cancel while waiting.",
             )}
           </span>
         </label>
@@ -495,6 +534,7 @@ export function LocalAssistant({
                   {
                     model,
                     processor,
+                    timeoutSeconds,
                     task,
                     instruction,
                     lang,
@@ -507,6 +547,17 @@ export function LocalAssistant({
                       : {}),
                   },
                   state.contextId,
+                  (nextPhase) => {
+                    if (
+                      mounted.current &&
+                      activeContext.current === state.contextId &&
+                      activeLanguage.current === lang
+                    )
+                      setProgress({
+                        context: state.contextId,
+                        phase: nextPhase,
+                      });
+                  },
                 );
                 if (
                   mounted.current &&
@@ -536,10 +587,7 @@ export function LocalAssistant({
         {busy ? (
           <p role="status">
             {generationStarted !== undefined
-              ? t(
-                  "로컬 모델 응답을 기다리고 있습니다. PC와 모델에 따라 몇 분이 걸릴 수 있습니다. 취소하거나 파일을 바꾸면 요청이 중단됩니다.",
-                  "Waiting for the local model. This can take minutes depending on your PC and model. Cancel or change the file to stop the request.",
-                )
+              ? `${phase ? localAIPhases[phase][lang] : t("요청 준비 중", "Preparing request")}… ${t("취소하거나 파일을 바꾸면 요청이 중단됩니다.", "Cancel or change the file to stop the request.")}`
               : t(
                   "요청한 작업을 처리하고 있습니다.",
                   "Processing the requested action.",
@@ -547,8 +595,9 @@ export function LocalAssistant({
             {generationStarted !== undefined ? (
               <span role="timer" aria-live="off">
                 {" "}
-                · {elapsedSeconds}
-                {t("초 경과", "s elapsed")}
+                · {t("전체 요청 경과", "Total request elapsed")}{" "}
+                {elapsedSeconds}
+                {t("초", "s")}
               </span>
             ) : null}
           </p>
@@ -592,14 +641,17 @@ export function LocalAssistant({
             {result.processor === "cpu"
               ? t("CPU 요청", "CPU requested")
               : t("Ollama 자동 설정", "Ollama automatic")}{" "}
-            · {t("추론 결과 · 검토 필요", "Model inference · review required")}
+            · {t("추론 결과 · 검토 필요", "Model inference · review required")}{" "}
+            · {t("설정한 대기 한도", "Selected time limit")}{" "}
+            {(result.timeoutSeconds ?? 180) / 60}
+            {t("분", " min")}
           </p>
           <p className="local-summary">{result.summary}</p>
           {result.observations && (
             <p className="muted">
               {t(
-                "위 예시 계산 결과와 함께 생성한 설명입니다. 입력 사례 외의 정확성은 검증하지 않았습니다.",
-                "Generated with the observations above. Correctness beyond these examples has not been verified.",
+                "위 예시 계산 결과를 첨부한 설명입니다. 모델은 이 결과와 모순되는 답을 할 수 있으므로 값·원문과 대조하세요.",
+                "Generated with the observations above. The model may still contradict them; compare its claims with the values and source.",
               )}
             </p>
           )}

@@ -3,6 +3,11 @@ import {
   encodePreviewMessage,
   usesPreviewTransport,
 } from "../../src/core/previewValues";
+import {
+  isLocalAIPhase,
+  localAITimeoutSeconds,
+  type LocalAIProgress,
+} from "../../src/core/localAIProgress";
 declare function acquireVsCodeApi(): {
   postMessage(message: unknown): void;
   getState(): unknown;
@@ -17,9 +22,16 @@ const pending = new Map<
     reject: (error: Error) => void;
     timer: ReturnType<typeof setTimeout>;
     preview: boolean;
+    onProgress?: LocalAIProgress;
   }
 >();
 window.addEventListener("message", (e) => {
+  if (e.data?.type === "progress") {
+    const request = pending.get(e.data.id);
+    if (request && isLocalAIPhase(e.data.phase))
+      request.onProgress?.(e.data.phase);
+    return;
+  }
   if (e.data?.type !== "response") return;
   const request = pending.get(e.data.id);
   if (!request) return;
@@ -40,6 +52,7 @@ export function request<T = void>(
   action: string,
   payload?: Record<string, unknown>,
   contextId?: string,
+  onProgress?: LocalAIProgress,
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     const preview = usesPreviewTransport(action);
@@ -54,9 +67,11 @@ export function request<T = void>(
           ),
         );
       },
-      action === "localGenerate" ? 240000 : 60000,
+      action === "localGenerate"
+        ? localAITimeoutSeconds(payload?.timeoutSeconds) * 1000 + 60000
+        : 60000,
     );
-    pending.set(id, { resolve, reject, timer, preview });
+    pending.set(id, { resolve, reject, timer, preview, onProgress });
     host.postMessage({ id, action, payload: wirePayload, contextId });
   });
 }

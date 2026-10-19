@@ -1,0 +1,123 @@
+{
+  "collectedAt": "2026-10-19T21:19:30.504Z",
+  "scope": "Same private project, unchanged original source, original question and seven previously selected calculation observations. No private identifiers, source, concrete inputs/results or raw model responses included.",
+  "attempts": [
+    {
+      "model": "qwen2.5-coder:3b",
+      "sourceUnchanged": true,
+      "observationsPrepared": true,
+      "nativeReturnedMatches": 6,
+      "nativeExceptionProductUnavailable": 1,
+      "processor": "cpu",
+      "outcome": "semantic-failed",
+      "clientElapsedMs": 157666,
+      "contextSize": 16384,
+      "outputTokenLimit": 4096,
+      "timeoutMs": 180000,
+      "exactCitationCount": 4,
+      "semanticReview": {
+        "kind": "Agent review against unchanged source and independent native observations; not an independent third-party evaluation.",
+        "findings": [
+          "Summary contradicts the observed out-of-range returns.",
+          "Summary incorrectly treats the empty-input exception as a numeric return.",
+          "Summary overgeneralizes duplicate positions despite the supplied successful duplicate-position case.",
+          "Singleton behavior is omitted.",
+          "Caller preconditions and validation actually performed are not adequately separated.",
+          "Response includes requested future checks despite the explanation-only prompt."
+        ]
+      },
+      "stages": [
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 15
+        },
+        {
+          "route": "/api/tags",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 873
+        },
+        {
+          "route": "/api/show",
+          "timeoutMs": 10000,
+          "outcome": "received",
+          "elapsedMs": 3758
+        },
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 33
+        },
+        {
+          "route": "/api/chat",
+          "timeoutMs": 180000,
+          "outcome": "received",
+          "elapsedMs": 157665
+        }
+      ],
+      "server": {
+        "done": true,
+        "doneReason": "stop",
+        "promptTokens": 2024,
+        "outputTokens": 389,
+        "totalDurationNs": 157617516100
+      }
+    },
+    {
+      "model": "qwen3.5:4b",
+      "sourceUnchanged": true,
+      "observationsPrepared": true,
+      "nativeReturnedMatches": 6,
+      "nativeExceptionProductUnavailable": 1,
+      "processor": "cpu",
+      "outcome": "generation-timeout",
+      "contextSize": 16384,
+      "outputTokenLimit": 4096,
+      "timeoutMs": 180000,
+      "semanticReview": {
+        "kind": "Agent review against unchanged source and independent native observations; not an independent third-party evaluation.",
+        "findings": [
+          "No complete answer; semantic quality unassessed."
+        ]
+      },
+      "stages": [
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 12
+        },
+        {
+          "route": "/api/tags",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 31
+        },
+        {
+          "route": "/api/show",
+          "timeoutMs": 10000,
+          "outcome": "received",
+          "elapsedMs": 172
+        },
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 3
+        },
+        {
+          "route": "/api/chat",
+          "timeoutMs": 180000,
+          "outcome": "failed",
+          "elapsedMs": 180008
+        }
+      ]
+    }
+  ],
+  "conclusion": "Calculation observations do not ensure the model uses them correctly. One completed answer contradicts observations; the other times out. No model-quality improvement or optimization established.",
+  "execution": "Own cloud-disabled loopback CPU server; existing models, no paid API, no downloads, no alteration of other Ollama servers.",
+  "implementation": "3B used committed observation runtime 7a6e368 / documentation HEAD 51cfdc8. 4B used the same prompt and limits plus uncommitted request-phase diagnostics; no prompt change."
+}
