@@ -130,6 +130,9 @@ export function activate(context: vscode.ExtensionContext) {
           case "localGenerate":
             result = await controller.assistant.generate(r.contextId, p);
             break;
+          case "localObserve":
+            result = await controller.assistant.observe(r.contextId, p);
+            break;
           case "localCancel":
             controller.assistant.cancel();
             break;

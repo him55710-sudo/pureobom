@@ -6,6 +6,8 @@ Go addition in the 0.7 development source: [model-free syntax reading and exact 
 
 ## 0.7.0 — local AI development preview (unreleased)
 
+- Add [optional calculation observations](docs/EXPLANATION_OBSERVATIONS.md) for selected JS/TS explanations. Calculate user examples without AI, preserve special values, and attach only current host-retained results. Reject mismatched function ranges and stale observations. Actual private-code observations match six native returns; one case is unavailable. Model-quality improvement remains unassessed after separate inference and preflight timeouts.
+
 - Fix [calculation trace source navigation](docs/TRACE_NAVIGATION.md) across imported files. Show the originating path and line, resolve only recorded locations in the host, reject stale text and superseded calculation handles, and leave omission notices unlinked. Keep local partial checks, full-suite failures and CI evidence separate.
 
 - Add [bounded while loops, local updates and interpreted array callbacks](docs/BOUNDED_PREVIEW.md) to JS/TS previews. Preserve lexical scope, evaluation order and sparse map positions; keep existing execution budgets and explicit unsupported results. The unchanged real-project target now matches Node for three original assertion cases and eleven separately selected inputs. This does not resolve prior model explanation failures or establish an optimization.

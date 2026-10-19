@@ -7,8 +7,12 @@ import type {
   AssistantInput,
   AssistantProposal,
   AssistantConstraintCheck,
+  AssistantObservation,
 } from "../../src/core/localAssistant";
-import { checkAssistantConstraint } from "../../src/core/localAssistant";
+import {
+  checkAssistantConstraint,
+  supportsObservationInputs,
+} from "../../src/core/localAssistant";
 import { validatePython } from "./pythonValidation";
 import type { ChangeFacts } from "../../src/core/changeFacts";
 
@@ -26,7 +30,9 @@ export type AssistantResult = Omit<AssistantProposal, "updated"> & {
   validation: AssistantValidation;
   constraint?: AssistantConstraintCheck;
   focus?: { name: string; line: number; endLine: number };
+  observations?: AssistantObservation[];
 };
+export type ObservationView = { id: string; items: AssistantObservation[] };
 type Pending = {
   result: AssistantResult;
   updated: string;
@@ -40,6 +46,13 @@ type Pending = {
 export class LocalAssistantController implements vscode.Disposable {
   private pending?: Pending;
   private running?: AbortController;
+  private observed?: {
+    view: ObservationView;
+    context: string;
+    version: number;
+    source: string;
+    focusId: string;
+  };
   private previews = new Map<string, string>();
   private provider = vscode.workspace.registerTextDocumentContentProvider(
     "pureobom-local-preview",
@@ -68,6 +81,11 @@ export class LocalAssistantController implements vscode.Disposable {
       context: string | undefined,
       id: string,
     ) => AssistantInput["focus"],
+    private observeFunction?: (
+      context: string | undefined,
+      focus: NonNullable<AssistantInput["focus"]>,
+      inputs: string,
+    ) => Promise<AssistantObservation[]>,
   ) {}
   private client(processor: InferenceProcessor = "auto") {
     if (vscode.env.remoteName)
@@ -94,6 +112,43 @@ export class LocalAssistantController implements vscode.Disposable {
   invalidate() {
     this.cancel();
     this.pending = undefined;
+    this.observed = undefined;
+  }
+  async observe(
+    context: string | undefined,
+    payload: Record<string, unknown>,
+  ): Promise<ObservationView> {
+    const doc = this.current(context);
+    if (!supportsObservationInputs(doc.languageId) || !this.observeFunction)
+      throw Error(
+        "계산 예시는 선택한 JS/TS 기능에서 사용할 수 있습니다. / Calculation examples require a selected JS/TS function.",
+      );
+    const focusId = inputString(payload.focusFunctionId, 1000);
+    const focus = this.focus(context, focusId, "explain")!;
+    const source = doc.getText(),
+      version = doc.version;
+    const items = await this.observeFunction(
+      context,
+      focus,
+      inputString(payload.inputs, 8000),
+    );
+    if (
+      this.current(context) !== doc ||
+      doc.version !== version ||
+      doc.getText() !== source
+    )
+      throw Error(
+        "파일이 바뀌었습니다. 다시 계산하세요. / Source changed. Calculate again.",
+      );
+    const id = randomUUID();
+    this.observed = {
+      view: { id, items: items.map((row) => ({ ...row })) },
+      context: context!,
+      version,
+      source,
+      focusId,
+    };
+    return { id, items };
   }
   private focus(context: string | undefined, id: unknown, task: unknown) {
     if (task !== "explain" || !this.resolveFocus)
@@ -135,6 +190,22 @@ export class LocalAssistantController implements vscode.Disposable {
           }
         : {}),
     };
+    if (payload.observationId !== undefined) {
+      const observed = this.observed;
+      if (
+        input.task !== "explain" ||
+        !observed ||
+        observed.view.id !== payload.observationId ||
+        observed.context !== context ||
+        observed.version !== doc.version ||
+        observed.source !== input.source ||
+        observed.focusId !== payload.focusFunctionId
+      )
+        throw Error(
+          "예시 계산이 바뀌었습니다. 선택한 기능에서 다시 계산하세요. / Calculation examples changed. Calculate again for the selected function.",
+        );
+      input.observations = observed.view.items.map((row) => ({ ...row }));
+    }
     const version = doc.version;
     const controller = new AbortController();
     this.running = controller;
@@ -194,6 +265,9 @@ export class LocalAssistantController implements vscode.Disposable {
         elapsedMs: response.elapsedMs,
         processor: response.processor,
         validation,
+        ...(input.observations
+          ? { observations: input.observations.map((row) => ({ ...row })) }
+          : {}),
         ...(input.focus
           ? {
               focus: {

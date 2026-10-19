@@ -3,6 +3,7 @@ import { ProjectAnalyzer } from "../../src/core/project";
 import { analyzeFile } from "../../src/core/analyze";
 import { makePatch, parseRequest } from "../../src/core/edit";
 import { simulate } from "../../src/core/simulate";
+import { observeFunction } from "../../src/core/assistantObservations";
 import { compareScenarios } from "../../src/core/scenarios";
 import { validateAssistantChange } from "../../src/core/assistantValidation";
 import { formatFunction } from "../../src/core/formatFunction";
@@ -48,6 +49,13 @@ parentPort!.on("message", async ({ id, type, payload }) => {
         payload.name,
         payload.scenarios,
         payload.patch,
+      );
+    else if (type === "observe")
+      result = observeFunction(
+        payload.files,
+        payload.path,
+        payload.focus,
+        payload.inputs,
       );
     else if (type === "simulate")
       result = simulate(

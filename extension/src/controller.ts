@@ -142,6 +142,19 @@ export class Controller implements vscode.Disposable {
         if (!fn) return undefined;
         return { name: fn.name.slice(0, 400), start: fn.start, end: fn.end };
       },
+      async (context, focus, inputs) => {
+        const doc = this.current(context);
+        const result = await client.call<
+          import("../../src/core/localAssistant").AssistantObservation[]
+        >("observe", {
+          files: [...this.sources.values()].map((source) => source.file),
+          path: this.path(doc),
+          focus,
+          inputs,
+        });
+        this.current(context);
+        return result;
+      },
     );
     this.checks = new ProjectChecks((context) => this.current(context));
     this.checks.changes.event((projectCheck) => this.publish({ projectCheck }));

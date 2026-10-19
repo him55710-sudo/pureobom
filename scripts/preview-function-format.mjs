@@ -18,6 +18,7 @@ const worker = new Worker(resolve("extension/out/worker.cjs"));
 let seq = 0,
   version = 1,
   proposal,
+  observation,
   reviewed = false;
 let source = rust
   ? '// 😀 Unicode anchors\nconst LIMIT: u64 = 9007199254740993u64;\npub fn label(count: u32) -> &\'static str {\n    match count {\n        0 => r#"아직 없음"#,\n        n if n < 10 => "a few",\n        _ => "many",\n    }\n}\n'
@@ -80,6 +81,20 @@ async function rpc(r) {
       },
     };
   if (r.contextId !== String(version)) throw Error("Stale fixture context");
+  if (r.action === "localObserve" && focus) {
+    const fn = (await state()).analysis.functions.find(
+      (f) => f.id === r.payload.focusFunctionId,
+    );
+    if (!fn) throw Error("Select a function for this UI fixture");
+    const items = await call("observe", {
+      files: [{ path, content: source }],
+      path,
+      focus: { name: fn.name, start: fn.start, end: fn.end },
+      inputs: r.payload.inputs,
+    });
+    observation = { id: `observation-${seq}`, items };
+    return { result: observation };
+  }
   if (r.action === "localGenerate" && focus) {
     const a = (await state()).analysis;
     const fn = a.functions.find((f) => f.id === r.payload.focusFunctionId);
@@ -112,6 +127,9 @@ async function rpc(r) {
         risks: [],
         checks: [],
         focus: { name: fn.name, line: fn.line, endLine: fn.endLine },
+        ...(r.payload.observationId === observation?.id && observation
+          ? { observations: observation.items }
+          : {}),
         validation: { status: "unavailable", detail: "No proposed change" },
       },
     };

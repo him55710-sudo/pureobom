@@ -4,9 +4,13 @@ import {
   assistantLanguages,
   assistantLimits,
   supportsWhitespaceConstraint,
+  supportsObservationInputs,
   type AssistantTask,
 } from "../../src/core/localAssistant";
-import type { AssistantResult } from "../src/localAssistantController";
+import type {
+  AssistantResult,
+  ObservationView,
+} from "../src/localAssistantController";
 import type { InferenceProcessor, LocalModel } from "../src/ollama";
 import type { ViewState } from "../src/protocol";
 import { request } from "./bridge";
@@ -33,6 +37,19 @@ export function LocalAssistant({
       : undefined;
   const [whitespaceOnly, setWhitespaceOnly] = useState(false);
   const [instruction, setInstruction] = useState("");
+  const [exampleInputs, setExampleInputs] = useState("");
+  const [observed, setObserved] = useState<{
+    context: string;
+    focusId: string;
+    inputs: string;
+    result: ObservationView;
+  }>();
+  const observation =
+    observed?.context === state.contextId &&
+    observed.focusId === focusedFunction?.id &&
+    observed.inputs === exampleInputs
+      ? observed.result
+      : undefined;
   const [busy, setBusy] = useState(false);
   const [generationStarted, setGenerationStarted] = useState<number>();
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -117,6 +134,8 @@ export function LocalAssistant({
     (state.sourceBytes ?? Infinity) <= assistantLimits.sourceBytes;
   const canConstrainWhitespace =
     task === "edit" && supportsWhitespaceConstraint(state.language || "");
+  const canObserve =
+    !!focusedFunction && supportsObservationInputs(state.language || "");
   function clearProposal() {
     setGenerated(undefined);
     setReviewed(false);
@@ -130,8 +149,8 @@ export function LocalAssistant({
         </h2>
         <p>
           {t(
-            "현재 파일 하나와 아래 요청만 선택한 로컬 모델로 보냅니다. 모델의 추론은 틀릴 수 있어 원문 근거와 변경안을 함께 확인합니다.",
-            "Only the current file and your request go to the selected local model. Review source evidence and changes because model reasoning can be wrong.",
+            "현재 파일과 요청, 선택한 예시 계산 결과를 로컬 모델로 보냅니다. 모델의 추론은 틀릴 수 있어 원문 근거와 계산 결과·변경안을 함께 확인합니다.",
+            "The current file, your request and any selected calculation examples go to the local model. Review source evidence, observed results and changes because model reasoning can be wrong.",
           )}
         </p>
         <p className="muted">
@@ -250,6 +269,7 @@ export function LocalAssistant({
             disabled={busy}
             onChange={(e) => {
               setTask(e.target.value as AssistantTask);
+              setObserved(undefined);
               clearProposal();
             }}
           >
@@ -279,6 +299,7 @@ export function LocalAssistant({
                   context: state.contextId,
                   id: event.target.value,
                 });
+                setObserved(undefined);
                 clearProposal();
               }}
             >
@@ -326,6 +347,105 @@ export function LocalAssistant({
             }
           />
         </label>
+        {canObserve && (
+          <details className="local-setup">
+            <summary>
+              {t(
+                "예시 입력으로 설명 확인하기 (선택)",
+                "Check the explanation with examples (optional)",
+              )}
+            </summary>
+            <p>
+              {t(
+                "AI 없이 먼저 계산하고, 확인한 결과를 설명에 함께 보냅니다. 지원되는 JS/TS 구문에 한한 계산이며 실제 앱 테스트를 대신하지 않습니다.",
+                "Calculate without AI first, then include these observations in the explanation. This covers supported JS/TS syntax and does not replace application tests.",
+              )}
+            </p>
+            <label>
+              {t(
+                "예시 입력 · 예시마다 인수를 배열로 묶기",
+                "Example inputs · one argument array per example",
+              )}
+              <textarea
+                rows={3}
+                maxLength={8000}
+                disabled={busy || state.busy}
+                value={exampleInputs}
+                placeholder="[[0], [5]]"
+                onChange={(event) => {
+                  setExampleInputs(event.target.value);
+                  setObserved(undefined);
+                  clearProposal();
+                }}
+              />
+            </label>
+            <p className="muted">
+              {t("인수 순서", "Argument order")}:{" "}
+              {focusedFunction.params.map((p) => p.name).join(", ") ||
+                t("없음", "none")}{" "}
+              · {t("최대 8개 예시", "Up to 8 examples")}
+            </p>
+            <button
+              disabled={busy || !eligible || !exampleInputs.trim()}
+              onClick={() =>
+                void run(async () => {
+                  clearProposal();
+                  setObserved(undefined);
+                  const response = await request<ObservationView>(
+                    "localObserve",
+                    {
+                      focusFunctionId: focusedFunction.id,
+                      inputs: exampleInputs,
+                    },
+                    state.contextId,
+                  );
+                  if (
+                    mounted.current &&
+                    activeContext.current === state.contextId
+                  )
+                    setObserved({
+                      context: state.contextId,
+                      focusId: focusedFunction.id,
+                      inputs: exampleInputs,
+                      result: response,
+                    });
+                })
+              }
+            >
+              {t("AI 없이 예시 계산", "Calculate examples without AI")}
+            </button>
+          </details>
+        )}
+        {observation && (
+          <section aria-label={t("예시 계산 결과", "Calculation observations")}>
+            <h3>
+              {t(
+                "설명에 첨부할 계산 결과",
+                "Observations to include in the explanation",
+              )}
+            </h3>
+            <p className="muted">
+              {t(
+                "이 입력들에서 관찰한 결과입니다. 확인 불가는 실제 코드의 예외나 결함이 확인됐다는 뜻이 아닙니다. 모델 설명과 대조해 주세요.",
+                "These results apply to these inputs. Unavailable does not establish a real exception or bug. Compare them with the model's explanation.",
+              )}
+            </p>
+            <ol>
+              {observation.items.map((row, index) => (
+                <li key={index}>
+                  <span>{t("입력", "Inputs")}</span>
+                  <pre>{row.args}</pre>
+                  <span>
+                    {row.status === "returned"
+                      ? t("계산 결과", "Observed value")
+                      : t("확인 불가", "Unavailable")}
+                  </span>
+                  <pre>{row.value}</pre>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
         {canConstrainWhitespace ? (
           <label className="local-ack">
             <input
@@ -381,6 +501,7 @@ export function LocalAssistant({
                     ...(focusedFunction
                       ? { focusFunctionId: focusedFunction.id }
                       : {}),
+                    ...(observation ? { observationId: observation.id } : {}),
                     ...(canConstrainWhitespace && whitespaceOnly
                       ? { editConstraint: "whitespace-only" }
                       : {}),
@@ -474,6 +595,14 @@ export function LocalAssistant({
             · {t("추론 결과 · 검토 필요", "Model inference · review required")}
           </p>
           <p className="local-summary">{result.summary}</p>
+          {result.observations && (
+            <p className="muted">
+              {t(
+                "위 예시 계산 결과와 함께 생성한 설명입니다. 입력 사례 외의 정확성은 검증하지 않았습니다.",
+                "Generated with the observations above. Correctness beyond these examples has not been verified.",
+              )}
+            </p>
+          )}
           <h3>{t("원문에서 확인", "Check against the source")}</h3>
           {result.citations.map((c, i) => (
             <div className="local-citation" key={`${c.start}-${i}`}>

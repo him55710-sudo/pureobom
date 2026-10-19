@@ -5,6 +5,7 @@ import JSZip from "jszip";
 import { resolve } from "node:path";
 const installed = process.argv.includes("--installed");
 const traceSourceOnly = process.argv.includes("--trace-source");
+const observationsOnly = process.argv.includes("--explanation-observations");
 const workspaces = resolve("test-results/extension-workspaces");
 await mkdir(workspaces, { recursive: true });
 const workspace = await mkdtemp(resolve(workspaces, ".run-"));
@@ -162,14 +163,17 @@ await runTests({
       : "",
     PUREOBOM_ONLY_BENCHMARK: process.env.PUREOBOM_ONLY_BENCHMARK || "0",
     PUREOBOM_ONLY_TRACE_SOURCE: traceSourceOnly ? "1" : "0",
+    PUREOBOM_ONLY_OBSERVATIONS: observationsOnly ? "1" : "0",
     PUREOBOM_INTEGRATION_REPORT: resolve(
-      traceSourceOnly
-        ? `test-results/trace-source-${installed ? "installed" : "development"}.json`
-        : installed
-          ? "test-results/installed-extension-integration.json"
-          : process.env.PUREOBOM_ONLY_BENCHMARK === "1"
-            ? "test-results/benchmark-integration.json"
-            : "test-results/extension-integration.json",
+      observationsOnly
+        ? `test-results/explanation-observations-${installed ? "installed" : "development"}.json`
+        : traceSourceOnly
+          ? `test-results/trace-source-${installed ? "installed" : "development"}.json`
+          : installed
+            ? "test-results/installed-extension-integration.json"
+            : process.env.PUREOBOM_ONLY_BENCHMARK === "1"
+              ? "test-results/benchmark-integration.json"
+              : "test-results/extension-integration.json",
     ),
   },
   launchArgs: [

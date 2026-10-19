@@ -17,6 +17,7 @@ import { functionFormatChecks } from "./formatFunction";
 import { previewValueChecks } from "./previewValues";
 import { iterationPreviewChecks } from "./iterationPreview";
 import { traceSourceChecks } from "./traceSource";
+import { explanationObservationChecks } from "./explanationObservations";
 const reports: string[] = [];
 async function until(
   check: () => boolean,
@@ -93,14 +94,23 @@ export async function run() {
     }
   };
   await ready();
-  if (process.env.PUREOBOM_ONLY_TRACE_SOURCE === "1") {
-    await traceSourceChecks(c, ready, reports);
+  if (
+    process.env.PUREOBOM_ONLY_TRACE_SOURCE === "1" ||
+    process.env.PUREOBOM_ONLY_OBSERVATIONS === "1"
+  ) {
+    const scope =
+      process.env.PUREOBOM_ONLY_OBSERVATIONS === "1"
+        ? "explanation-observations-only"
+        : "trace-source-only";
+    if (scope === "explanation-observations-only")
+      await explanationObservationChecks(c, ready, reports);
+    else await traceSourceChecks(c, ready, reports);
     await vscode.workspace.fs.writeFile(
       vscode.Uri.file(process.env.PUREOBOM_INTEGRATION_REPORT!),
       Buffer.from(
         JSON.stringify(
           {
-            scope: "trace-source-only",
+            scope,
             vscode: vscode.version,
             checks: reports,
             passed: reports.length,
@@ -112,9 +122,7 @@ export async function run() {
         ),
       ),
     );
-    console.log(
-      JSON.stringify({ scope: "trace-source-only", passed: reports.length }),
-    );
+    console.log(JSON.stringify({ scope, passed: reports.length }));
     return;
   }
   if (process.env.PUREOBOM_ONLY_BENCHMARK === "1") {
@@ -756,6 +764,7 @@ export async function run() {
   await previewValueChecks(c, ready, reports);
   await iterationPreviewChecks(c, ready, reports);
   await traceSourceChecks(c, ready, reports);
+  await explanationObservationChecks(c, ready, reports);
   await projectChecks(c, ready, reports);
   await benchmarkChecks(c, ready, reports);
   const report = {

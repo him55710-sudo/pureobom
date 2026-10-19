@@ -9,6 +9,7 @@ export function simulate(
   path: string,
   functionName: string,
   args: unknown[],
+  expectedFocus?: { start: number; end: number },
 ): Simulation {
   const trace: Trace[] = [];
   let traceCharacters = 0,
@@ -660,7 +661,21 @@ export function simulate(
   }
   try {
     const sf = get(path);
-    const result = invoke(binding(sf, functionName, new Env()), args);
+    const target = binding(sf, functionName, new Env());
+    if (expectedFocus) {
+      const captured =
+        target && typeof target === "object" ? closures.get(target) : undefined;
+      if (
+        !captured ||
+        captured.sf.fileName !== path ||
+        captured.fn.getStart(sf) !== expectedFocus.start ||
+        captured.fn.end !== expectedFocus.end
+      )
+        throw Error(
+          "선택한 선언을 계산 대상으로 확인할 수 없습니다. / The selected declaration is not the preview target.",
+        );
+    }
+    const result = invoke(target, args);
     // The same bounded value must be displayable by both worker and JSON UIs.
     encodePreviewMessage(result);
     return { ok: true, result, trace };
