@@ -103,7 +103,20 @@ export async function explanationObservationChecks(
     );
     assert.equal(expected[1].args, "[-0]");
     assert.equal(expected[0].execution?.steps[0].line, 1);
-    assert.match(expected[0].execution!.steps[0].text, /Infinity/);
+    assert.match(expected[0].execution!.steps[0].text, /0 \/ 0 → NaN/);
+    assert.ok(
+      expected[0].execution!.steps.some((step) =>
+        step.text.includes("1 / 0 → Infinity"),
+      ),
+    );
+    assert.ok(
+      expected[1].execution!.steps.some((step) =>
+        step.text.includes("1 / -0 → -Infinity"),
+      ),
+    );
+    reports.push(
+      "Explanation arithmetic: actual worker records original expressions and evaluated operand/result values for zero division and signed infinity, separately from the returned object, with no model inference",
+    );
     observed.items[0].execution!.steps[0].line = 99;
     observed.items[0].execution!.steps[0].text = "forged trace";
     await c.assistant.observationSource(observed.id, c.state.contextId, 0, 0);

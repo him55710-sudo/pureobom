@@ -14,7 +14,12 @@ export function simulate(
   const trace: Trace[] = [];
   let traceCharacters = 0,
     traceOmitted = false;
-  const record = (path: string | undefined, line: number, text: string) => {
+  const record = (
+    path: string | undefined,
+    line: number,
+    text: string,
+    nonFiniteArithmetic = false,
+  ) => {
     if (trace.length >= 200 || traceCharacters >= 30000) {
       if (!traceOmitted)
         trace.push({
@@ -34,9 +39,11 @@ export function simulate(
       line,
       text: shown,
       ...(text.length > 2000 ? { truncated: true as const } : {}),
+      ...(nonFiniteArithmetic ? { nonFiniteArithmetic: true as const } : {}),
     });
   };
   const recordReturn = (path: string, line: number, value: unknown) => {
+    if (traceOmitted) return;
     // Recording must not prevent an intermediate closure/large value from flowing
     // through the interpreter. Top-level results still pass the transport guard.
     let shown: string;
@@ -348,14 +355,14 @@ export function simulate(
         const r = expr(n.right, sf, env);
         const value = ["&&=", "||=", "??="].includes(op)
           ? r
-          : binary(op.slice(0, -1), l, r, n);
+          : calculatedBinary(op.slice(0, -1), l, r, n, sf);
         return env.assign((n.left as ts.Identifier).text, value);
       }
       if (op === "&&") return l && expr(n.right, sf, env);
       if (op === "||") return l || expr(n.right, sf, env);
       if (op === "??") return l ?? expr(n.right, sf, env);
       const r = expr(n.right, sf, env);
-      return binary(op, l, r, n);
+      return calculatedBinary(op, l, r, n, sf);
     }
     if (ts.isArrayLiteralExpression(n)) {
       const values = new Array(n.elements.length);
@@ -479,6 +486,42 @@ export function simulate(
       return bad(n);
     }
     return bad(n);
+  }
+  function calculatedBinary(
+    op: string,
+    l: any,
+    r: any,
+    n: ts.BinaryExpression,
+    sf: ts.SourceFile,
+  ): any {
+    // Evaluate operands exactly once in expr(), then record the already computed result.
+    const value = binary(op, l, r, n);
+    if (traceOmitted || !["+", "-", "*", "/", "%", "**"].includes(op))
+      return value;
+    const line =
+      sf.getLineAndCharacterOfPosition(n.operatorToken.getStart(sf)).line + 1;
+    if (trace.length >= 200 || traceCharacters >= 30000) {
+      record(sf.fileName, line, "");
+      return value;
+    }
+    let shown: string;
+    try {
+      shown = `계산 / arithmetic: ${n.getText(sf)}\n${displayValue(l)} ${op} ${displayValue(r)} → ${displayValue(value)}`;
+    } catch {
+      record(
+        undefined,
+        line,
+        "연산의 과정 표시는 생략했습니다. / Arithmetic values cannot be displayed in this trace.",
+      );
+      return value;
+    }
+    record(
+      sf.fileName,
+      line,
+      shown,
+      typeof value === "number" && !Number.isFinite(value),
+    );
+    return value;
   }
   function binary(op: string, l: any, r: any, n: ts.Node): any {
     switch (op) {

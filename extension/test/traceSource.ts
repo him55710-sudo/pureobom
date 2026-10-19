@@ -97,8 +97,11 @@ export async function traceSourceChecks(
       [leftUri, 2],
       [leftUri, 3],
       [leftUri, 5],
+      [leftUri, 5],
       [leftUri, 4],
       [rightUri, 3],
+      [rightUri, 3],
+      [mainUri, 4],
       [mainUri, 4],
     ] as const;
     for (let i = 0; i < expected.length; i++) {

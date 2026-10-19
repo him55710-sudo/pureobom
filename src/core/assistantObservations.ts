@@ -77,22 +77,38 @@ function executionRecords(trace: import("./types").Trace[], path: string) {
       omitted = true;
       return [];
     }
-    return [{ order: index + 1, line: step.line, text: step.text }];
+    return [
+      {
+        order: index + 1,
+        line: step.line,
+        text: step.text,
+        nonFinite: !!step.nonFiniteArithmetic,
+      },
+    ];
   });
-  // Keep both early decisions and final observations, with original indexes showing gaps.
-  const selected =
-    eligible.length > assistantExecutionLimits.steps
-      ? [...eligible.slice(0, 8), ...eligible.slice(-4)]
-      : eligible;
+  // Reserve room for early non-finite arithmetic even when a long trace would hide it.
+  const priority = [
+    ...eligible.filter((step) => step.nonFinite).slice(0, 2),
+    ...eligible.slice(-4),
+    ...eligible.slice(0, 6),
+    ...eligible,
+  ];
+  const selected = [...new Set(priority)].slice(
+    0,
+    assistantExecutionLimits.steps,
+  );
   if (selected.length !== eligible.length) omitted = true;
   let characters = 0;
-  const steps = selected.filter((step) => {
-    if (characters + step.text.length > assistantExecutionLimits.characters) {
-      omitted = true;
-      return false;
-    }
-    characters += step.text.length;
-    return true;
-  });
+  const steps = selected
+    .filter((step) => {
+      if (characters + step.text.length > assistantExecutionLimits.characters) {
+        omitted = true;
+        return false;
+      }
+      characters += step.text.length;
+      return true;
+    })
+    .sort((a, b) => a.order - b.order)
+    .map(({ nonFinite, ...step }) => step);
   return { steps, omitted };
 }

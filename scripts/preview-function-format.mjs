@@ -6,17 +6,21 @@ import { Worker } from "node:worker_threads";
 const rust = process.argv.includes("--rust");
 const progress = process.argv.includes("--progress");
 const execution = process.argv.includes("--execution");
-const focus = process.argv.includes("--focus") || progress || execution;
+const arithmetic = process.argv.includes("--arithmetic");
+const focus =
+  process.argv.includes("--focus") || progress || execution || arithmetic;
 const folder = resolve(
-  execution
-    ? "test-results/execution-records-ui"
-    : progress
-      ? "test-results/local-ai-progress-ui"
-      : focus
-        ? "test-results/focused-explanation-ui"
-        : rust
-          ? "test-results/rust-source-ui"
-          : "test-results/function-format-ui",
+  arithmetic
+    ? "test-results/arithmetic-records-ui"
+    : execution
+      ? "test-results/execution-records-ui"
+      : progress
+        ? "test-results/local-ai-progress-ui"
+        : focus
+          ? "test-results/focused-explanation-ui"
+          : rust
+            ? "test-results/rust-source-ui"
+            : "test-results/function-format-ui",
 );
 const path = rust ? "sample.rs" : "sample.ts";
 await mkdir(folder, { recursive: true });
@@ -28,7 +32,9 @@ let seq = 0,
   reviewed = false;
 let source = rust
   ? '// 😀 Unicode anchors\nconst LIMIT: u64 = 9007199254740993u64;\npub fn label(count: u32) -> &\'static str {\n    match count {\n        0 => r#"아직 없음"#,\n        n if n < 10 => "a few",\n        _ => "many",\n    }\n}\n'
-  : "export function total(rows: number[]) { let amount=0, index=0; while(index<rows.length) { amount+=rows[index]; index++; } return amount; }\nconst untouched=()=>2;\n";
+  : arithmetic
+    ? "export function quotient(dividend: number, divisor: number) {\n  return dividend / divisor;\n}\n"
+    : "export function total(rows: number[]) { let amount=0, index=0; while(index<rows.length) { amount+=rows[index]; index++; } return amount; }\nconst untouched=()=>2;\n";
 const calls = [],
   pending = new Map();
 worker.on("message", (response) => {

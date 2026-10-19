@@ -137,6 +137,7 @@ export type Trace = {
   line: number;
   text: string;
   truncated?: true;
+  nonFiniteArithmetic?: true;
 };
 export type Simulation = {
   ok: boolean;

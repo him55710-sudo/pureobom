@@ -33,6 +33,7 @@ describe("calculation source locations", () => {
       { path: "nested/helper.ts", line: 2 },
       { path: "nested/helper.ts", line: 3 },
       { path: "nested/helper.ts", line: 5 },
+      { path: "nested/helper.ts", line: 5 },
       { path: "nested/helper.ts", line: 4 },
       { path: "main.ts", line: 3 },
     ]);

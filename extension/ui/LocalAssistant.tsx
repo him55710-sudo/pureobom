@@ -490,8 +490,8 @@ export function LocalAssistant({
                       </summary>
                       <p className="muted">
                         {t(
-                          "현재 파일에서 기록한 분기·반환과 반복 요약입니다. 전체 실행 과정이나 앱 테스트는 아닙니다. 반복 요약은 반복 종료 시 기록됩니다.",
-                          "Recorded conditions, returns and loop summaries in this file. This is not a full execution trace or an application test. Loop summaries are recorded on exit.",
+                          "현재 파일에서 기록한 산술 계산·분기·반환과 반복 요약입니다. 계산식 아래에는 계산에 사용한 값과 결과가 표시됩니다. 전체 실행 과정이나 앱 테스트는 아닙니다. 반복 요약은 반복 종료 시 기록됩니다.",
+                          "Recorded arithmetic, conditions, returns and loop summaries in this file. Arithmetic shows evaluated operands and their result below the source expression. This is not a full execution trace or an application test. Loop summaries are recorded on exit.",
                         )}
                       </p>
                       {row.execution.omitted && (

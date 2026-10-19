@@ -157,8 +157,9 @@ describe("observations attached to local explanations", () => {
     expect(rows[1].execution).toEqual({
       steps: [
         { order: 1, line: 3, text: "x <= 0 → false" },
-        { order: 2, line: 1, text: "결과 / return: 6" },
-        { order: 3, line: 4, text: "결과 / return: 6" },
+        { order: 2, line: 1, text: "계산 / arithmetic: x*2\n3 * 2 → 6" },
+        { order: 3, line: 1, text: "결과 / return: 6" },
+        { order: 4, line: 4, text: "결과 / return: 6" },
       ],
       omitted: false,
     });
