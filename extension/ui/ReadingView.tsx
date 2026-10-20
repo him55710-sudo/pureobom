@@ -1,7 +1,14 @@
-import { useState, type ComponentProps, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
 import { Story, Steps } from "../../src/components/Story";
 import { label } from "../../src/core/labels";
 import type { Lang, Step } from "../../src/core/types";
+import { functionNesting } from "../../src/core/functionNesting";
 
 type Props = ComponentProps<typeof Story> & {
   onRules: () => void;
@@ -27,6 +34,11 @@ export function ReadingView(props: Props) {
   const [query, setQuery] = useState("");
   const [limit, setLimit] = useState(12);
   const fn = a.functions.find((f) => f.id === selected) || a.functions[0];
+  const nesting = functionNesting(a.functions, fn?.id || "");
+  const focusHeading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (selected && selected === fn?.id) focusHeading.current?.focus();
+  }, [selected, fn?.id]);
   const matches = a.functions.filter((f) =>
     `${f.label[lang]} ${f.name}`.toLowerCase().includes(query.toLowerCase()),
   );
@@ -201,7 +213,9 @@ export function ReadingView(props: Props) {
                 <span className="eyebrow">
                   {t("지금 살펴보는 기능", "FOCUS")}
                 </span>
-                <h2>{fn.label[lang]}</h2>
+                <h2 ref={focusHeading} tabIndex={-1}>
+                  {fn.label[lang]}
+                </h2>
                 <code className="muted">{fn.name}</code>
               </div>
               <button
@@ -267,6 +281,49 @@ export function ReadingView(props: Props) {
                   "No supported body to explain. Check the source.",
                 )}
               </p>
+            )}
+            {(nesting.parent || nesting.children.length > 0) && (
+              <nav
+                className="function-nesting"
+                aria-label={t(
+                  "안쪽·바깥 함수 읽기",
+                  "Read inner and outer functions",
+                )}
+              >
+                {nesting.parent && (
+                  <button onClick={() => setSelected(nesting.parent!.id)}>
+                    {t("바깥 함수 읽기", "Read outer function")}:{" "}
+                    {nesting.parent.label[lang]} · L{nesting.parent.line}
+                  </button>
+                )}
+                {nesting.children.length > 0 && (
+                  <>
+                    <h3>
+                      {t(
+                        "이 원문 안에 정의된 함수",
+                        "Functions defined inside this source",
+                      )}
+                    </h3>
+                    <p className="muted">
+                      {t(
+                        "따로 정의된 함수의 입력과 본문도 이어서 읽어보세요. 원문에 포함된 관계이며 호출 순서를 뜻하지 않습니다.",
+                        "Continue into each function's inputs and body. These links show source nesting, not call order.",
+                      )}
+                    </p>
+                    <div className="function-nesting-links">
+                      {nesting.children.map((child) => (
+                        <button
+                          key={child.id}
+                          onClick={() => setSelected(child.id)}
+                        >
+                          {t("본문 읽기", "Read body")}: {child.label[lang]} · L
+                          {child.line}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </nav>
             )}
             <footer>
               <span>

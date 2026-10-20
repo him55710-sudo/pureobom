@@ -176,8 +176,8 @@ export function expression(
       : `create ${n.expression.getText(sf)} (${n.arguments?.map(e).join(", ") || ""})`;
   if (ts.isArrowFunction(n) || ts.isFunctionExpression(n))
     return ko
-      ? "함수 값 (본문은 아래 기능 설명 참조, 호출 시점은 호출하는 코드에 따름)"
-      : "a function value (see its body below; the calling code determines when it runs)";
+      ? "함수 값 (해당 함수의 별도 설명에서 본문 확인, 호출 시점은 호출하는 코드에 따름)"
+      : "a function value (read its body in the separate function entry; the calling code determines when it runs)";
   if (
     ts.isJsxElement(n) ||
     ts.isJsxSelfClosingElement(n) ||
@@ -640,11 +640,16 @@ export function analyzeFile(
         ...at(n),
         id: `fn:${n.getStart(sf)}`,
         name,
-        label: naming.describe(
-          n.name ||
-            (ts.isVariableDeclaration(n.parent) ? n.parent.name : undefined),
-          name,
-        ),
+        label:
+          !n.name && !ts.isVariableDeclaration(n.parent)
+            ? words("이름 없는 함수", "Anonymous function")
+            : naming.describe(
+                n.name ||
+                  (ts.isVariableDeclaration(n.parent)
+                    ? n.parent.name
+                    : undefined),
+                name,
+              ),
         params: n.parameters.map((p) => ({
           name: p.name.getText(sf),
           label: naming.describe(p.name),

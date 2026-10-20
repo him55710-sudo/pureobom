@@ -399,6 +399,23 @@
   margin-top: 18px;
   padding-top: 14px;
 }
+.function-nesting {
+  border-top: 1px solid var(--line);
+  margin-top: 18px;
+  padding-top: 14px;
+}
+.function-nesting p {
+  line-height: 1.65;
+}
+.function-nesting-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.function-nesting button {
+  white-space: normal;
+  text-align: left;
+}
 .focus-function > footer > span {
   color: var(--muted);
   font-size: 10px;
