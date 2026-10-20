@@ -1,0 +1,968 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-20",
+  "scope": "One real private web application, actual entrypoint and assets; anonymized aggregates only. Agent-reviewed, not independent validation.",
+  "productSourceRevision": "84e5ffa96cbf63df58ef82cdafd734c440227fc0",
+  "testedRuntimeRevision": "49b1a2b34f311538503f2e190123041d35d92805",
+  "candidate": {
+    "origin": "Agent-authored; not Ollama inference",
+    "productProposalParser": "accepted three exact source edits",
+    "syntaxCheck": "passed",
+    "nativeApplyUndo": "not evaluated in this experiment",
+    "adopted": false
+  },
+  "baselineProjectChecks": {
+    "passed": 8,
+    "failed": 0,
+    "scope": "Existing tests on unchanged evaluation copy; they do not exercise the changed rendering path. Not a candidate correctness result."
+  },
+  "originalPreserved": {
+    "evaluationCheckoutClean": true,
+    "sourceHashUnchanged": true,
+    "originalUserCheckoutWritten": false
+  },
+  "method": {
+    "browser": "Windows ChatGPT in-app browser (Chromium)",
+    "externalFontRequests": "removed for both variants",
+    "checkpoints": "Controlled render progress, same/different-size resize, motion toggle, missing/replacement image; pixel hashes and relevant DOM state",
+    "timing": "One warmup then seven paired alternating-order samples; 3025 synchronous render submissions per sample with intentionally repeated progress.",
+    "timingInterpretation": "Synthetic submission timing, not frame rate, GPU completion, memory, network, or user-perceived latency.",
+    "diagnosticModes": "default, willReadFrequently true, willReadFrequently false; adapter-only changes on both variants. Backend transition not directly measured."
+  },
+  "runs": [
+    {
+      "attempt": 1,
+      "viewportWidth": 920,
+      "contextMode": "default",
+      "contextReuse": "initial",
+      "timingAfterPixelReadback": true,
+      "checkedAt": "2026-10-19T22:07:59.472Z",
+      "selectedCheckpoints": 57,
+      "pixelMismatches": 2,
+      "domOrSizeMismatches": 0,
+      "samples": {
+        "baseline": [
+          {
+            "elapsedMs": 417.30000001192093,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 284.40000000596046,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 287.90000000596046,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 256.6000000089407,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 255.8999999910593,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 265.79999999701977,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 273.20000000298023,
+            "drawCalls": 3025,
+            "renders": 3025
+          }
+        ],
+        "candidate": [
+          {
+            "elapsedMs": 271.59999999403954,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 289.5,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 256.8999999910593,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 234.20000000298023,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 217.6000000089407,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 211,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 246.6000000089407,
+            "drawCalls": 23,
+            "renders": 3025
+          }
+        ]
+      },
+      "summary": {
+        "snapshots": 57,
+        "pixelAndDOMMismatches": 2,
+        "baselineDrawCalls": [
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025
+        ],
+        "candidateDrawCalls": [
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23
+        ],
+        "baselineMedianMs": 273.20000000298023,
+        "candidateMedianMs": 246.6000000089407,
+        "rendersPerSample": 3025
+      }
+    },
+    {
+      "attempt": 2,
+      "viewportWidth": 920,
+      "contextMode": "default",
+      "contextReuse": "same-context rerun",
+      "timingAfterPixelReadback": true,
+      "checkedAt": "2026-10-19T22:09:42.506Z",
+      "selectedCheckpoints": 57,
+      "pixelMismatches": 0,
+      "domOrSizeMismatches": 0,
+      "samples": {
+        "baseline": [
+          {
+            "elapsedMs": 773.7000000029802,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 687.6999999880791,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 637.2000000029802,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 666,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 610.2000000029802,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 594.6000000089407,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 681.7000000029802,
+            "drawCalls": 3025,
+            "renders": 3025
+          }
+        ],
+        "candidate": [
+          {
+            "elapsedMs": 588.7000000029802,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 673.7000000029802,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 543.3999999910593,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 572.9000000059605,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 586.2999999970198,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 536.5,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 578,
+            "drawCalls": 23,
+            "renders": 3025
+          }
+        ]
+      },
+      "summary": {
+        "snapshots": 57,
+        "pixelAndDOMMismatches": 0,
+        "baselineDrawCalls": [
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025
+        ],
+        "candidateDrawCalls": [
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23
+        ],
+        "baselineMedianMs": 666,
+        "candidateMedianMs": 578,
+        "rendersPerSample": 3025
+      }
+    },
+    {
+      "attempt": 3,
+      "viewportWidth": 920,
+      "contextMode": "default",
+      "contextReuse": "fresh for each correctness/timing phase",
+      "timingAfterPixelReadback": false,
+      "checkedAt": "2026-10-19T22:13:35.129Z",
+      "selectedCheckpoints": 57,
+      "pixelMismatches": 2,
+      "domOrSizeMismatches": 0,
+      "samples": {
+        "baseline": [
+          {
+            "elapsedMs": 556.1999999880791,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 611.5999999940395,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 595.7000000029802,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 693.7000000029802,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 585.8999999910593,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 562,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 580.4000000059605,
+            "drawCalls": 3025,
+            "renders": 3025
+          }
+        ],
+        "candidate": [
+          {
+            "elapsedMs": 432.09999999403954,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 489.40000000596046,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 487.90000000596046,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 533.0999999940395,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 502.20000000298023,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 496,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 480.70000000298023,
+            "drawCalls": 23,
+            "renders": 3025
+          }
+        ]
+      },
+      "summary": {
+        "width": 920,
+        "contextMode": "default",
+        "snapshots": 57,
+        "pixelAndDOMMismatches": 2,
+        "baselineDrawCalls": [
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025
+        ],
+        "candidateDrawCalls": [
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23
+        ],
+        "baselineMedianMs": 585.8999999910593,
+        "candidateMedianMs": 489.40000000596046,
+        "rendersPerSample": 3025
+      }
+    },
+    {
+      "attempt": 4,
+      "viewportWidth": 600,
+      "contextMode": "default",
+      "contextReuse": "fresh for each correctness/timing phase",
+      "timingAfterPixelReadback": false,
+      "checkedAt": "2026-10-19T22:13:51.309Z",
+      "selectedCheckpoints": 57,
+      "pixelMismatches": 2,
+      "domOrSizeMismatches": 0,
+      "samples": {
+        "baseline": [
+          {
+            "elapsedMs": 543.5,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 567.6000000089407,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 687.7999999970198,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 607.0999999940395,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 593.3999999910593,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 578.4000000059605,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 636.4000000059605,
+            "drawCalls": 3025,
+            "renders": 3025
+          }
+        ],
+        "candidate": [
+          {
+            "elapsedMs": 566.5,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 505.3999999910593,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 537,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 496.20000000298023,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 566.5,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 507.5,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 595.8999999910593,
+            "drawCalls": 23,
+            "renders": 3025
+          }
+        ]
+      },
+      "summary": {
+        "width": 600,
+        "contextMode": "default",
+        "snapshots": 57,
+        "pixelAndDOMMismatches": 2,
+        "baselineDrawCalls": [
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025
+        ],
+        "candidateDrawCalls": [
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23
+        ],
+        "baselineMedianMs": 593.3999999910593,
+        "candidateMedianMs": 537,
+        "rendersPerSample": 3025
+      }
+    },
+    {
+      "attempt": 5,
+      "viewportWidth": 920,
+      "contextMode": "readback",
+      "contextReuse": "fresh for each correctness/timing phase",
+      "timingAfterPixelReadback": false,
+      "checkedAt": "2026-10-19T22:14:06.999Z",
+      "selectedCheckpoints": 57,
+      "pixelMismatches": 0,
+      "domOrSizeMismatches": 0,
+      "samples": {
+        "baseline": [
+          {
+            "elapsedMs": 588.3999999910593,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 570.4000000059605,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 551,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 605.7999999970198,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 657.7999999970198,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 560.9000000059605,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 577.5,
+            "drawCalls": 3025,
+            "renders": 3025
+          }
+        ],
+        "candidate": [
+          {
+            "elapsedMs": 494.70000000298023,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 540.7000000029802,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 511.70000000298023,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 475.09999999403954,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 540.3999999910593,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 607.7000000029802,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 512,
+            "drawCalls": 23,
+            "renders": 3025
+          }
+        ]
+      },
+      "summary": {
+        "width": 920,
+        "contextMode": "readback",
+        "snapshots": 57,
+        "pixelAndDOMMismatches": 0,
+        "baselineDrawCalls": [
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025
+        ],
+        "candidateDrawCalls": [
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23
+        ],
+        "baselineMedianMs": 577.5,
+        "candidateMedianMs": 512,
+        "rendersPerSample": 3025
+      }
+    },
+    {
+      "attempt": 6,
+      "viewportWidth": 600,
+      "contextMode": "readback",
+      "contextReuse": "fresh for each correctness/timing phase",
+      "timingAfterPixelReadback": false,
+      "checkedAt": "2026-10-19T22:16:03.488Z",
+      "selectedCheckpoints": 57,
+      "pixelMismatches": 0,
+      "domOrSizeMismatches": 0,
+      "samples": {
+        "baseline": [
+          {
+            "elapsedMs": 8097.79999999702,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 8342.699999988079,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 7372.600000008941,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 7443.29999999702,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 7144,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 4294.800000011921,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 5011.5999999940395,
+            "drawCalls": 3025,
+            "renders": 3025
+          }
+        ],
+        "candidate": [
+          {
+            "elapsedMs": 627.0999999940395,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 674,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 599.2999999970198,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 617.2999999970198,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 319,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 322.40000000596046,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 327.5,
+            "drawCalls": 23,
+            "renders": 3025
+          }
+        ]
+      },
+      "summary": {
+        "width": 600,
+        "contextMode": "readback",
+        "snapshots": 57,
+        "pixelAndDOMMismatches": 0,
+        "baselineDrawCalls": [
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025
+        ],
+        "candidateDrawCalls": [
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23
+        ],
+        "baselineMedianMs": 7372.600000008941,
+        "candidateMedianMs": 599.2999999970198,
+        "rendersPerSample": 3025
+      }
+    },
+    {
+      "attempt": 7,
+      "viewportWidth": 920,
+      "contextMode": "no-readback-hint",
+      "contextReuse": "fresh for each correctness/timing phase",
+      "timingAfterPixelReadback": false,
+      "checkedAt": "2026-10-19T22:16:13.556Z",
+      "selectedCheckpoints": 57,
+      "pixelMismatches": 0,
+      "domOrSizeMismatches": 0,
+      "samples": {
+        "baseline": [
+          {
+            "elapsedMs": 304.29999999701977,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 277.40000000596046,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 321.70000000298023,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 315.59999999403954,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 286.29999999701977,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 412,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 398,
+            "drawCalls": 3025,
+            "renders": 3025
+          }
+        ],
+        "candidate": [
+          {
+            "elapsedMs": 238.40000000596046,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 244.09999999403954,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 298.70000000298023,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 363.69999998807907,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 299.79999999701977,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 319.70000000298023,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 340.1000000089407,
+            "drawCalls": 23,
+            "renders": 3025
+          }
+        ]
+      },
+      "summary": {
+        "width": 920,
+        "contextMode": "no-readback-hint",
+        "snapshots": 57,
+        "pixelAndDOMMismatches": 0,
+        "baselineDrawCalls": [
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025
+        ],
+        "candidateDrawCalls": [
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23
+        ],
+        "baselineMedianMs": 315.59999999403954,
+        "candidateMedianMs": 299.79999999701977,
+        "rendersPerSample": 3025
+      }
+    },
+    {
+      "attempt": 8,
+      "viewportWidth": 600,
+      "contextMode": "no-readback-hint",
+      "contextReuse": "fresh for each correctness/timing phase",
+      "timingAfterPixelReadback": false,
+      "checkedAt": "2026-10-19T22:16:23.104Z",
+      "selectedCheckpoints": 57,
+      "pixelMismatches": 0,
+      "domOrSizeMismatches": 0,
+      "samples": {
+        "baseline": [
+          {
+            "elapsedMs": 276.29999999701977,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 321.79999999701977,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 320.59999999403954,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 301.5,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 311.5,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 323.20000000298023,
+            "drawCalls": 3025,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 341.3999999910593,
+            "drawCalls": 3025,
+            "renders": 3025
+          }
+        ],
+        "candidate": [
+          {
+            "elapsedMs": 266.1000000089407,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 288,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 312.90000000596046,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 260,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 356,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 291.70000000298023,
+            "drawCalls": 23,
+            "renders": 3025
+          },
+          {
+            "elapsedMs": 405.20000000298023,
+            "drawCalls": 23,
+            "renders": 3025
+          }
+        ]
+      },
+      "summary": {
+        "width": 600,
+        "contextMode": "no-readback-hint",
+        "snapshots": 57,
+        "pixelAndDOMMismatches": 0,
+        "baselineDrawCalls": [
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025,
+          3025
+        ],
+        "candidateDrawCalls": [
+          23,
+          23,
+          23,
+          23,
+          23,
+          23,
+          23
+        ],
+        "baselineMedianMs": 320.59999999403954,
+        "candidateMedianMs": 291.70000000298023,
+        "rendersPerSample": 3025
+      }
+    }
+  ],
+  "decision": {
+    "result": "not-adopted",
+    "reason": "Default-context pixel differences reproduced at both viewport widths. Controlled hints and a warm rerun do not erase the initial mismatch.",
+    "inference": "Readback-induced backend differences are plausible, supported by Chromium source and controlled-context results; actual browser backend transition and exact cause remain unmeasured.",
+    "notValidated": [
+      "Real user scroll/event sequences",
+      "Other browsers or devices",
+      "Native application and undo for this candidate",
+      "Local model optimization quality",
+      "Whole-project correctness",
+      "Scientific or medical validity",
+      "User-perceived performance improvement"
+    ]
+  },
+  "references": [
+    "https://chromium.googlesource.com/chromium/src/+/500947f508e484696c809b5ea84568bfd51b320a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc",
+    "https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+  ],
+  "privacy": "Private source, identifiers, inputs/results, assets, raw screenshots, full adapters and raw reports are not published. Public repository alone cannot reproduce the private-source experiment.",
+  "presentation": {
+    "kind": "Static aggregate report rendered in a browser; not the private application or execution UI",
+    "html": "canvas-evaluation.html",
+    "screenshot": "canvas-evaluation.png",
+    "screenshotSha256": "83a562a63d0de215e4ef6044d73b4789ec539301045dbaf68489744d044d33fc"
+  },
+  "cleanup": "Owned private evaluation servers, static report server and temporary browser tab stopped after completion. Other projects were not touched."
+}

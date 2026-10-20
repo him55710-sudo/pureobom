@@ -1,0 +1,34 @@
+{
+  "source": "export function values() { return { nan: 0/0, positive: 1/0, negative: -1/0, zero: -0, absent: undefined, text: \"NaN\", literal: null, nested: [undefined, 0/0, \"[NaN]\"] }; }",
+  "engineDisplay": "{\"nan\": NaN, \"positive\": Infinity, \"negative\": -Infinity, \"zero\": -0, \"absent\": undefined, \"text\": \"NaN\", \"literal\": null, \"nested\": [undefined, NaN, \"[NaN]\"]}",
+  "webviewDisplay": "{\"nan\": null, \"positive\": null, \"negative\": null, \"zero\": 0, \"text\": \"NaN\", \"literal\": null, \"nested\": [null, null, \"[NaN]\"]}",
+  "trace": [
+    {
+      "line": 1,
+      "text": "values.ts · 결과 / return: {\"nan\":null,\"positive\":null,\"negative\":null,\"zero\":0,\"text\":\"NaN\",\"literal\":null,\"nested\":[null,null,\"[NaN]\"]}"
+    }
+  ],
+  "wire": {
+    "ok": true,
+    "result": {
+      "nan": null,
+      "positive": null,
+      "negative": null,
+      "zero": 0,
+      "text": "NaN",
+      "literal": null,
+      "nested": [
+        null,
+        null,
+        "[NaN]"
+      ]
+    },
+    "trace": [
+      {
+        "line": 1,
+        "text": "values.ts · 결과 / return: {\"nan\":null,\"positive\":null,\"negative\":null,\"zero\":0,\"text\":\"NaN\",\"literal\":null,\"nested\":[null,null,\"[NaN]\"]}"
+      }
+    ]
+  },
+  "expected": "NaN / Infinity / -Infinity / -0 / undefined remain distinct from null and strings"
+}

@@ -4,6 +4,46 @@
 
 ## 현재 상태
 
+- **최신 런타임 검증:** `d9e11b2`의 [Windows·Ubuntu CI](evidence/local-ai/check-comparison-ci.json)는 각 핵심 **369개/37파일**, 실제 VS Code 개발·production 설치 **각 72개**, 설치 파일 11개·패키지 검사 7개를 통과했다. 기능 런타임은 `c602693`이며 후속 커밋은 테스트 동기화만 바꿨다. 로컬 확장·worker·UI JS/CSS 네 파일은 양쪽 설치본과 일치하고, 로컬 개발 VSIX의 실행 파일 11개는 Windows 설치본과 일치한다. 안정 배포·전체 품질 완료와 구분한다.
+
+- **수정 전후 검사 비교:** [완료 결과를 세션 기준으로 보관](CHECK_COMPARISON.md)하고 같은 조건의 다음 실행과 비교한다. 핵심 11개와 실제 VS Code 공개 흐름에서 정상 종료→실패→undo 후 정상 종료, 잘못된 기준 요청·manifest 변경 차단을 확인했다. 고정 사용자 프로젝트에서도 원래 검사→기준 보관→함수 줄바꿈 정리→검사→undo→검사까지 세 번 정상 종료했고 바이트 차이·복구가 표시됐다. 원본은 건드리지 않았다. [익명 결과](evidence/local-ai/check-comparison-verification.json). 종료 코드 비교이며 전체 동작 동일성·성능·테스트 범위를 판정하지 않는다.
+
+- **기존 검사 스크립트 연결:** [VS Code가 발견한 package 검사](PROJECT_CHECKS.md)를 그룹 없이 선택할 수 있게 했다. 실제 스크립트·앞뒤 명령을 표시하고 manifest 변경 후 실행을 차단한다. 핵심 4개·native 흐름 2개와 한/영 UI를 확인했고, 고정 사용자 프로젝트에서 별도 task 설정 없이 원래 검사 명령이 정상 종료했다. 원본·manifest를 보존했으며 테스트 수·전체 정확도·최적화 성과로 확대하지 않는다. [익명 근거·초기 환경 실패](evidence/local-ai/package-scripts-verification.json).
+- **스크립트 연결 단계 검증:** `387a70f`의 [Windows·Ubuntu CI](evidence/local-ai/package-scripts-ci.json)는 각 핵심 358개·실제 VS Code 개발/production 설치 각 71개·설치 파일 11개·패키지 검사 7개를 통과했다. 로컬 개발 VSIX의 실행 파일 11개도 Windows 설치본과 일치했다. 안정 배포·전체 품질 완료와 구분한다.
+- **안쪽 함수 읽기:** [콜백·부모 함수 탐색](NESTED_FUNCTIONS.md)을 추가했다. 부분 핵심 18개(새 관계 4개), 한/영 UI와 실제 고정 프로젝트의 콜백 원문 위치를 확인했다. 모델 없이 사용하는 문법 탐색이며 호출 순서나 모든 언어의 의미 정확도를 보장하지 않는다.
+- **안쪽 함수 단계 검증:** `c6248bc`의 [Windows·Ubuntu 전체 CI](evidence/local-ai/nested-functions-ci.json)는 각 핵심 354개·VS Code 개발/production 설치 각 69개·설치 파일 11개·패키지 검사 7개를 통과했다. 로컬 확장·worker·UI JS/CSS 네 파일이 양쪽 설치본과 일치한다.
+- **설명 분할 실험 미채택:** [같은 실제 과제를 개요와 일곱 사례로 나눈 요청](SPLIT_EXPLANATION_EXPERIMENT.md)은 전체 600.014초에 종료됐다. 예정 8단계 중 형식 통과 3개에도 의미 오류가 남았고 3개는 미시도였다. 전체 과제 실패로 남기며 제품에 분할 실행 기능을 넣지 않았다.
+- **추론 설정 비교:** [모델 기본값·켜기/끄기·지원 수준 선택](LOCAL_AI_THINKING.md)을 구현했다. 부분 핵심 36개·native 설명 부분 7개·한/영 공개 UI를 확인했고, 생성 전 최신 지원 목록과 대조한다. 같은 실제 과제의 4B 켜기 요청은 [10분 생성 시간 초과](evidence/local-ai/thinking-settings-model.json)로 완성 응답을 받지 못했다. 기존 끄기 요청의 의미 오류도 남아 있어 설정 추가를 설명 품질 향상이나 제품 완성으로 세지 않는다.
+- **추론 설정 최종 검사:** `e832712`의 [Windows·Ubuntu CI](evidence/local-ai/thinking-settings-ci.json)는 각 핵심 350개·개발/production 설치 각 69개·설치 파일 11개·패키지 검사 7개를 통과했다. Windows 첫 Python 테스트 시간 초과와 같은 코드의 성공 재실행을 함께 남긴다. 설정 전달/설치 검증이며 실제 모델 의미 평가를 대체하지 않는다.
+
+- **산술 기록 후 실제 설명 품질:** [같은 과제의 7B·4B 요청](evidence/local-ai/arithmetic-model-followup.json)은 약 499·428초에 완성되고 인용/예시 구조 검사를 통과했다. 그러나 7B는 세 반환 사례를 예외로, 4B는 한 반환값과 반복 조건의 보장을 잘못 설명해 두 과제 모두 실패했다. 일부 맞는 원인 설명은 있지만 일반 품질 개선의 근거로 세지 않는다. 실제 코드·질문·입력은 유지했고 원문을 보존했다. 추론 옵션의 품질/지연 영향은 별도로 검증해야 한다.
+
+- **결과 비교 결함 후속:** [빈 배열과 빈 자리 구분](SPARSE_COMPARISON.md)으로 서로 다른 반환 배열을 같다고 표시한 결함을 수정했다. 수정 전 세 실패를 재현했고 수정 후 관련 핵심 29개·확장 빌드가 통과했다. 공개 회귀 예제이며 실제 사용자 프로젝트의 오류 발견이나 모델 최적화 성공으로 세지 않는다. [근거](evidence/local-ai/sparse-comparison-verification.json).
+- **배열 비교 최종 검증:** `25d0c27`의 [Windows·Ubuntu CI](evidence/local-ai/sparse-comparison-ci.json)는 각 핵심 342개·개발/production 설치 각 68개·설치 파일 11개 해시·패키지 검사 7개를 통과했다. 새 비교 판정·값 전달·한/영 보고서 확인을 실제 로그에서 대조했다.
+
+- **계산식을 직접 대조:** [산술 기록](ARITHMETIC_RECORDS.md)에 원래 수식·실제 피연산자·결과를 추가했다. 핵심 부분 88개·확장 빌드·native 개발 예시 부분 6개/원문 이동 3개·한/영 UI를 확인했다. 같은 비공개 함수의 기존 일곱 입력에서 반환 여섯 개는 Node와 일치, 한 개는 확인 불가이며 원문을 보존했다. 두 사례의 비유한 연산을 표시하고 생략을 명시한다. 모델을 다시 평가하지 않았으므로 설명 품질 개선으로 세지 않는다. [실행 근거](evidence/local-ai/arithmetic-records-verification.json).
+- **산술 기록 최종 검증:** `00eedd7`의 [Windows·Ubuntu CI](evidence/local-ai/arithmetic-records-ci.json)는 각 핵심 335개·개발/production 설치 각 67개·설치 파일 11개 해시·패키지 검사 7개를 통과했다. 첫 CI 334 pass/1 fail은 기존 반환 기록 위치 가정을 고쳐 해결했고 첫 실패도 보존했다. 로컬 계산 엔진·UI 세 파일은 두 OS 설치본과 일치한다. 모델 의미 품질과 전체 앱 검증은 별도다.
+
+- **설명 근거의 실행 기록:** [예시별 계산 과정·원문 이동](EXPLANATION_EXECUTION.md)을 추가했다. 현재 파일의 조건 결과·반환·반복 요약을 한도 안에서 표시·첨부하고 다른 파일/생략 기록을 구분한다. 중첩 기록을 호스트에 깊게 복사해 화면 변조·오래된 식별자로 근거를 바꾸지 못하게 한다. 핵심 부분 82개·최종 확장 빌드·개발 부분 5개·한/영 공개 UI를 확인했다. [실제 7B](evidence/local-ai/execution-records-model.json)는 약 512초에 완료되고 여섯 반환값을 맞게 기술했지만 원인·입력 조건 설명 오류로 과제는 여전히 실패했다. 최종 교차 검증은 별도 기록으로 확인하며 전체 완성을 주장하지 않는다.
+- **실행 기록 최종 검증:** `0cf6b34`의 [Windows·Ubuntu CI](evidence/local-ai/execution-records-ci.json)는 각 핵심 329개·개발/production 설치 각 66개·설치 파일 11개 해시·패키지 검사 7개를 통과했다. 기록 전달·원문 이동·오래된 근거 차단의 제품 검증이며 실제 모델 의미 정확성을 대체하지 않는다.
+
+- **실제 웹 화면 평가:** 사용자가 지정한 프로젝트의 실제 진입점·자산으로 [Canvas 후보 전후 비교](CANVAS_EVALUATION.md)를 수행했다. 57개 관찰 지점을 첫 실행·재실행·넓이·읽기 설정별로 비교했고 기본 설정에서 2곳의 픽셀 차이가 재현돼 후보를 채택하지 않았다. 원래 프로젝트 테스트 8개는 통과했으나 변경한 그리기 경로의 검사가 아니다. 후보는 에이전트 작성이며 새 모델 최적화 성공, 전체 성능 개선 또는 범용 브라우저 검증 제품 기능으로 세지 않는다. 원본·배포는 보존했다.
+
+- **설명 누락 후속:** [실제 검사·호출 조건·모든 첨부 예시의 설명](STRUCTURED_EXPLANATIONS.md)을 별도 필수 항목으로 만들었다. 예시 누락·중복과 잘못된 인용 번호를 거절하고 화면에서 프로그램 값과 모델 문장을 구분한다. 핵심 부분 42개·확장 빌드·한/영 공개 UI를 확인했다. `49b1a2b`의 [Windows·Ubuntu CI](evidence/local-ai/explanation-coverage-ci.json)는 각 핵심 324개·개발/production 설치 각 65개·설치 파일 11개 해시·패키지 검사 7개를 통과했다. 실제 모델 의미 정확성과 구분한다.
+- **구조화 후 실제 품질:** [3B·7B 후속 요청](evidence/local-ai/explanation-coverage-models.json)은 약 278·509초에 완성됐다. 3B는 잘못된 인용 번호로 거절, 7B는 구조 검사를 통과했으나 실제 검사와 호출 전제를 섞고 세 경계 사례를 틀렸다. 원문·질문·예시는 유지했고 두 설명 과제 모두 의미 검토에 실패했다. 응답 완성·예시 항목 존재·정확한 인용을 유용한 설명의 정확성과 구분한다.
+
+- **실제 모델·지연 후속:** [같은 과제·같은 예시의 네 요청](evidence/local-ai/observed-explanation-models.json) 중 3B 기본 3분, 4B 선택 5분, 7B 선택 10분 요청은 각각 약 158·242·315초에 완성됐으나 의미 오류나 요구 사항 누락으로 설명 과제를 충족하지 못했다. 4B 기본 3분 요청은 생성 timeout이었다. 연결/모델/생성/검사 단계와 오류 단계를 표시하고 [대기 한도 선택](LOCAL_AI.md)을 제공한다. 오래 기다림과 모델 정확성을 구분한다.
+- **요청 진단 최종 검증:** `fd9d0b2`의 [Windows·Ubuntu CI](evidence/local-ai/local-ai-phases-ci.json)는 각 핵심 318개·개발/production 설치 각 64개·설치 파일 11개 해시·패키지 검사 7개를 통과했다. [로컬 부분 검사·화면](evidence/local-ai/local-ai-phases-verification.json)과 실제 모델 의미 평가를 분리한다. 일반 설명·수정·최적화 품질의 완료는 아니다.
+
+- **설명 근거 보강:** [AI 없는 예시 계산과 선택적 첨부](EXPLANATION_OBSERVATIONS.md)를 추가했다. 실제 사용자 코드의 선정 입력은 반환 6개가 Node와 일치, 1개는 확인 불가였으며 원문은 보존했다. 공개 fixture로 핵심 부분 68개·실제 개발/설치 부분 각 3개와 한/영 브라우저 UI를 검증했다. 7B 생성 timeout과 3B 연결 확인 timeout으로 모델 설명 개선은 미평가다. [실행 기록](evidence/local-ai/explanation-observations.json).
+- **예시 첨부 최종 검증:** `7a6e368`의 [Windows·Ubuntu CI](evidence/local-ai/explanation-observations-ci.json)는 각 핵심 312개·개발/production 설치 각 64개·설치 파일 11개 해시·패키지 검사를 통과했다. 실제 모델 품질이나 모든 언어의 계산 지원을 증명하지 않는다.
+
+- **계산 출처 이동 후속:** [다른 파일의 정확한 원본 줄 이동](TRACE_NAVIGATION.md)을 연결하고 최신 계산 식별자·원문 일치 확인을 추가했다. 핵심 부분 108개·개발/production 설치 부분 각 3개 통과와 전체 native 실패 2회·직접 UI 연결 실패를 [분리 기록](evidence/local-ai/trace-navigation.json)한다. 프로젝트 전체 검증이나 모델 품질 근거는 아니다.
+- **출처 이동 최종 검증:** 긴 경로 표시를 포함한 `13752f4`의 [Windows·Ubuntu CI](evidence/local-ai/trace-navigation-ci.json)는 각 핵심 304개·개발/production 설치 각 61개·설치 파일 11개 해시·패키지 검사를 통과했다. 위 로컬 전체 실패와 직접 UI 미확인을 해소했다고 하지 않는다.
+- **실제 대상 계산 후속:** [한도 있는 while·배열 콜백](BOUNDED_PREVIEW.md)으로 앞서 확인 불가였던 원래 대상 함수를 제품 worker에서 계산했다. 프로젝트 원래 assertion 3사례와 선정 11사례가 Node와 일치했고 소스를 보존했다. 앞선 미지원 기록은 당시 버전 근거로 유지한다. 전체 언어·모든 입력·모델 설명/수정·성능 최적화의 완료가 아니다.
+- **반복 계산 검증:** `5242fcc`의 [Windows·Ubuntu CI](evidence/local-ai/iteration-preview-ci.json)는 각 핵심 301개·개발/production 설치 각 58개를 통과했다. 로컬 전체 첫 timeout 및 해당 SDK 검사 재실행 17개 통과, 브라우저 연결 실패, 당시 남은 다른 파일 trace 이동 결함은 [상세 기록](BOUNDED_PREVIEW.md)에 분리했다. 이동 결함의 후속 수정은 위 별도 근거를 따른다.
+- **실제 결과 표시 보완:** [계산 값 보존](evidence/local-ai/preview-values.md)으로 JSON 전달 중 NaN/무한대/-0/undefined가 변하는 오류와 숨김 상위 폴더 아래 프로젝트의 소스 누락을 수정했다. 비공개 실제 코드의 지원 가능한 함수에서 선정한 입력 4개는 Node와 일치했지만 원래 요청 대상 함수의 미지원 구문·모델 설명 품질은 남아 있다. 프로젝트 전체 검증이나 최적화 성공은 아니다.
+- **표시 보완 검증:** 기능 커밋 `66a6781`의 [Windows·Ubuntu CI](evidence/local-ai/preview-values-ci.json)는 각 핵심 266개, 개발/production 설치 각 57개와 추출 도구 검사를 통과했다. [PR #1](https://github.com/him55710-sudo/pureobom/pull/1)의 격리 변경안이며 기본 브랜치 반영·안정 릴리스 배포와 구분한다.
 - **0.7 개발 소스:** 로컬 Ollama 연결, 정확한 원문에 연결한 다중 범위 편집, native diff·적용·undo, 기존 프로젝트 명령 실행, 전후 시간·메모리 측정이 있다. 공개 안정판과 Pages 데모는 **0.6.0**이며 새 기능 배포와 구분한다.
 - **설명 대상 연결:** [선택한 함수 설명](FOCUSED_EXPLANATIONS.md)을 읽기 화면에 연결했다. 호스트가 최신 원문 범위를 확인하고 해당 함수의 실제 인용을 요구한다. 전체 원문을 선택 함수와 앞뒤 문맥으로 구분해 보존한다. 첫 두 실제 요청은 timeout, [후속 CPU 응답 세 건](evidence/local-ai/focused-context-cpu.md)은 인용 또는 의미 검토에 실패했다. 요청별 CPU 선택은 제공하지만 실제 과제의 설명 품질은 아직 부족하다.
 - **함수 선택 후속 검증:** CPU 옵션과 원문 구분을 포함한 `954d6cf`의 [Windows·Ubuntu CI](evidence/local-ai/focused-context-cpu-ci.json)는 각 핵심 260개·개발/설치 각 55개·파일 11개 해시·추출 도구 실행을 통과했다. 로컬에서도 같은 수가 통과했으며 이전 시도의 Java timeout은 별도 실패로 남긴다. 실제 사용자 프로젝트의 모델 품질이나 원격·모든 환경 지원을 입증한 결과는 아니다.

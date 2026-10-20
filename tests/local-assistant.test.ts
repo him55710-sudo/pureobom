@@ -62,9 +62,9 @@ describe("grounded local assistant proposals", () => {
     const report = {
       summary: "입력에 두 배를 곱합니다. 입력 검사는 없습니다.",
       citations: [{ quote: "const scale = 2;", explanation: "배율 값입니다." }],
-      edits: [],
-      risks: [],
-      checks: [],
+      inputChecks: "입력 검사가 없습니다.",
+      callerRequirements: "숫자 입력을 전제로 설명합니다.",
+      examples: [],
     };
     expect(() => parse(report, selected)).toThrow(
       /inside the selected function/,
@@ -219,10 +219,15 @@ describe("grounded local assistant proposals", () => {
   });
   it("rejects edits for explanation-only requests and accepts a grounded no-edit answer", () => {
     expect(() => parse(response(), { ...input, task: "explain" })).toThrow(
-      /Unexpected edits/,
+      /structure/,
     );
-    const r = response();
-    r.edits = [];
+    const r = {
+      summary: "값을 선언합니다.",
+      citations: response().citations,
+      inputChecks: "입력 검사가 없습니다.",
+      callerRequirements: "사용처는 알 수 없습니다.",
+      examples: [],
+    };
     expect(parse(r, { ...input, task: "explain" }).updated).toBe(input.source);
   });
   it("rejects extra fields, wrong types, excessive lists and missing evidence", () => {

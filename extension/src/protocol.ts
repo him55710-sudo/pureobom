@@ -15,6 +15,7 @@ export type ViewState = {
   analysis?: FileAnalysis;
   diagnostics?: import("../../src/core/editorDiagnostics").EditorDiagnostics;
   projectCheck?: import("./projectChecks").ProjectCheck;
+  checkComparison?: import("./checkComparison").CheckComparison;
   benchmark?: import("./benchmarks").BenchmarkState;
   project?: ProjectAnalysis;
   scanNote?: string;
@@ -37,6 +38,10 @@ export type PatchSummary = {
 export type FormatSummary =
   | PatchSummary
   | { unchanged: true; description: Words };
+// The controller binds this opaque handle to its latest calculation snapshot.
+export type SimulationView = import("../../src/core/types").Simulation & {
+  traceId: string;
+};
 export type Request = {
   id: string;
   action: string;

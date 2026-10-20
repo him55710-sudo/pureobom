@@ -1,0 +1,22 @@
+{
+  "commit": "1f6760d185c6fd395b50c47251a4cccf20092b99",
+  "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39349944872",
+  "jobs": [
+    {
+      "id": 118391514111,
+      "os": "windows-latest"
+    },
+    {
+      "id": 118391514259,
+      "os": "ubuntu-latest"
+    }
+  ],
+  "conclusion": "failure",
+  "stage": "Fetching first package check while analysis was refreshing after manifest reload",
+  "resolutionCommit": "d9e11b26a7b2e189d9cee053281068a9e5cf7a35",
+  "resolution": "The fixture also waits for an open manifest document to match the written bytes and for analysis readiness, as the disabled product UI requires.",
+  "localFullNativeAfterFix": {
+    "passed": 72,
+    "vscode": "1.96.4"
+  }
+}

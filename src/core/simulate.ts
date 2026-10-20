@@ -1,6 +1,7 @@
 import ts from "typescript";
 import { diagnostics, parse, resolveImport } from "./analyze";
 import type { Simulation, SourceFile, Trace } from "./types";
+import { displayValue, encodePreviewMessage } from "./previewValues";
 
 // A deliberately small interpreter. Uploaded code never reaches eval, Function, DOM or network APIs.
 export function simulate(
@@ -8,8 +9,56 @@ export function simulate(
   path: string,
   functionName: string,
   args: unknown[],
+  expectedFocus?: { start: number; end: number },
 ): Simulation {
   const trace: Trace[] = [];
+  let traceCharacters = 0,
+    traceOmitted = false;
+  const record = (
+    path: string | undefined,
+    line: number,
+    text: string,
+    nonFiniteArithmetic = false,
+  ) => {
+    if (trace.length >= 200 || traceCharacters >= 30000) {
+      if (!traceOmitted)
+        trace.push({
+          line,
+          text: "이후 과정 표시는 생략했습니다. / Further trace entries omitted.",
+        });
+      traceOmitted = true;
+      return;
+    }
+    const shown =
+      text.length > 2000
+        ? text.slice(0, 2000) + "… [표시 한도 / display limit]"
+        : text;
+    traceCharacters += shown.length;
+    trace.push({
+      path,
+      line,
+      text: shown,
+      ...(text.length > 2000 ? { truncated: true as const } : {}),
+      ...(nonFiniteArithmetic ? { nonFiniteArithmetic: true as const } : {}),
+    });
+  };
+  const recordReturn = (path: string, line: number, value: unknown) => {
+    if (traceOmitted) return;
+    // Recording must not prevent an intermediate closure/large value from flowing
+    // through the interpreter. Top-level results still pass the transport guard.
+    let shown: string;
+    try {
+      shown = displayValue(value);
+    } catch {
+      record(
+        undefined,
+        line,
+        "반환값의 과정 표시는 생략했습니다. / Return value cannot be displayed in this trace.",
+      );
+      return;
+    }
+    record(path, line, `결과 / return: ${shown}`);
+  };
   let budget = 4000,
     depth = 0;
   const parsed = new Map<string, ts.SourceFile>();
@@ -98,8 +147,58 @@ export function simulate(
     if (Array.isArray(o) && key === "length") return o.length;
     throw Error(`확인할 수 없는 속성: ${String(key)}`);
   };
-  type Env = Map<string, unknown>;
   const uninitialized = Symbol("uninitialized");
+  const moduleValues = new Map<string, unknown>();
+  type Slot = { value: unknown; mutable: boolean };
+  class Env {
+    readonly values = new Map<string, Slot>();
+    constructor(readonly parent?: Env) {}
+    slot(name: string): Slot | undefined {
+      return this.values.get(name) || this.parent?.slot(name);
+    }
+    has(name: string) {
+      return !!this.slot(name);
+    }
+    get(name: string) {
+      return this.slot(name)?.value;
+    }
+    declare(name: string, mutable: boolean, value: unknown = uninitialized) {
+      if (this.values.has(name))
+        throw Error("중복 선언 / Duplicate declaration.");
+      this.values.set(name, { value, mutable });
+    }
+    initialize(name: string, value: unknown) {
+      this.values.get(name)!.value = value;
+    }
+    assign(name: string, value: unknown) {
+      const slot = this.slot(name);
+      if (!slot || slot.value === uninitialized || !slot.mutable)
+        throw Error(
+          "지역 변수에 대입할 수 없습니다. / Cannot assign this local binding.",
+        );
+      slot.value = value;
+      return value;
+    }
+  }
+  type FunctionNode =
+    | ts.FunctionDeclaration
+    | ts.ArrowFunction
+    | ts.FunctionExpression;
+  const closures = new WeakMap<
+    object,
+    { fn: FunctionNode; sf: ts.SourceFile; env: Env }
+  >();
+  function closure(fn: FunctionNode, sf: ts.SourceFile, env: Env) {
+    // Opaque data, never a host function. The symbol also prevents returning it
+    // as an apparently ordinary JSON result through the preview transport.
+    const value = Object.freeze(
+      Object.assign(Object.create(null), {
+        [Symbol("preview function")]: true,
+      }),
+    );
+    closures.set(value, { fn, sf, env });
+    return value;
+  }
   function binding(
     sf: ts.SourceFile,
     name: string,
@@ -115,14 +214,27 @@ export function simulate(
     }
     if (name === "undefined") return undefined;
     const key = sf.fileName + ":" + name;
+    if (moduleValues.has(key)) return moduleValues.get(key);
     if (seen.has(key)) throw Error("순환 값 참조입니다. / Circular binding.");
     seen.add(key);
     for (const s of sf.statements) {
       if (ts.isVariableStatement(s))
         for (const d of s.declarationList.declarations) {
-          if (ts.isIdentifier(d.name) && d.name.text === name && d.initializer)
-            return expr(d.initializer, sf, new Map(), seen);
+          if (
+            ts.isIdentifier(d.name) &&
+            d.name.text === name &&
+            d.initializer
+          ) {
+            const value = expr(d.initializer, sf, new Env(), seen);
+            moduleValues.set(key, value);
+            return value;
+          }
         }
+      if (ts.isFunctionDeclaration(s) && s.name?.text === name) {
+        const value = closure(s, sf, new Env());
+        moduleValues.set(key, value);
+        return value;
+      }
       if (ts.isImportDeclaration(s) && ts.isStringLiteral(s.moduleSpecifier)) {
         const b = s.importClause?.namedBindings;
         if (b && ts.isNamedImports(b)) {
@@ -142,10 +254,12 @@ export function simulate(
             if (
               !targetSf.statements.some(
                 (x) =>
-                  ts.isVariableStatement(x) &&
-                  x.declarationList.declarations.some(
-                    (d) => d.name.getText(targetSf) === importedName,
-                  ) &&
+                  ((ts.isVariableStatement(x) &&
+                    x.declarationList.declarations.some(
+                      (d) => d.name.getText(targetSf) === importedName,
+                    )) ||
+                    (ts.isFunctionDeclaration(x) &&
+                      x.name?.text === importedName)) &&
                   ts
                     .getModifiers(x)
                     ?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword),
@@ -155,7 +269,7 @@ export function simulate(
             return binding(
               targetSf,
               im.propertyName?.text || im.name.text,
-              new Map(),
+              new Env(),
               seen,
             );
           }
@@ -178,6 +292,8 @@ export function simulate(
     if (n.kind === ts.SyntaxKind.FalseKeyword) return false;
     if (n.kind === ts.SyntaxKind.NullKeyword) return null;
     if (ts.isIdentifier(n)) return binding(sf, n.text, env, seen);
+    if (ts.isArrowFunction(n) || ts.isFunctionExpression(n))
+      return closure(n, sf, env);
     if (
       ts.isParenthesizedExpression(n) ||
       ts.isAsExpression(n) ||
@@ -185,11 +301,31 @@ export function simulate(
     )
       return expr(n.expression, sf, env, seen);
     if (ts.isPrefixUnaryExpression(n)) {
+      if (
+        n.operator === ts.SyntaxKind.PlusPlusToken ||
+        n.operator === ts.SyntaxKind.MinusMinusToken
+      ) {
+        if (!ts.isIdentifier(n.operand)) return bad(n);
+        const value =
+          Number(binding(sf, n.operand.text, env)) +
+          (n.operator === ts.SyntaxKind.PlusPlusToken ? 1 : -1);
+        return env.assign(n.operand.text, value);
+      }
       const v = expr(n.operand, sf, env);
       if (n.operator === ts.SyntaxKind.MinusToken) return -v;
       if (n.operator === ts.SyntaxKind.PlusToken) return +v;
       if (n.operator === ts.SyntaxKind.ExclamationToken) return !v;
+      if (n.operator === ts.SyntaxKind.TildeToken) return ~v;
       return bad(n);
+    }
+    if (ts.isPostfixUnaryExpression(n)) {
+      if (!ts.isIdentifier(n.operand)) return bad(n);
+      const previous = Number(binding(sf, n.operand.text, env));
+      env.assign(
+        n.operand.text,
+        previous + (n.operator === ts.SyntaxKind.PlusPlusToken ? 1 : -1),
+      );
+      return previous;
     }
     if (ts.isConditionalExpression(n))
       return expr(
@@ -198,47 +334,44 @@ export function simulate(
         env,
       );
     if (ts.isBinaryExpression(n)) {
-      const op = n.operatorToken.getText(sf),
-        l = expr(n.left, sf, env);
+      const op = n.operatorToken.getText(sf);
+      const assignment =
+        n.operatorToken.kind >= ts.SyntaxKind.FirstAssignment &&
+        n.operatorToken.kind <= ts.SyntaxKind.LastAssignment;
+      if (assignment && !ts.isIdentifier(n.left)) return bad(n);
+      if (op === "=")
+        return env.assign(
+          (n.left as ts.Identifier).text,
+          expr(n.right, sf, env),
+        );
+      const l = expr(n.left, sf, env);
+      if (assignment) {
+        if (
+          (op === "&&=" && !l) ||
+          (op === "||=" && l) ||
+          (op === "??=" && l !== null && l !== undefined)
+        )
+          return l;
+        const r = expr(n.right, sf, env);
+        const value = ["&&=", "||=", "??="].includes(op)
+          ? r
+          : calculatedBinary(op.slice(0, -1), l, r, n, sf);
+        return env.assign((n.left as ts.Identifier).text, value);
+      }
       if (op === "&&") return l && expr(n.right, sf, env);
       if (op === "||") return l || expr(n.right, sf, env);
       if (op === "??") return l ?? expr(n.right, sf, env);
       const r = expr(n.right, sf, env);
-      switch (op) {
-        case "+":
-          return l + r;
-        case "-":
-          return l - r;
-        case "*":
-          return l * r;
-        case "/":
-          return l / r;
-        case "%":
-          return l % r;
-        case "**":
-          return l ** r;
-        case ">=":
-          return l >= r;
-        case ">":
-          return l > r;
-        case "<=":
-          return l <= r;
-        case "<":
-          return l < r;
-        case "===":
-          return l === r;
-        case "!==":
-          return l !== r;
-        case "==":
-          return l == r;
-        case "!=":
-          return l != r;
-        default:
-          return bad(n);
-      }
+      return calculatedBinary(op, l, r, n, sf);
     }
-    if (ts.isArrayLiteralExpression(n))
-      return n.elements.map((x) => expr(x as ts.Expression, sf, env));
+    if (ts.isArrayLiteralExpression(n)) {
+      const values = new Array(n.elements.length);
+      n.elements.forEach((x, i) => {
+        if (!ts.isOmittedExpression(x))
+          values[i] = expr(x as ts.Expression, sf, env);
+      });
+      return values;
+    }
     if (ts.isObjectLiteralExpression(n)) {
       const obj: Record<string, unknown> = Object.create(null);
       for (const p of n.properties) {
@@ -264,83 +397,219 @@ export function simulate(
         expr(n.argumentExpression, sf, env),
       );
     if (ts.isCallExpression(n)) {
-      const values = n.arguments.map((x) => expr(x, sf, env));
+      if (n.questionDotToken) return bad(n);
+      // Resolve the callee/receiver before evaluating arguments, as JavaScript does.
       if (ts.isIdentifier(n.expression)) {
-        if (env.has(n.expression.text)) return bad(n);
-        return invoke(sf, n.expression.text, values);
+        const fn = binding(sf, n.expression.text, env);
+        return invoke(
+          fn,
+          n.arguments.map((x) => expr(x, sf, env)),
+        );
+      }
+      if (
+        ts.isArrowFunction(n.expression) ||
+        ts.isFunctionExpression(n.expression) ||
+        ts.isParenthesizedExpression(n.expression)
+      ) {
+        const fn = expr(n.expression, sf, env);
+        return invoke(
+          fn,
+          n.arguments.map((x) => expr(x, sf, env)),
+        );
       }
       if (
         ts.isPropertyAccessExpression(n.expression) &&
-        ts.isIdentifier(n.expression.expression) &&
-        n.expression.expression.text === "Math"
+        !n.expression.questionDotToken
       ) {
-        if (
-          env.has("Math") ||
-          sf.statements.some(
-            (s) =>
-              (ts.isVariableStatement(s) &&
-                s.declarationList.declarations.some(
-                  (d) => d.name.getText(sf) === "Math",
-                )) ||
-              (ts.isImportDeclaration(s) &&
-                s.importClause?.getText(sf).includes("Math")),
+        const receiver = n.expression.expression,
+          method = n.expression.name.text;
+        if (ts.isIdentifier(receiver) && receiver.text === "Math") {
+          if (
+            env.has("Math") ||
+            sf.statements.some(
+              (s) =>
+                (ts.isVariableStatement(s) &&
+                  s.declarationList.declarations.some(
+                    (d) => d.name.getText(sf) === "Math",
+                  )) ||
+                (ts.isFunctionDeclaration(s) && s.name?.text === "Math") ||
+                (ts.isImportDeclaration(s) &&
+                  s.importClause?.getText(sf).includes("Math")),
+            )
           )
-        )
+            return bad(n);
+          const methods: Record<string, (...a: number[]) => number> = {
+            round: Math.round,
+            floor: Math.floor,
+            ceil: Math.ceil,
+            abs: Math.abs,
+            min: Math.min,
+            max: Math.max,
+          };
+          const fn = Object.hasOwn(methods, method)
+            ? methods[method]
+            : undefined;
+          if (!fn) return bad(n);
+          const values = n.arguments.map((x) => expr(x, sf, env));
+          if (values.every((x) => typeof x === "number")) return fn(...values);
           return bad(n);
-        const methods: Record<string, (...a: number[]) => number> = {
-          round: Math.round,
-          floor: Math.floor,
-          ceil: Math.ceil,
-          abs: Math.abs,
-          min: Math.min,
-          max: Math.max,
-        };
-        const fn = Object.hasOwn(methods, n.expression.name.text)
-          ? methods[n.expression.name.text]
-          : undefined;
-        if (fn && values.every((x) => typeof x === "number"))
-          return fn(...values);
+        }
+        const target = expr(receiver, sf, env);
+        if (
+          (Array.isArray(target) || typeof target === "string") &&
+          !Object.prototype.hasOwnProperty.call(target, method)
+        ) {
+          if (method === "at") {
+            const values = n.arguments.map((x) => expr(x, sf, env));
+            if (values[0] !== undefined && typeof values[0] !== "number")
+              return bad(n);
+            return target.at(values[0] ?? 0);
+          }
+          if (method === "map" && Array.isArray(target)) {
+            const values = n.arguments.map((x) => expr(x, sf, env));
+            if (
+              !values[0] ||
+              typeof values[0] !== "object" ||
+              !closures.has(values[0])
+            )
+              return bad(n);
+            const result = new Array(target.length);
+            for (let i = 0; i < target.length; i++) {
+              tick();
+              if (Object.hasOwn(target, i))
+                result[i] = invoke(values[0], [target[i], i, target]);
+            }
+            return result;
+          }
+        }
       }
       return bad(n);
     }
     return bad(n);
   }
+  function calculatedBinary(
+    op: string,
+    l: any,
+    r: any,
+    n: ts.BinaryExpression,
+    sf: ts.SourceFile,
+  ): any {
+    // Evaluate operands exactly once in expr(), then record the already computed result.
+    const value = binary(op, l, r, n);
+    if (traceOmitted || !["+", "-", "*", "/", "%", "**"].includes(op))
+      return value;
+    const line =
+      sf.getLineAndCharacterOfPosition(n.operatorToken.getStart(sf)).line + 1;
+    if (trace.length >= 200 || traceCharacters >= 30000) {
+      record(sf.fileName, line, "");
+      return value;
+    }
+    let shown: string;
+    try {
+      shown = `계산 / arithmetic: ${n.getText(sf)}\n${displayValue(l)} ${op} ${displayValue(r)} → ${displayValue(value)}`;
+    } catch {
+      record(
+        undefined,
+        line,
+        "연산의 과정 표시는 생략했습니다. / Arithmetic values cannot be displayed in this trace.",
+      );
+      return value;
+    }
+    record(
+      sf.fileName,
+      line,
+      shown,
+      typeof value === "number" && !Number.isFinite(value),
+    );
+    return value;
+  }
+  function binary(op: string, l: any, r: any, n: ts.Node): any {
+    switch (op) {
+      case "+":
+        return l + r;
+      case "-":
+        return l - r;
+      case "*":
+        return l * r;
+      case "/":
+        return l / r;
+      case "%":
+        return l % r;
+      case "**":
+        return l ** r;
+      case "&":
+        return l & r;
+      case "|":
+        return l | r;
+      case "^":
+        return l ^ r;
+      case "<<":
+        return l << r;
+      case ">>":
+        return l >> r;
+      case ">>>":
+        return l >>> r;
+      case ">=":
+        return l >= r;
+      case ">":
+        return l > r;
+      case "<=":
+        return l <= r;
+      case "<":
+        return l < r;
+      case "===":
+        return l === r;
+      case "!==":
+        return l !== r;
+      case "==":
+        return l == r;
+      case "!=":
+        return l != r;
+      default:
+        return bad(n);
+    }
+  }
+  type Flow =
+    | { kind: "return"; value: unknown }
+    | { kind: "break" | "continue" };
   function statements(
     nodes: readonly ts.Statement[],
     sf: ts.SourceFile,
     env: Env,
-  ): { value: unknown } | undefined {
+  ): Flow | undefined {
     for (const statement of nodes)
       if (
         ts.isVariableStatement(statement) &&
         statement.declarationList.flags & ts.NodeFlags.BlockScoped
       ) {
         for (const declaration of statement.declarationList.declarations)
-          env.set(declaration.name.getText(sf), uninitialized);
-      }
+          env.declare(
+            declaration.name.getText(sf),
+            !(statement.declarationList.flags & ts.NodeFlags.Const),
+          );
+      } else if (ts.isFunctionDeclaration(statement) && statement.name)
+        env.declare(statement.name.text, true, closure(statement, sf, env));
     for (const s of nodes) {
       tick();
       const line = sf.getLineAndCharacterOfPosition(s.getStart(sf)).line + 1;
       if (ts.isReturnStatement(s)) {
         const value = s.expression ? expr(s.expression, sf, env) : undefined;
-        trace.push({
-          line,
-          text: `${sf.fileName} · 결과 / return: ${JSON.stringify(value)}`,
-        });
-        return { value };
+        recordReturn(sf.fileName, line, value);
+        return { kind: "return", value };
       }
       if (ts.isIfStatement(s)) {
         const value = expr(s.expression, sf, env);
-        trace.push({
+        record(
+          sf.fileName,
           line,
-          text: `${s.expression.getText(sf)} → ${Boolean(value)}`,
-        });
+          `${s.expression.getText(sf)} → ${Boolean(value)}`,
+        );
         const branch = value ? s.thenStatement : s.elseStatement;
         if (branch) {
           const r = statements(
             ts.isBlock(branch) ? branch.statements : [branch],
             sf,
-            new Map(env),
+            new Env(env),
           );
           if (r) return r;
         }
@@ -348,14 +617,36 @@ export function simulate(
         if (!(s.declarationList.flags & ts.NodeFlags.BlockScoped)) bad(s);
         for (const d of s.declarationList.declarations) {
           if (!ts.isIdentifier(d.name)) bad(d);
-          env.set(
+          env.initialize(
             d.name.getText(sf),
             d.initializer ? expr(d.initializer, sf, env) : undefined,
           );
         }
       } else if (ts.isBlock(s)) {
-        const r = statements(s.statements, sf, new Map(env));
+        const r = statements(s.statements, sf, new Env(env));
         if (r) return r;
+      } else if (ts.isWhileStatement(s)) {
+        let iterations = 0;
+        try {
+          while (expr(s.expression, sf, env)) {
+            tick();
+            iterations++;
+            const flow = statements([s.statement], sf, new Env(env));
+            if (flow?.kind === "return") return flow;
+            if (flow?.kind === "break") break;
+          }
+        } finally {
+          record(
+            sf.fileName,
+            line,
+            `반복 진입 / loop entries: ${iterations} · ${s.expression.getText(sf)}`,
+          );
+        }
+      } else if (ts.isBreakStatement(s) || ts.isContinueStatement(s)) {
+        if (s.label) bad(s);
+        return { kind: ts.isBreakStatement(s) ? "break" : "continue" };
+      } else if (ts.isExpressionStatement(s)) {
+        expr(s.expression, sf, env);
       } else if (ts.isThrowStatement(s)) {
         if (
           ts.isNewExpression(s.expression) &&
@@ -372,6 +663,7 @@ export function simulate(
         throw Error(String(expr(s.expression, sf, env)));
       } else if (
         !ts.isIfStatement(s) &&
+        !ts.isFunctionDeclaration(s) &&
         !ts.isEmptyStatement(s) &&
         !ts.isReturnStatement(s)
       )
@@ -379,96 +671,85 @@ export function simulate(
     }
     return undefined;
   }
-  function invoke(sf: ts.SourceFile, name: string, values: unknown[]): unknown {
+  function invoke(value: unknown, values: unknown[]): unknown {
     tick();
+    const captured =
+      value !== null && typeof value === "object"
+        ? closures.get(value)
+        : undefined;
+    if (!captured)
+      throw Error("호출할 수 없는 값입니다. / Not an interpreted function.");
+    const { fn, sf } = captured;
     if (++depth > 32)
       throw Error("호출 깊이 한도를 넘었습니다. / Recursion limit.");
     try {
-      let fn:
-        | ts.FunctionDeclaration
-        | ts.ArrowFunction
-        | ts.FunctionExpression
-        | undefined;
-      for (const s of sf.statements) {
-        if (ts.isFunctionDeclaration(s) && s.name?.text === name) fn = s;
-        if (ts.isVariableStatement(s))
-          for (const d of s.declarationList.declarations) {
-            if (
-              ts.isIdentifier(d.name) &&
-              d.name.text === name &&
-              d.initializer &&
-              (ts.isArrowFunction(d.initializer) ||
-                ts.isFunctionExpression(d.initializer))
-            )
-              fn = d.initializer;
-          }
-        if (
-          ts.isImportDeclaration(s) &&
-          ts.isStringLiteral(s.moduleSpecifier)
-        ) {
-          const b = s.importClause?.namedBindings;
-          if (b && ts.isNamedImports(b)) {
-            const im = b.elements.find((e) => e.name.text === name);
-            if (im) {
-              const target = resolveImport(
-                sf.fileName,
-                s.moduleSpecifier.text,
-                paths,
-              );
-              if (!target)
-                throw Error("외부 기능은 미리보기에서 실행할 수 없습니다.");
-              const targetSf = get(target);
-              const exported = targetSf.statements.some(
-                (x) =>
-                  ((ts.isFunctionDeclaration(x) &&
-                    x.name?.text === (im.propertyName?.text || name)) ||
-                    (ts.isVariableStatement(x) &&
-                      x.declarationList.declarations.some(
-                        (d) =>
-                          d.name.getText(targetSf) ===
-                          (im.propertyName?.text || name),
-                      ))) &&
-                  ts.canHaveModifiers(x) &&
-                  ts
-                    .getModifiers(x)
-                    ?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword),
-              );
-              if (!exported)
-                throw Error(
-                  "직접 내보낸 기능만 미리보기로 연결할 수 있습니다.",
-                );
-              return invoke(targetSf, im.propertyName?.text || name, values);
-            }
-          }
-        }
-      }
-      if (!fn?.body)
-        throw Error(`미리보기에서 기능을 찾을 수 없습니다: ${name}`);
       if (
+        !fn.body ||
         fn.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ||
         fn.asteriskToken
       )
         throw Error("비동기·제너레이터 기능은 미리보기를 지원하지 않습니다.");
-      const env: Env = new Map();
-      fn.parameters.forEach((p) => env.set(p.name.getText(sf), uninitialized));
+      let parent = captured.env;
+      if (ts.isFunctionExpression(fn) && fn.name) {
+        parent = new Env(parent);
+        parent.declare(fn.name.text, false, value);
+      }
+      const env = new Env(parent);
+      fn.parameters.forEach((p) => env.declare(p.name.getText(sf), true));
       fn.parameters.forEach((p, i) => {
         if (!ts.isIdentifier(p.name) || p.dotDotDotToken) bad(p);
-        env.set(
+        env.initialize(
           p.name.getText(sf),
           values[i] === undefined && p.initializer
             ? expr(p.initializer, sf, env)
             : values[i],
         );
       });
-      return ts.isBlock(fn.body)
-        ? statements(fn.body.statements, sf, env)?.value
-        : expr(fn.body, sf, env);
+      if (!ts.isBlock(fn.body)) {
+        const result = expr(fn.body, sf, env);
+        recordReturn(
+          sf.fileName,
+          sf.getLineAndCharacterOfPosition(fn.body.getStart(sf)).line + 1,
+          result,
+        );
+        return result;
+      }
+      const names = new Set(fn.parameters.map((p) => p.name.getText(sf)));
+      for (const s of fn.body.statements)
+        if (
+          ts.isVariableStatement(s) &&
+          s.declarationList.declarations.some((d) =>
+            names.has(d.name.getText(sf)),
+          )
+        )
+          bad(s);
+      const flow = statements(fn.body.statements, sf, new Env(env));
+      if (flow && flow.kind !== "return")
+        throw Error("반복문 밖 제어 / Loop control outside a loop.");
+      return flow?.kind === "return" ? flow.value : undefined;
     } finally {
       depth--;
     }
   }
   try {
-    const result = invoke(get(path), functionName, args);
+    const sf = get(path);
+    const target = binding(sf, functionName, new Env());
+    if (expectedFocus) {
+      const captured =
+        target && typeof target === "object" ? closures.get(target) : undefined;
+      if (
+        !captured ||
+        captured.sf.fileName !== path ||
+        captured.fn.getStart(sf) !== expectedFocus.start ||
+        captured.fn.end !== expectedFocus.end
+      )
+        throw Error(
+          "선택한 선언을 계산 대상으로 확인할 수 없습니다. / The selected declaration is not the preview target.",
+        );
+    }
+    const result = invoke(target, args);
+    // The same bounded value must be displayable by both worker and JSON UIs.
+    encodePreviewMessage(result);
     return { ok: true, result, trace };
   } catch (e) {
     return {

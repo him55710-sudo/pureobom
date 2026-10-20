@@ -1,4 +1,5 @@
 import type { FunctionInfo, Patch, Rule, Simulation } from "./types";
+export { displayValue } from "./previewValues";
 
 export type Scenario = { label: string; args: unknown[] };
 export type ScenarioResult = Scenario & {
@@ -64,13 +65,4 @@ export function suggestScenarios(
       args: base.map((b, n) => (n === boolean ? value : b)),
     }));
   return [{ label: "1", args: base }];
-}
-
-export function displayValue(value: unknown): string {
-  if (value === undefined) return "undefined";
-  if (Object.is(value, -0)) return "-0";
-  if (typeof value === "number" && !Number.isFinite(value)) return String(value);
-  if (Array.isArray(value)) return `[${value.map(displayValue).join(", ")}]`;
-  if (value !== null && typeof value === "object") return `{${Object.entries(value).map(([key, item]) => `${JSON.stringify(key)}: ${displayValue(item)}`).join(", ")}}`;
-  return JSON.stringify(value);
 }

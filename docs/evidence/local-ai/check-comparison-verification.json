@@ -1,0 +1,145 @@
+{
+  "runtimeCommit": "c6026937b087a85bb5a8cdf7c442d08cb1e64b3a",
+  "recordedAt": "2026-10-20T00:41:17.192Z",
+  "scope": "Session-only historical baselines and same-configuration command-exit comparison; not test-count, semantic equivalence or performance assessment",
+  "runtimeHashes": {
+    "extension/out/extension.cjs": "69ba76447bd1bacf0f3052f27b665a15ee00a68a8cd892c6b7a0328c096141fb",
+    "extension/out/worker.cjs": "40e77d6e2c7f29e2fc051f5cc67de4909d0989c78c434e72942455de6553d66c",
+    "extension/media/view.js": "19e4cd56417f2d57c9ef090474cc341eeebe319f48ff54c6323501772af7c8ca",
+    "extension/media/view.css": "32e6f66eab202f7b1a632537718f3c9337ce98e24800badec2fad64a692811e7"
+  },
+  "logHashes": {
+    "core": "fc49c12441888454b6232d26cd939fa9a4a6a774df8ad068c012b0a8b1514086",
+    "build": "3aac8fc50433922b33cb3b51badb216c423a5eb11730fedab50bd05198c024a3",
+    "nativeFirst": "0a24f2d6d43f243e4d0f13e61071960a84c384baafd6eabfa1c64806737b7349",
+    "nativeExpanded": "4edcb45f951c905b29bc61f8b7d99f4b136563cdd7db34a8c563e1a020de992a",
+    "privateNative": "b367b53505327fee59a7efa1193bdf85f46289ced47a94be4a8d0002a4a78aac",
+    "fullMissingGo": "1e80f6907820dc63d4b2625e55decfa96f3598b4956046958495d6752e62bcd0",
+    "fullGoDefaultNotOnPath": "d4607856772f62ccf9cc16fa4e0eeda65d07656b85b623bdf56631f069dea9ba",
+    "fullAnalysisReloadPending": "15ee6f4c055ed7364104c2f1ff66bd82f6cbcddbfc907e38daa30e3dfcc0fec8",
+    "fullAfterSynchronization": "f92e8abbe224f3e96af534f243101455dbeede02aac25277f51d20e50c7b67f7"
+  },
+  "core": {
+    "passed": 11,
+    "files": 1
+  },
+  "native": {
+    "scope": "package-scripts-only",
+    "vscode": "1.96.4",
+    "checks": [
+      "Package scripts: built-in npm task discovery includes ungrouped check, displays actual script and pre/post declarations, excludes dev/watch/install/publish, never executes while listing and rejects a changed manifest before launch",
+      "Project check comparison: actual npm pass is pinned, wrong-run and stale pin requests are rejected, source edit produces pass-to-fail, native undo restores both-passed with identical source bytes; changed manifest prevents comparison; historical snapshots cannot verify current code, can be replaced and cleared",
+      "Package scripts: actual npm command passes, model-free source edit makes the original assertion fail, native undo restores pass and exact source; declared npm hooks run according to npm success/failure semantics"
+    ],
+    "passed": 3,
+    "timestamp": "2026-10-20T00:38:55.516Z",
+    "packageManager": "npm 10.9.2",
+    "checksAreFlowsNotTestCaseCounts": true
+  },
+  "privateProject": {
+    "fixedCheckout": true,
+    "originalProjectNotModified": true,
+    "taskConfigurationWritten": false,
+    "existingProjectCheckUsed": true,
+    "baselinePinned": true,
+    "edit": "Selected-function line-break formatting",
+    "reviewer": "Codex agent; not independent third-party validation",
+    "runs": [
+      {
+        "stage": "baseline",
+        "status": "passed",
+        "exitCode": 0,
+        "stale": false,
+        "elapsedMs": 4541
+      },
+      {
+        "stage": "after",
+        "status": "passed",
+        "exitCode": 0,
+        "stale": false,
+        "elapsedMs": 2910
+      },
+      {
+        "stage": "restored",
+        "status": "passed",
+        "exitCode": 0,
+        "stale": false,
+        "elapsedMs": 2635
+      }
+    ],
+    "after": {
+      "outcome": "both-passed",
+      "sourceChanged": true
+    },
+    "restored": {
+      "outcome": "both-passed",
+      "sourceChanged": false,
+      "sameBaselineRetained": true
+    },
+    "unreviewedApplyBlocked": true,
+    "unsavedCheckBlocked": true,
+    "noOpDetected": true,
+    "sourceRestoredExactly": true,
+    "checkoutCleanAfterRun": true,
+    "assertionCountNotInferred": true,
+    "scientificValidityNotAssessed": true,
+    "wholeApplicationCorrectnessNotEstablished": true,
+    "modelRequests": 0,
+    "currentOriginalCheckoutNotEvaluated": true
+  },
+  "browser": {
+    "actualBuiltUIAndWorker": true,
+    "results": "controlled public fixture; no private project source or results",
+    "languages": [
+      "ko",
+      "en"
+    ],
+    "passedToFailedVisible": true,
+    "clearBaselineVerified": true,
+    "pinLatestBaselineVerified": true,
+    "awaitingNextRunVisible": true,
+    "runRequests": 0,
+    "nativeUIOperationNotClaimed": true
+  },
+  "screenshots": [
+    "check-comparison-ko.png",
+    "check-comparison-en.png"
+  ],
+  "cleanup": {
+    "temporaryBrowserTabClosed": true,
+    "fixtureServerStopped": true
+  },
+  "localVSIX": {
+    "version": "0.7.0",
+    "development": true,
+    "file": "pureobom-0.7.0-c602693.vsix",
+    "sha256": "2d31801d2cb4dcbcfe81fd5a5236d333b6a07f90435d69fad8d3ff8f6d3d973a",
+    "verifiedRuntimeFiles": {
+      "extension/out/extension.cjs": "69ba76447bd1bacf0f3052f27b665a15ee00a68a8cd892c6b7a0328c096141fb",
+      "extension/out/worker.cjs": "40e77d6e2c7f29e2fc051f5cc67de4909d0989c78c434e72942455de6553d66c",
+      "extension/media/view.js": "19e4cd56417f2d57c9ef090474cc341eeebe319f48ff54c6323501772af7c8ca",
+      "extension/media/view.css": "32e6f66eab202f7b1a632537718f3c9337ce98e24800badec2fad64a692811e7"
+    },
+    "matchesWindowsCIInstalledRuntimeFiles": 11
+  },
+  "limitations": [
+    "Baseline is memory-only for the current extension session.",
+    "Equal target-file bytes do not establish equality of other project files.",
+    "Command identity covers reviewed task/settings/manifest, not complete dependencies or external state.",
+    "Matching exit codes do not prove equal failures, behavior, test coverage or performance.",
+    "Historical baseline cannot satisfy the current successful-check requirement for benchmarks."
+  ],
+  "validationCommit": "d9e11b26a7b2e189d9cee053281068a9e5cf7a35",
+  "ci": "check-comparison-ci.json",
+  "ciInitialFailures": "check-comparison-ci-first-failure.json",
+  "localRuntimeMatchesBothCIInstallations": true,
+  "ciReloadFailure": "check-comparison-ci-reload-failure.json",
+  "localFullNative": {
+    "passed": 72,
+    "vscode": "1.96.4",
+    "timestamp": "2026-10-20T00:55:26.862Z",
+    "checks": [
+      "Project check comparison: actual npm pass is pinned, wrong-run and stale pin requests are rejected, source edit produces pass-to-fail, native undo restores both-passed with identical source bytes; changed manifest prevents comparison; historical snapshots cannot verify current code, can be replaced and cleared"
+    ]
+  }
+}

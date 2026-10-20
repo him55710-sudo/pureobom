@@ -1,5 +1,15 @@
 import * as vscode from "vscode";
 import { createHash, randomUUID } from "node:crypto";
+import {
+  compareChecks,
+  completedCheck,
+  type CheckRecord,
+} from "./checkComparison";
+import {
+  isPackageCheck,
+  readPackageScript,
+  type PackageScript,
+} from "./packageScripts";
 
 export type ProjectTask = {
   id: string;
@@ -9,6 +19,7 @@ export type ProjectTask = {
   kind: "process" | "shell";
   command: string;
   cwd: string;
+  packageScript?: PackageScript;
 };
 export type ProjectCheck = {
   id: string;
@@ -30,7 +41,12 @@ export type ProjectCheck = {
   stale: boolean;
   staleReason?: string;
 };
-type Choice = { fingerprint: string; settings: string; uri: string };
+type Choice = {
+  fingerprint: string;
+  settings: string;
+  uri: string;
+  packageFingerprint?: string;
+};
 type Run = {
   id: string;
   uri: vscode.Uri;
@@ -67,7 +83,9 @@ function eligible(task: vscode.Task, folder: vscode.WorkspaceFolder) {
   return (
     folderOf(task)?.uri.toString() === folder.uri.toString() &&
     !task.isBackground &&
-    ["test", "build"].includes(task.group?.id || "") &&
+    (task.definition.type === "npm"
+      ? isPackageCheck(task.definition)
+      : ["test", "build"].includes(task.group?.id || "")) &&
     (task.execution instanceof vscode.ProcessExecution ||
       task.execution instanceof vscode.ShellExecution)
   );
@@ -128,6 +146,14 @@ export function executionSettings(task: vscode.Task) {
     "terminal.integrated.inheritEnv",
     "terminal.integrated.detectLocale",
   ]);
+  if (task.definition.type === "npm")
+    for (const key of [
+      "npm.packageManager",
+      "npm.runSilent",
+      "npm.autoDetect",
+      "npm.exclude",
+    ])
+      keys.add(key);
   if (task.execution instanceof vscode.ShellExecution) {
     for (const key of [
       "automationProfile",
@@ -163,6 +189,8 @@ export class ProjectChecks implements vscode.Disposable {
   private resultUri?: string;
   private resultTask?: vscode.Task;
   private resultSettings?: string;
+  private resultIdentity?: string;
+  private baseline?: CheckRecord;
   private disposables: vscode.Disposable[] = [];
   constructor(
     private current: (context: string | undefined) => vscode.TextDocument,
@@ -221,6 +249,80 @@ export class ProjectChecks implements vscode.Disposable {
     this.result = { ...this.result, ...next };
     this.changes.fire(this.result);
   }
+  get comparison() {
+    return compareChecks(
+      this.baseline,
+      this.result && this.resultIdentity
+        ? { check: this.result, identity: this.resultIdentity }
+        : undefined,
+    );
+  }
+  /** Only host-owned, still-current results can become historical baselines. */
+  async pinBaseline(context: string | undefined, id: string) {
+    const result = this.result;
+    const { doc, folder } = this.context(context);
+    if (
+      this.active ||
+      this.measurement ||
+      !result ||
+      result.id !== id ||
+      result.stale ||
+      !completedCheck(result) ||
+      this.resultUri !== doc.uri.toString()
+    )
+      throw Error(
+        "최신 완료 결과만 기준으로 보관할 수 있습니다. / Only the current completed check can be kept as a baseline.",
+      );
+    this.requireSaved(folder);
+    const version = doc.version;
+    const tasks = await vscode.tasks.fetchTasks();
+    const task = tasks.find(
+      (task) =>
+        eligible(task, folder) &&
+        fingerprint(task) === fingerprint(this.resultTask!),
+    );
+    const packageInfo =
+      task &&
+      (await readPackageScript(folder.uri.fsPath, task.definition).catch(
+        () => undefined,
+      ));
+    const bytes = await vscode.workspace.fs.readFile(doc.uri);
+    this.confirm(context, doc, version);
+    if (
+      this.active ||
+      this.measurement ||
+      this.result !== result ||
+      result.stale ||
+      !task ||
+      (task.definition.type === "npm" && !packageInfo) ||
+      this.identity(task, doc, packageInfo?.fingerprint) !==
+        this.resultIdentity ||
+      hash(bytes) !== result.sourceSha256
+    )
+      throw Error(
+        "파일 또는 검사 설정이 바뀌었습니다. 다시 검사하세요. / Files or check configuration changed. Run again.",
+      );
+    this.baseline = { check: { ...result }, identity: this.resultIdentity! };
+    this.changes.fire(this.result);
+  }
+  clearBaseline() {
+    this.baseline = undefined;
+    if (this.result) this.changes.fire(this.result);
+  }
+  private identity(
+    task: vscode.Task,
+    doc: vscode.TextDocument,
+    packageFingerprint?: string,
+  ) {
+    return hash(
+      JSON.stringify({
+        uri: doc.uri.toString(),
+        task: fingerprint(task),
+        settings: executionSettings(task),
+        packageFingerprint,
+      }),
+    );
+  }
   private markStale(staleReason: string) {
     if (this.result && !this.result.stale)
       this.publish({ stale: true, staleReason });
@@ -274,27 +376,42 @@ export class ProjectChecks implements vscode.Disposable {
     if (this.context(context).doc !== doc)
       throw Error("File changed. Refresh tasks.");
     if (this.choices.size > 100) this.choices.clear();
-    return tasks
-      .filter((task) => eligible(task, folder))
-      .map((task) => {
-        const id = randomUUID();
-        this.choices.set(id, {
-          fingerprint: fingerprint(task),
-          settings: executionSettings(task),
-          uri: doc.uri.toString(),
-        });
-        return view(task, id);
-      });
+    const results = await Promise.all(
+      tasks
+        .filter((task) => eligible(task, folder))
+        .map(async (task) => {
+          const packageInfo = await readPackageScript(
+            folder.uri.fsPath,
+            task.definition,
+          ).catch(() => undefined);
+          // An npm script without its current manifest cannot be reviewed accurately.
+          if (task.definition.type === "npm" && !packageInfo) return undefined;
+          const id = randomUUID();
+          this.choices.set(id, {
+            fingerprint: fingerprint(task),
+            settings: executionSettings(task),
+            uri: doc.uri.toString(),
+            packageFingerprint: packageInfo?.fingerprint,
+          });
+          return { ...view(task, id), packageScript: packageInfo?.view };
+        }),
+    );
+    if (this.context(context).doc !== doc)
+      throw Error("File changed. Refresh tasks.");
+    return results.filter((task): task is NonNullable<typeof task> => !!task);
   }
   async start(context: string | undefined, id: string, reviewed: unknown) {
     if (this.active || this.measurement)
       throw Error("검사가 진행 중입니다. / A check is already running.");
     if (reviewed !== true)
       throw Error("실행할 명령을 먼저 확인하세요. / Review the command first.");
-    const { selected, doc, folder, bytes } = await this.select(context, id);
+    const { selected, doc, folder, bytes, identity } = await this.select(
+      context,
+      id,
+    );
     if (this.active || this.measurement)
       throw Error("A check is already running.");
-    return this.execute(selected, doc, folder, bytes);
+    return this.execute(selected, doc, folder, bytes, identity);
   }
   /** Resolve a previously listed task again without executing it. */
   async select(context: string | undefined, id: string) {
@@ -313,11 +430,28 @@ export class ProjectChecks implements vscode.Disposable {
       throw Error(
         "검사 명령이 바뀌었습니다. 목록을 새로 읽으세요. / Task configuration changed. Refresh the list.",
       );
+    const packageInfo = await readPackageScript(
+      folder.uri.fsPath,
+      selected.definition,
+    ).catch(() => undefined);
+    if (
+      packageInfo?.fingerprint !== choice.packageFingerprint ||
+      (selected.definition.type === "npm" && !packageInfo)
+    )
+      throw Error(
+        "검사 스크립트가 바뀌었습니다. 목록을 다시 읽고 확인하세요. / Package script changed. Reload and review the list.",
+      );
     const bytes = await vscode.workspace.fs.readFile(doc.uri);
     this.confirm(context, doc, version);
     if (executionSettings(selected) !== choice.settings)
       throw Error("Task configuration changed. Refresh the list.");
-    return { selected, doc, folder, bytes };
+    return {
+      selected,
+      doc,
+      folder,
+      bytes,
+      identity: this.identity(selected, doc, packageInfo?.fingerprint),
+    };
   }
   confirm(
     context: string | undefined,
@@ -355,6 +489,7 @@ export class ProjectChecks implements vscode.Disposable {
     doc: vscode.TextDocument,
     folder: vscode.WorkspaceFolder,
     bytes: Uint8Array,
+    identity: string,
   ) {
     const runId = randomUUID();
     const run: Run = {
@@ -368,6 +503,7 @@ export class ProjectChecks implements vscode.Disposable {
     this.resultUri = doc.uri.toString();
     this.resultTask = selected;
     this.resultSettings = executionSettings(selected);
+    this.resultIdentity = identity;
     this.result = {
       id: runId,
       name: selected.name,

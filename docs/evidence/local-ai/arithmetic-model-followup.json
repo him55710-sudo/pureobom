@@ -1,0 +1,242 @@
+{
+  "collectedAt": "2026-10-19T23:20:54.024Z",
+  "runtimeCommit": "25d0c274a4287114e451d904c1bdd52e8e8e8276",
+  "scope": "Two sequential actual CPU model requests on the same unchanged private function, question and seven previous inputs. Arithmetic records are attached. These are repeated evaluations, not new input coverage or independent projects.",
+  "comparison": {
+    "identicalMessages": true,
+    "identicalResponseSchema": true,
+    "identicalGenerationOptions": true,
+    "modelAndSupportedThinkingControlDiffer": true
+  },
+  "attempts": [
+    {
+      "model": "qwen2.5-coder:7b",
+      "digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+      "processor": "cpu",
+      "timeoutSeconds": 600,
+      "startedAt": "2026-10-19T23:00:46.736Z",
+      "elapsedMs": 498538,
+      "errorPresent": false,
+      "request": {
+        "context": 32768,
+        "outputLimit": 4096,
+        "temperature": 0,
+        "requestedGpuLayers": 0,
+        "thinking": "not overridden for this model"
+      },
+      "response": {
+        "completed": true,
+        "doneReason": "stop",
+        "promptTokens": 4629,
+        "outputTokens": 698,
+        "promptSeconds": 264.13213,
+        "generationSeconds": 222.179248
+      },
+      "productValidation": {
+        "accepted": true,
+        "citations": 4,
+        "examples": 7
+      },
+      "stages": [
+        {
+          "route": "/api/status",
+          "startedAt": "2026-10-19T23:00:47.815Z",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "completedAt": "2026-10-19T23:00:47.824Z",
+          "errorPresent": false
+        },
+        {
+          "route": "/api/tags",
+          "startedAt": "2026-10-19T23:00:47.825Z",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "completedAt": "2026-10-19T23:00:47.904Z",
+          "errorPresent": false
+        },
+        {
+          "route": "/api/show",
+          "startedAt": "2026-10-19T23:00:47.905Z",
+          "timeoutMs": 10000,
+          "outcome": "received",
+          "completedAt": "2026-10-19T23:00:48.039Z",
+          "errorPresent": false
+        },
+        {
+          "route": "/api/status",
+          "startedAt": "2026-10-19T23:00:48.040Z",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "completedAt": "2026-10-19T23:00:48.042Z",
+          "errorPresent": false
+        },
+        {
+          "route": "/api/chat",
+          "startedAt": "2026-10-19T23:00:48.044Z",
+          "timeoutMs": 600000,
+          "outcome": "received",
+          "completedAt": "2026-10-19T23:09:06.581Z",
+          "errorPresent": false
+        }
+      ],
+      "finalRuntimeInputVerification": {
+        "runtimeCommit": "25d0c274a4287114e451d904c1bdd52e8e8e8276",
+        "recalculatedObservationsIdentical": true,
+        "modelMessagesIdentical": true,
+        "responseSchemaIdentical": true,
+        "sameSourceQuestionFocusInputsAsPreviousModelAttempt": true,
+        "caseCount": 7,
+        "recordCounts": [
+          12,
+          12,
+          12,
+          0,
+          12,
+          12,
+          12
+        ],
+        "omittedCases": 6
+      },
+      "nativeComparison": {
+        "returnedMatches": 6,
+        "exceptionReportedUnavailable": 1,
+        "sourceUnchanged": true
+      },
+      "assessment": {
+        "outcome": "semantic-failed",
+        "reviewer": "Agent review of the unchanged source, exact seven prior inputs, six native returns, one native exception, actual arithmetic records and complete model response; not third-party review.",
+        "contradictoryReturnedCount": 3,
+        "remainingErrors": [
+          "Three cases that returned in both native Node and the interpreter are asserted to throw exceptions, despite attached return/arithmetic records.",
+          "One case invents an out-of-range input condition instead of explaining the actual input configuration and invalid arithmetic.",
+          "Boundary examples misdescribe the supplied inputs as already at a boundary instead of explaining the adjustment made by source.",
+          "A value adjustment is described as input validation; unchecked ordering and numeric/data-shape requirements are omitted.",
+          "All seven examples cite the same early operation, which does not substantiate the downstream arithmetic/return claims.",
+          "The summary and operation descriptions are too generic to resolve the requested preconditions and edge behavior."
+        ],
+        "conclusion": "Task failed. Additional arithmetic records did not establish semantic improvement. This response contradicts three returned outcomes; previous attempts and the product's grounded values remain separately recorded."
+      }
+    },
+    {
+      "model": "qwen3.5:4b",
+      "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+      "processor": "cpu",
+      "timeoutSeconds": 600,
+      "startedAt": "2026-10-19T23:11:08.865Z",
+      "elapsedMs": 427619,
+      "errorPresent": false,
+      "request": {
+        "context": 32768,
+        "outputLimit": 4096,
+        "temperature": 0,
+        "requestedGpuLayers": 0,
+        "thinking": false
+      },
+      "response": {
+        "completed": true,
+        "doneReason": "stop",
+        "promptTokens": 4590,
+        "outputTokens": 1131,
+        "promptSeconds": 157.357113,
+        "generationSeconds": 259.373921
+      },
+      "productValidation": {
+        "accepted": true,
+        "citations": 6,
+        "examples": 7
+      },
+      "stages": [
+        {
+          "route": "/api/status",
+          "startedAt": "2026-10-19T23:11:10.021Z",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "completedAt": "2026-10-19T23:11:10.036Z",
+          "errorPresent": false
+        },
+        {
+          "route": "/api/tags",
+          "startedAt": "2026-10-19T23:11:10.037Z",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "completedAt": "2026-10-19T23:11:10.070Z",
+          "errorPresent": false
+        },
+        {
+          "route": "/api/show",
+          "startedAt": "2026-10-19T23:11:10.071Z",
+          "timeoutMs": 10000,
+          "outcome": "received",
+          "completedAt": "2026-10-19T23:11:10.191Z",
+          "errorPresent": false
+        },
+        {
+          "route": "/api/status",
+          "startedAt": "2026-10-19T23:11:10.192Z",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "completedAt": "2026-10-19T23:11:10.194Z",
+          "errorPresent": false
+        },
+        {
+          "route": "/api/chat",
+          "startedAt": "2026-10-19T23:11:10.196Z",
+          "timeoutMs": 600000,
+          "outcome": "received",
+          "completedAt": "2026-10-19T23:18:17.814Z",
+          "errorPresent": false
+        }
+      ],
+      "finalRuntimeInputVerification": {
+        "runtimeCommit": "25d0c274a4287114e451d904c1bdd52e8e8e8276",
+        "recalculatedObservationsIdentical": true,
+        "modelMessagesIdentical": true,
+        "responseSchemaIdentical": true,
+        "sameSourceQuestionFocusInputsAsPreviousModelAttempt": true,
+        "caseCount": 7,
+        "recordCounts": [
+          12,
+          12,
+          12,
+          0,
+          12,
+          12,
+          12
+        ],
+        "omittedCases": 6
+      },
+      "nativeComparison": {
+        "returnedMatches": 6,
+        "exceptionReportedUnavailable": 1,
+        "sourceUnchanged": true
+      },
+      "assessment": {
+        "outcome": "semantic-failed",
+        "reviewer": "Agent review of unchanged source, the exact seven prior inputs, native outcomes, actual arithmetic records and full model response; not third-party review.",
+        "contradictoryReturnedCount": 1,
+        "remainingErrors": [
+          "One returned example is described as producing an invalid numeric result even though both native execution and attached observations return finite values; the explanation invents a different input configuration.",
+          "The loop continuation condition is incorrectly claimed to guarantee a minimum input size. It is not a validation guard and can simply skip the loop.",
+          "A range adjustment performed by the function is also presented as an unchecked range restriction the caller must guarantee.",
+          "An out-of-range example is described as already equal to a boundary, although its final result is correctly stated.",
+          "A one-element example is described as two input points without explaining that both selected references address the same element.",
+          "Required ordering and numeric/data-shape assumptions are not adequately explained; one source reference for an unavailable case points to an operation that was not reached."
+        ],
+        "correctPortions": [
+          "The summary describes interpolation and the returned shape; one boundary adjustment and two invalid-arithmetic returned outcomes are explained more concretely than the seven-billion-parameter response.",
+          "These correct portions do not resolve the contradictory returned outcome or invented validation guarantee."
+        ],
+        "conclusion": "Task failed. Six exact citations and seven case items passed the product validator, but one returned outcome and important input-precondition claims are wrong. Partial improvements in one repeated task do not establish general model accuracy."
+      }
+    }
+  ],
+  "limits": [
+    "Agent semantic review, not independent third-party evaluation.",
+    "Prompt and response lengths, model architecture, server state, local background activity and caching differ; elapsed times are observations, not a controlled speed benchmark.",
+    "Local core/build checks overlapped part of the first request; no claim that concurrent environment load was equal.",
+    "Structural acceptance, exact quotes and populated example items do not prove semantic correctness.",
+    "No private source, identifiers, concrete inputs/results or raw model responses are published.",
+    "Native final-return comparisons do not establish whole-application correctness or scientific validity."
+  ],
+  "cleanup": "After both requests completed, verified the owned server and runner executable paths and parent relationship, stopped only those two processes and confirmed the owned port had no listener. The first cleanup guard aborted without stopping processes because the runner executable differs from the server; exact runner identity was then inspected. Other project servers were untouched."
+}

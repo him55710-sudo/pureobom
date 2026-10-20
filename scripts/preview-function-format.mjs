@@ -4,13 +4,64 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { Worker } from "node:worker_threads";
 const rust = process.argv.includes("--rust");
-const focus = process.argv.includes("--focus");
+const progress = process.argv.includes("--progress");
+const execution = process.argv.includes("--execution");
+const arithmetic = process.argv.includes("--arithmetic");
+const thinking = process.argv.includes("--thinking");
+const nested = process.argv.includes("--nested");
+const checkComparison = process.argv.includes("--check-comparison");
+const packageChecks =
+  process.argv.includes("--package-checks") || checkComparison;
+const fixtureCheck = {
+  id: "after",
+  name: "check",
+  folder: "public-sample",
+  file: "sample.ts",
+  sourceSha256: "b".repeat(64),
+  startedAt: "2026-01-01T00:02:00Z",
+  elapsedMs: 1400,
+  status: "failed",
+  exitCode: 1,
+  stale: false,
+};
+let fixtureComparison = {
+  baseline: {
+    ...fixtureCheck,
+    id: "before",
+    sourceSha256: "a".repeat(64),
+    startedAt: "2026-01-01T00:00:00Z",
+    status: "passed",
+    exitCode: 0,
+  },
+  outcome: "passed-to-failed",
+  sourceChanged: true,
+};
+const focus =
+  process.argv.includes("--focus") ||
+  progress ||
+  execution ||
+  arithmetic ||
+  thinking;
 const folder = resolve(
-  focus
-    ? "test-results/focused-explanation-ui"
-    : rust
-      ? "test-results/rust-source-ui"
-      : "test-results/function-format-ui",
+  checkComparison
+    ? "test-results/check-comparison-ui"
+    : packageChecks
+      ? "test-results/package-checks-ui"
+      : nested
+        ? "test-results/nested-functions-ui"
+        : thinking
+          ? "test-results/local-ai-thinking-ui"
+          : arithmetic
+            ? "test-results/arithmetic-records-ui"
+            : execution
+              ? "test-results/execution-records-ui"
+              : progress
+                ? "test-results/local-ai-progress-ui"
+                : focus
+                  ? "test-results/focused-explanation-ui"
+                  : rust
+                    ? "test-results/rust-source-ui"
+                    : "test-results/function-format-ui",
 );
 const path = rust ? "sample.rs" : "sample.ts";
 await mkdir(folder, { recursive: true });
@@ -18,10 +69,15 @@ const worker = new Worker(resolve("extension/out/worker.cjs"));
 let seq = 0,
   version = 1,
   proposal,
+  observation,
   reviewed = false;
-let source = rust
-  ? '// 😀 Unicode anchors\nconst LIMIT: u64 = 9007199254740993u64;\npub fn label(count: u32) -> &\'static str {\n    match count {\n        0 => r#"아직 없음"#,\n        n if n < 10 => "a few",\n        _ => "many",\n    }\n}\n'
-  : "export function total(rows: number[]) { let amount=0, index=0; while(index<rows.length) { amount+=rows[index]; index++; } return amount; }\nconst untouched=()=>2;\n";
+let source = nested
+  ? "export function scaleRows(rows: number[], factor = 2) {\n  const scale = (value: number) => value * factor;\n  return rows.map((value: number) => scale(value));\n}\nfunction untouched() { return 9; }\n"
+  : rust
+    ? '// 😀 Unicode anchors\nconst LIMIT: u64 = 9007199254740993u64;\npub fn label(count: u32) -> &\'static str {\n    match count {\n        0 => r#"아직 없음"#,\n        n if n < 10 => "a few",\n        _ => "many",\n    }\n}\n'
+    : arithmetic
+      ? "export function quotient(dividend: number, divisor: number) {\n  return dividend / divisor;\n}\n"
+      : "export function total(rows: number[]) { let amount=0, index=0; while(index<rows.length) { amount+=rows[index]; index++; } return amount; }\nconst untouched=()=>2;\n";
 const calls = [],
   pending = new Map();
 worker.on("message", (response) => {
@@ -63,6 +119,9 @@ async function state() {
     trusted: true,
     busy: false,
     analysis,
+    ...(checkComparison
+      ? { projectCheck: fixtureCheck, checkComparison: fixtureComparison }
+      : {}),
   };
 }
 async function rpc(r) {
@@ -72,14 +131,78 @@ async function rpc(r) {
     JSON.stringify(calls, null, 2),
   );
   if (r.action === "ready") return { state: await state() };
+  if (r.action === "projectBaselineClear" && checkComparison) {
+    fixtureComparison = { outcome: "no-baseline" };
+    return { state: await state() };
+  }
+  if (r.action === "projectBaseline" && checkComparison) {
+    fixtureComparison = {
+      baseline: { ...fixtureCheck },
+      outcome: "awaiting-run",
+    };
+    return { state: await state() };
+  }
+  if (r.action === "projectTasks" && packageChecks)
+    return {
+      result: [
+        {
+          id: "package-check",
+          name: "check",
+          source: "npm",
+          folder: "public-sample",
+          kind: "shell",
+          command: JSON.stringify(["npm", "run", "check"], null, 2),
+          cwd: "public-sample",
+          packageScript: {
+            file: "package.json",
+            name: "check",
+            command: "node --test",
+            before: "node scripts/prepare-tests.cjs",
+            after: "node scripts/report-tests.cjs",
+          },
+        },
+      ],
+    };
+  if (r.action === "projectRun" && packageChecks)
+    throw Error(
+      "UI fixture only; no command is executed. / 화면 검증용이며 명령을 실행하지 않습니다.",
+    );
   if (r.action === "localModels" && focus)
     return {
       result: {
         origin: "Controlled UI fixture; no model inference",
-        models: [{ name: "fixture:local", digest: "a".repeat(64), size: 0 }],
+        models: (thinking
+          ? ["fixture:local", "fixture:levels", "fixture:unknown"]
+          : ["fixture:local"]
+        ).map((name) => ({ name, digest: "a".repeat(64), size: 0 })),
+      },
+    };
+  if (r.action === "localModelOptions" && focus)
+    return {
+      result: {
+        thinking:
+          r.payload.model === "fixture:levels"
+            ? { values: ["low", "medium", "high"], default: "medium" }
+            : r.payload.model === "fixture:unknown"
+              ? { values: [] }
+              : { values: [false, true], default: true },
       },
     };
   if (r.contextId !== String(version)) throw Error("Stale fixture context");
+  if (r.action === "localObserve" && focus) {
+    const fn = (await state()).analysis.functions.find(
+      (f) => f.id === r.payload.focusFunctionId,
+    );
+    if (!fn) throw Error("Select a function for this UI fixture");
+    const items = await call("observe", {
+      files: [{ path, content: source }],
+      path,
+      focus: { name: fn.name, start: fn.start, end: fn.end },
+      inputs: r.payload.inputs,
+    });
+    observation = { id: `observation-${seq}`, items };
+    return { result: observation };
+  }
   if (r.action === "localGenerate" && focus) {
     const a = (await state()).analysis;
     const fn = a.functions.find((f) => f.id === r.payload.focusFunctionId);
@@ -90,10 +213,20 @@ async function rpc(r) {
     return {
       result: {
         id: "focus-fixture",
-        model: "fixture:local",
+        model: r.payload.model,
         digest: "a".repeat(64),
         elapsedMs: 1,
         processor: r.payload.processor || "auto",
+        timeoutSeconds: r.payload.timeoutSeconds ?? 180,
+        thinking: {
+          requested: r.payload.thinking ?? null,
+          ...(r.payload.model === "fixture:unknown"
+            ? {}
+            : {
+                modelDefault:
+                  r.payload.model === "fixture:levels" ? "medium" : true,
+              }),
+        },
         summary: ko
           ? "선택한 함수의 설명을 표시하는 화면 검증용 응답입니다. 실제 모델의 설명 품질 검증이 아닙니다."
           : "Controlled response for verifying the selected-function display. This does not evaluate a real model.",
@@ -111,12 +244,42 @@ async function rpc(r) {
         edits: [],
         risks: [],
         checks: [],
+        explanation: {
+          inputChecks: ko
+            ? "입력 검사를 구분해 보여 주는 화면 검증용 설명입니다."
+            : "Controlled text for the input-check section.",
+          callerRequirements: ko
+            ? "호출 조건을 구분해 보여 주는 화면 검증용 설명입니다."
+            : "Controlled text for the caller-requirements section.",
+          examples:
+            r.payload.observationId === observation?.id && observation
+              ? observation.items.map((_, i) => ({
+                  case: i + 1,
+                  citation: 1,
+                  explanation: ko
+                    ? "이 예시의 계산 값과 나란히 표시하는 모의 모델 설명입니다."
+                    : "A controlled model explanation beside this example's observed value.",
+                }))
+              : [],
+        },
         focus: { name: fn.name, line: fn.line, endLine: fn.endLine },
+        ...(r.payload.observationId === observation?.id && observation
+          ? { observations: observation.items }
+          : {}),
         validation: { status: "unavailable", detail: "No proposed change" },
       },
     };
   }
   if (r.action === "localSource" && focus) return { result: {} };
+  if (r.action === "localObservationSource" && focus) {
+    const step =
+      observation?.id === r.payload.observationId &&
+      observation.items[r.payload.caseIndex]?.execution?.steps[
+        r.payload.stepIndex
+      ];
+    if (!step) throw Error("Stale fixture calculation source");
+    return { result: {} }; // Simulated editor; native navigation is checked by extension integration tests.
+  }
   if (r.action === "prepare" && rust) {
     proposal = await call("rust", {
       file: { path, content: source },
@@ -168,12 +331,37 @@ async function rpc(r) {
   if (r.action === "source") return { result: {} };
   throw Error("Unsupported fixture action: " + r.action);
 }
-const fixtureTitle = focus
-  ? "Focused explanation"
-  : rust
-    ? "Rust source"
-    : "Function layout";
-const page = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${fixtureTitle} UI verification</title><link rel="stylesheet" href="/view.css"><link rel="stylesheet" href="/theme.css"><body><p style="padding:12px;margin:0;background:#fff4d4;color:#433716">UI verification fixture — actual extension UI and worker; simulated editor, public sample code.${focus ? " Controlled model replies; no model inference." : ""}</p><div id="root"></div><script>window.acquireVsCodeApi=()=>({getState:()=>({}),setState:()=>{},postMessage:async m=>{const r=await(await fetch('/rpc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(m)})).json();if(r.state)window.postMessage({type:'state',state:r.state},location.origin);window.postMessage({type:'response',id:m.id,result:r.result,error:r.error},location.origin)}});</script><script src="/view.js"></script></body></html>`;
+const fixtureTitle = checkComparison
+  ? "Project check comparison"
+  : packageChecks
+    ? "Package check scripts"
+    : nested
+      ? "Nested functions"
+      : focus
+        ? "Focused explanation"
+        : rust
+          ? "Rust source"
+          : "Function layout";
+const simulatedProgress = progress
+  ? `
+if(m.action==='localCancel') {
+  window.fixtureCancelled=true;
+  window.postMessage({type:'response',id:m.id,result:{}},location.origin);
+  return;
+}
+if(m.action==='localGenerate') {
+  window.fixtureCancelled=false;
+  for(const phase of ['connection','models','model','connection','generation','validation']) {
+    window.postMessage({type:'progress',id:m.id,phase},location.origin);
+    await new Promise(resolve=>setTimeout(resolve,phase==='generation'?12000:1500));
+    if(window.fixtureCancelled) {
+      window.postMessage({type:'response',id:m.id,error:'모의 요청을 취소했습니다. / Fixture request cancelled.'},location.origin);
+      return;
+    }
+  }
+}`
+  : "";
+const page = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${fixtureTitle} UI verification</title><link rel="stylesheet" href="/view.css"><link rel="stylesheet" href="/theme.css"><body><p style="padding:12px;margin:0;background:#fff4d4;color:#433716">UI verification fixture — actual extension UI and worker; simulated editor, public sample code.${focus ? " Controlled model replies; no model inference." : ""}</p><div id="root"></div><script>window.acquireVsCodeApi=()=>({getState:()=>({}),setState:()=>{},postMessage:async m=>{${simulatedProgress}const r=await(await fetch('/rpc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(m)})).json();if(r.state)window.postMessage({type:'state',state:r.state},location.origin);window.postMessage({type:'response',id:m.id,result:r.result,error:r.error},location.origin)}});</script><script src="/view.js"></script></body></html>`;
 const server = createServer(async (req, res) => {
   try {
     if (req.url === "/rpc" && req.method === "POST") {

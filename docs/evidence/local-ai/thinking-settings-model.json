@@ -1,0 +1,125 @@
+{
+  "collectedAt": "2026-10-19T23:41:00.628Z",
+  "runtimeCommit": "88cd9a5b3ddf8f6350be2145032ffb32c1c8b597",
+  "finalRuntimeProof": {
+    "runtimeCommit": "e8327125f57883eb4f566082b3657a45eb66cb34",
+    "recalculatedObservationsIdentical": true,
+    "modelMessagesIdentical": true,
+    "responseSchemaIdentical": true,
+    "sameSourceQuestionFocusInputsAsPreviousModelAttempt": true,
+    "caseCount": 7,
+    "recordCounts": [
+      12,
+      12,
+      12,
+      0,
+      12,
+      12,
+      12
+    ],
+    "omittedCases": 6
+  },
+  "scope": "One same-task private-code request with thinking enabled, compared with the previously recorded disabled request. Agent-run assessment, not an independent benchmark.",
+  "model": "qwen3.5:4b",
+  "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+  "processor": "cpu",
+  "timeoutSeconds": 600,
+  "options": {
+    "temperature": 0,
+    "num_ctx": 32768,
+    "num_predict": 4096,
+    "num_gpu": 0
+  },
+  "cloudDisabledVerified": true,
+  "noPaidAPI": true,
+  "baseline": {
+    "record": "arithmetic-model-followup.json",
+    "thinking": false,
+    "elapsedMs": 427619,
+    "structuralAccepted": true,
+    "semanticAssessment": "failed"
+  },
+  "current": {
+    "thinking": true,
+    "chatElapsedMs": 600016,
+    "transport": "failed",
+    "structuralAccepted": false,
+    "semanticAssessment": "not-assessed-no-accepted-response",
+    "errorCategory": "generation-timeout",
+    "structuralAssessment": "not-reached-no-response"
+  },
+  "stages": [
+    {
+      "route": "/api/status",
+      "startedAt": "2026-10-19T23:30:49.105Z",
+      "completedAt": "2026-10-19T23:30:49.122Z",
+      "timeoutMs": 5000,
+      "outcome": "received",
+      "errorPresent": false
+    },
+    {
+      "route": "/api/tags",
+      "startedAt": "2026-10-19T23:30:49.123Z",
+      "completedAt": "2026-10-19T23:30:49.17Z",
+      "timeoutMs": 5000,
+      "outcome": "received",
+      "errorPresent": false
+    },
+    {
+      "route": "/api/show",
+      "startedAt": "2026-10-19T23:30:49.171Z",
+      "completedAt": "2026-10-19T23:30:49.188Z",
+      "timeoutMs": 10000,
+      "outcome": "received",
+      "errorPresent": false
+    },
+    {
+      "route": "/api/status",
+      "startedAt": "2026-10-19T23:30:49.189Z",
+      "completedAt": "2026-10-19T23:30:49.191Z",
+      "timeoutMs": 5000,
+      "outcome": "received",
+      "errorPresent": false
+    },
+    {
+      "route": "/api/chat",
+      "startedAt": "2026-10-19T23:30:49.193Z",
+      "completedAt": "2026-10-19T23:40:49.209Z",
+      "timeoutMs": 600000,
+      "outcome": "failed",
+      "errorPresent": true
+    }
+  ],
+  "sourcePreserved": true,
+  "observations": {
+    "caseCount": 7,
+    "nativeReturnMatches": 6,
+    "nativeUnavailable": 1
+  },
+  "privacy": {
+    "sourcePublished": false,
+    "concreteInputsOrResultsPublished": false,
+    "rawModelReplyPublished": false,
+    "internalThinkingTextPublished": false
+  },
+  "limits": [
+    "Same messages/schema/options but different requested thinking; model tokenization and completion length can differ.",
+    "Runs occurred at different times. A local UI build and input verification overlapped part of this request; this is not a controlled speed benchmark.",
+    "A timeout or rejected answer is not evidence about the correctness of an unseen answer.",
+    "Previous meaning errors remain unresolved unless a completed answer is separately reviewed."
+  ],
+  "cleanup": {
+    "temporaryUITabAndServerClosed": true,
+    "dedicatedServerAndRunnerStopped": true,
+    "cancelledServerTaskObserved": true,
+    "ownedPortNoLongerListening": true,
+    "privateEvaluationCheckoutClean": true
+  },
+  "originalComparison": {
+    "originalModifiedByThisWork": false,
+    "targetTextMatchesAfterLineEndingNormalization": true,
+    "initialByteHashMatch": false,
+    "scope": "Fixed evaluation copy and selected function/inputs, not the current original checkout as a whole.",
+    "currentOriginalCheckoutSameAsEvaluation": false
+  }
+}

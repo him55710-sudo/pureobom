@@ -1,0 +1,152 @@
+{
+  "collectedAt": "2026-10-19T22:51:28.192Z",
+  "runtimeCommit": "c64bc4a283afb575605e7b05adcecaf85069975a",
+  "local": [
+    {
+      "path": "test-results/arithmetic-records-core.log",
+      "sha256": "47dd3b971705ce4357bd4a518958e8ba8d7d10f24bde8b81452214d15f458966",
+      "scope": "88 focused core tests in seven files, including six arithmetic regression tests; passed."
+    },
+    {
+      "path": "test-results/arithmetic-records-build.log",
+      "sha256": "4c94054b2f8740959128724c31797fad9620be759b97d048350f77e79a06b047",
+      "scope": "Extension TypeScript/bundle build passed."
+    },
+    {
+      "path": "test-results/arithmetic-records-native.log",
+      "sha256": "873544817d7b94ea7d016161202db5e18600a5d35465951b25cc9fa2bad2d1ad",
+      "scope": "Actual development VS Code observation subset, six checks; controlled model HTTP response."
+    },
+    {
+      "path": "test-results/arithmetic-records-source.log",
+      "sha256": "69647c518b10ea7c08d1e5f87eefdba79079e1d96e1562bf7869c62dfa49208f",
+      "scope": "Actual development VS Code source-navigation subset, three checks; arithmetic, condition, callback, loop and return source locations."
+    },
+    {
+      "path": "test-results/arithmetic-records-return-regression.log",
+      "sha256": "5c7ab54c3a5b2b5904369de51d82dcba377f640487e2559dc0acaa0dabdef150",
+      "scope": "After the first full-CI failure, twelve value-transport/arithmetic regression checks passed with explicit return-record selection."
+    }
+  ],
+  "development": {
+    "observation": {
+      "scope": "explanation-observations-only",
+      "vscode": "1.96.4",
+      "checks": [
+        "Explanation arithmetic: actual worker records original expressions and evaluated operand/result values for zero division and signed infinity, separately from the returned object, with no model inference",
+        "Explanation execution records: actual worker records a source-linked return; nested client mutation cannot change host evidence or navigation, and invalid record indexes are rejected without model inference",
+        "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+        "Explanation observations: host-retained results, progress phases and a selected time limit reach the actual local-model client and returned view; invalid limits and fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+        "Explanation coverage: actual client returns separate input checks and caller requirements with every example; its citation opens exact source, duplicated or missing examples are rejected and source remains unchanged (controlled model response)",
+        "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+      ],
+      "passed": 6,
+      "timestamp": "2026-10-19T22:44:45.892Z"
+    },
+    "navigation": {
+      "scope": "trace-source-only",
+      "vscode": "1.96.4",
+      "checks": [
+        "Trace source handles: unknown handles, stale contexts, superseded results and invalid indexes are rejected; clients cannot supply a navigation path",
+        "Trace source freshness: an unopened imported file changed on disk is rejected before showing a stale line, even without an editor change notification",
+        "Trace source navigation: actual worker/controller opens exact imported condition, loop, callback and return lines across files with duplicate basenames; returned-data mutation cannot redirect selection; source text stays unchanged"
+      ],
+      "passed": 3,
+      "timestamp": "2026-10-19T22:45:29.879Z"
+    }
+  },
+  "browser": {
+    "kind": "Actual built UI and worker; public division fixture and simulated editor; no model inference.",
+    "checked": [
+      "Korean and English arithmetic labels and source/operand/result text",
+      "Normal result, NaN and Infinity preserved",
+      "Source action wired for both languages; actual native navigation separately checked",
+      "Changing inputs removes old records"
+    ],
+    "loggedRequests": {
+      "localObserve": 2,
+      "localObservationSource": 2,
+      "localModels": 0,
+      "localGenerate": 0
+    },
+    "screenshots": [
+      {
+        "path": "docs/evidence/local-ai/arithmetic-records-ko.png",
+        "sha256": "b4cfa9e3673ea24cc60277194cb6e40d23286ad745807d410b3fca3f517bbdb5",
+        "scope": "Public Korean arithmetic UI."
+      },
+      {
+        "path": "docs/evidence/local-ai/arithmetic-records-en.png",
+        "sha256": "12c5fd5b12d1d71513c656c0d1ce3f1edf4f8e77d376a2842c72f191d1b29268",
+        "scope": "Public English arithmetic UI; record text remains source plus bilingual labels."
+      }
+    ],
+    "cleanup": "Owned temporary tab closed and harness stopped; owned port has no listener."
+  },
+  "privateEvaluation": {
+    "checkedAt": "2026-10-19T22:45:20.783Z",
+    "scope": "Same fixed private function and seven previous inputs; actual product worker vs native Node returns; no model request",
+    "cases": 7,
+    "nativeMatched": 6,
+    "nativeUnavailable": 1,
+    "recordCounts": [
+      12,
+      12,
+      12,
+      0,
+      12,
+      12,
+      12
+    ],
+    "arithmeticRecordCounts": [
+      8,
+      8,
+      8,
+      0,
+      8,
+      8,
+      7
+    ],
+    "nonFiniteArithmeticCases": 2,
+    "omittedCases": 6,
+    "sourceUnchanged": true,
+    "checkoutClean": true,
+    "modelQuality": "not evaluated for the new arithmetic records",
+    "promptBudget": {
+      "accepted": true,
+      "requestBytes": 18446,
+      "selectedContextSize": 32768,
+      "modelRequested": false
+    }
+  },
+  "limits": [
+    "Same private function and same seven previous inputs, not new coverage.",
+    "Native final returns compared; intermediate operations not independently instrumented in native execution.",
+    "All six returned cases have omitted records under existing display limits.",
+    "No new model request; earlier semantic failure is not resolved by this evidence.",
+    "Private source, identifiers, inputs, outputs and raw observations remain local.",
+    "Not whole-app validity, performance improvement, all-language support or release deployment."
+  ],
+  "finalCI": "arithmetic-records-ci.json: test-only follow-up 00eedd7 with runtime unchanged from c64bc4a passed Windows/Ubuntu; each 335 core, 67 development, 67 production-installed, eleven installed hashes and seven package checks. Local worker and UI JS/CSS match both installations.",
+  "testFollowupCommit": "00eedd7b0541d903f81a387b6aa2bae692eec07f",
+  "initialCIFailure": {
+    "commit": "c64bc4a283afb575605e7b05adcecaf85069975a",
+    "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39337376784",
+    "jobs": [
+      {
+        "id": 118350129315,
+        "name": "verify (windows-latest)",
+        "passed": 334,
+        "failed": 1
+      },
+      {
+        "id": 118350129688,
+        "name": "verify (ubuntu-latest)",
+        "passed": 334,
+        "failed": 1
+      }
+    ],
+    "cause": "Existing value-transport test assumed the first trace record was the returned object; arithmetic now precedes that return.",
+    "correction": "Select the explicit return record and retain special-value/undefined assertions; the core check also asserts one return. Corrected the same assumption in native tests. Runtime code unchanged; twelve focused regression checks passed."
+  }
+}

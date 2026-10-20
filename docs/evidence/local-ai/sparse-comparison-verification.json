@@ -1,0 +1,45 @@
+{
+  "collectedAt": "2026-10-19T23:06:04.798Z",
+  "runtimeCommit": "25d0c274a4287114e451d904c1bdd52e8e8e8276",
+  "scope": "Public regression cases for comparison of supported JS/TS return values, not a private-project defect or model optimization.",
+  "before": {
+    "passed": 14,
+    "failed": 3,
+    "incorrectSameResults": [
+      "[] versus [,]",
+      "[[]] versus [[,]]",
+      "{a:[,]} versus {a:[]}"
+    ]
+  },
+  "after": {
+    "focusedCorePassed": 29,
+    "files": 3,
+    "newCases": 7,
+    "extensionBuild": "passed"
+  },
+  "logs": [
+    {
+      "path": "test-results/sparse-comparison-before.log",
+      "sha256": "6de8a53ff3d4b3503d6b252483f8e831920d55c83be61f1a41a13328c67fe3d5",
+      "scope": "Bug reproduction before fix: three false same results, fourteen checks pass."
+    },
+    {
+      "path": "test-results/sparse-comparison-core.log",
+      "sha256": "1e792b13502a359a2344aff85bb69e892f4e4ed6929d948940b8c71ffcc86158",
+      "scope": "After fix: 29 comparison, value-transport and arithmetic regression checks pass."
+    },
+    {
+      "path": "test-results/sparse-comparison-build.log",
+      "sha256": "e62ed58130ec0ff5506da4e8d53d0473b606e0acb8b29377e89f1604acb7a2de",
+      "scope": "Extension TypeScript and bundle build passes."
+    }
+  ],
+  "mechanism": "Array.map skipped missing slots; joining an empty mapped array and one missing slot produced the same representation. Visit every index and encode absence separately from an explicit value.",
+  "nativeScope": "Full CI checks actual prepared patch, worker/controller, two-way VS Code webview transport, array length/absence and Korean/English Markdown status. No direct screenshot/UI-click claim.",
+  "finalCI": "sparse-comparison-ci.json: exact runtime 25d0c27 passed Windows/Ubuntu; each 342 core, 68 development, 68 production-installed, eleven installed file hashes and seven package checks. New sparse comparison check is present in all four native reports.",
+  "limits": [
+    "Supported return values at selected inputs, not whole-program behavioral equivalence.",
+    "Does not validate model explanations, native application side effects or performance improvements.",
+    "Private user source is neither modified nor included."
+  ]
+}

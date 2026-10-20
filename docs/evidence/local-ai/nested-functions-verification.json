@@ -1,0 +1,70 @@
+{
+  "recordedAt": "2026-10-20T00:01:52.404Z",
+  "scope": "Source nesting navigation in the extension reading view; not a call graph or general model-quality assessment",
+  "runtimeHashes": {
+    "extension/out/extension.cjs": "0e45c7603085a3c4912c19eb2c64a5d9c535f31d9ef3ac8e5199e907d67a685e",
+    "extension/out/worker.cjs": "40e77d6e2c7f29e2fc051f5cc67de4909d0989c78c434e72942455de6553d66c",
+    "extension/media/view.js": "ff5f79d75941c1a83a83dcc941577249cac080be5765de795647918c5ea98f4c",
+    "extension/media/view.css": "32e6f66eab202f7b1a632537718f3c9337ce98e24800badec2fad64a692811e7"
+  },
+  "focusedTests": {
+    "files": 2,
+    "passed": 18,
+    "newNestingCases": 4
+  },
+  "privateFixedCheckout": {
+    "clean": true,
+    "selectedDirectChildren": 1,
+    "closestParentMatches": true,
+    "exactOriginalSourceRange": true,
+    "anonymousLabel": true,
+    "bodyHasReturn": true,
+    "sourceUnchanged": true,
+    "originalCheckoutNotModified": true,
+    "currentOriginalWholeProjectVerified": false
+  },
+  "browser": {
+    "fixture": "scripts/preview-function-format.mjs --nested",
+    "actualBuiltUIAndWorker": true,
+    "editor": "simulated",
+    "source": "public sample",
+    "languages": [
+      "ko",
+      "en"
+    ],
+    "immediateChildren": 2,
+    "anonymousChildAndParentNavigation": true,
+    "keyboardNamedChildNavigation": true,
+    "headingReceivesFocus": true,
+    "unrelatedFunctionHasNoNavigation": true,
+    "sourceRequestLines": [
+      3,
+      2
+    ],
+    "modelRequests": 0,
+    "editRequests": 0,
+    "nativeClickCoverage": false
+  },
+  "screenshots": [
+    "nested-functions-ko.png",
+    "nested-functions-en.png"
+  ],
+  "runtimeCommit": "c6248bc7f8d132098c5488d5fc3ce265eff9686e",
+  "logs": {
+    "focusedCore": {
+      "sha256": "be03f3cd06e9fb9cc685f792aecc03727a2d6f35cad0bc947574d60134090f0b",
+      "exitCode": 0
+    },
+    "extensionBuild": {
+      "sha256": "d2367a13a62aee4e5b2d2e48c1f184869c02bc85f40c496d6e7c4907257387c8",
+      "exitCode": 0
+    }
+  },
+  "setupFailure": "Initial aggregate recorder used a nonexistent UI bundle filename; corrected to the actual build output and reran successfully. Product behavior was not changed.",
+  "cleanup": {
+    "browserTabClosed": true,
+    "fixtureServerStopped": true
+  },
+  "ci": "nested-functions-ci.json",
+  "localRuntimeMatchesBothCIInstallations": true
+}

@@ -4,9 +4,12 @@ import { createHash } from "node:crypto";
 import JSZip from "jszip";
 import { resolve } from "node:path";
 const installed = process.argv.includes("--installed");
+const traceSourceOnly = process.argv.includes("--trace-source");
+const observationsOnly = process.argv.includes("--explanation-observations");
+const packageScriptsOnly = process.argv.includes("--package-scripts");
 const workspaces = resolve("test-results/extension-workspaces");
 await mkdir(workspaces, { recursive: true });
-const workspace = await mkdtemp(resolve(workspaces, "run-"));
+const workspace = await mkdtemp(resolve(workspaces, ".run-"));
 await writeFile(
   resolve(workspace, "tsconfig.json"),
   JSON.stringify({
@@ -25,6 +28,43 @@ await writeFile(
   `import { helper } from './helper';\nconst freeShippingThreshold = 50000;\nconst shippingFee = 3000;\nexport function calculateShipping(subtotal: number) {\n  if (subtotal < 0) throw new Error('negative');\n  if (subtotal >= freeShippingThreshold) return 0;\n  return shippingFee;\n}\n`,
 );
 await writeFile(resolve(workspace, "helper.ts"), "export const helper = 1;\n");
+await writeFile(
+  resolve(workspace, "package.json"),
+  JSON.stringify(
+    {
+      private: true,
+      scripts: {
+        check: "node package-check.cjs",
+        precheck: "node package-hook.cjs before",
+        postcheck: "node package-hook.cjs after",
+        dev: "node package-hook.cjs unexpected",
+        watch: "node package-hook.cjs unexpected",
+        install: "node package-hook.cjs unexpected",
+        publish: "node package-hook.cjs unexpected",
+      },
+    },
+    null,
+    2,
+  ),
+);
+await writeFile(
+  resolve(workspace, "package-value.cjs"),
+  "const amount = 42;\nmodule.exports = { amount };\n",
+);
+await writeFile(
+  resolve(workspace, "package-check.cjs"),
+  "require('node:assert/strict').equal(require('./package-value.cjs').amount,42); console.log('package assertion passed');\n",
+);
+await writeFile(
+  resolve(workspace, "package-hook.cjs"),
+  "require('node:fs').mkdirSync('test-results',{recursive:true}); require('node:fs').appendFileSync('test-results/package-hooks.txt',process.argv[2]+'\\n');\n",
+);
+await mkdir(resolve(workspace, ".private"));
+await writeFile(
+  resolve(workspace, ".private/hidden.ts"),
+  "export const hidden = 1;\n",
+);
+await writeFile(resolve(workspace, ".hidden.ts"), "export const hidden = 2;\n");
 await mkdir(resolve(workspace, ".vscode"), { recursive: true });
 await writeFile(
   resolve(workspace, ".vscode/tasks.json"),
@@ -78,6 +118,15 @@ await writeFile(
     "typescript.disableAutomaticTypeAcquisition": true,
     "extensions.autoUpdate": false,
     "extensions.autoCheckUpdates": false,
+    "npm.packageManager": "npm",
+    "npm.autoDetect": "on",
+    ...(process.platform === "win32"
+      ? {
+          "terminal.integrated.automationProfile.windows": {
+            path: process.env.ComSpec || "C:\\Windows\\System32\\cmd.exe",
+          },
+        }
+      : {}),
   }),
 );
 let developmentPath = resolve("extension");
@@ -154,12 +203,21 @@ await runTests({
       ? JSON.stringify(expectedInstallation)
       : "",
     PUREOBOM_ONLY_BENCHMARK: process.env.PUREOBOM_ONLY_BENCHMARK || "0",
+    PUREOBOM_ONLY_TRACE_SOURCE: traceSourceOnly ? "1" : "0",
+    PUREOBOM_ONLY_OBSERVATIONS: observationsOnly ? "1" : "0",
+    PUREOBOM_ONLY_PACKAGE_SCRIPTS: packageScriptsOnly ? "1" : "0",
     PUREOBOM_INTEGRATION_REPORT: resolve(
-      installed
-        ? "test-results/installed-extension-integration.json"
-        : process.env.PUREOBOM_ONLY_BENCHMARK === "1"
-          ? "test-results/benchmark-integration.json"
-          : "test-results/extension-integration.json",
+      packageScriptsOnly
+        ? `test-results/package-scripts-${installed ? "installed" : "development"}.json`
+        : observationsOnly
+          ? `test-results/explanation-observations-${installed ? "installed" : "development"}.json`
+          : traceSourceOnly
+            ? `test-results/trace-source-${installed ? "installed" : "development"}.json`
+            : installed
+              ? "test-results/installed-extension-integration.json"
+              : process.env.PUREOBOM_ONLY_BENCHMARK === "1"
+                ? "test-results/benchmark-integration.json"
+                : "test-results/extension-integration.json",
     ),
   },
   launchArgs: [

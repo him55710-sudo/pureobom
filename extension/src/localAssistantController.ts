@@ -1,16 +1,29 @@
 import * as vscode from "vscode";
 import { randomUUID } from "node:crypto";
 import { OllamaClient, type InferenceProcessor } from "./ollama";
+import {
+  thinkingSelection,
+  type ThinkingRequest,
+  type ThinkingValue,
+} from "../../src/core/localAIThinking";
 import { inputString } from "./protocol";
 import type { AnalysisClient } from "./analysisClient";
 import type {
   AssistantInput,
   AssistantProposal,
   AssistantConstraintCheck,
+  AssistantObservation,
 } from "../../src/core/localAssistant";
-import { checkAssistantConstraint } from "../../src/core/localAssistant";
+import {
+  checkAssistantConstraint,
+  supportsObservationInputs,
+} from "../../src/core/localAssistant";
 import { validatePython } from "./pythonValidation";
 import type { ChangeFacts } from "../../src/core/changeFacts";
+import {
+  localAITimeoutSeconds,
+  type LocalAIProgress,
+} from "../../src/core/localAIProgress";
 
 export type AssistantValidation = {
   status: "syntax-passed" | "syntax-failed" | "unavailable";
@@ -22,11 +35,15 @@ export type AssistantResult = Omit<AssistantProposal, "updated"> & {
   model: string;
   digest: string;
   elapsedMs: number;
+  timeoutSeconds: number;
   processor: InferenceProcessor;
+  thinking: ThinkingRequest;
   validation: AssistantValidation;
   constraint?: AssistantConstraintCheck;
   focus?: { name: string; line: number; endLine: number };
+  observations?: AssistantObservation[];
 };
+export type ObservationView = { id: string; items: AssistantObservation[] };
 type Pending = {
   result: AssistantResult;
   updated: string;
@@ -40,6 +57,13 @@ type Pending = {
 export class LocalAssistantController implements vscode.Disposable {
   private pending?: Pending;
   private running?: AbortController;
+  private observed?: {
+    view: ObservationView;
+    context: string;
+    version: number;
+    source: string;
+    focusId: string;
+  };
   private previews = new Map<string, string>();
   private provider = vscode.workspace.registerTextDocumentContentProvider(
     "pureobom-local-preview",
@@ -68,8 +92,17 @@ export class LocalAssistantController implements vscode.Disposable {
       context: string | undefined,
       id: string,
     ) => AssistantInput["focus"],
+    private observeFunction?: (
+      context: string | undefined,
+      focus: NonNullable<AssistantInput["focus"]>,
+      inputs: string,
+    ) => Promise<AssistantObservation[]>,
   ) {}
-  private client(processor: InferenceProcessor = "auto") {
+  private client(
+    processor: InferenceProcessor = "auto",
+    timeoutSeconds = 180,
+    thinking: ThinkingValue | null = null,
+  ) {
     if (vscode.env.remoteName)
       throw Error(
         "로컬 AI는 데스크톱의 로컬 작업 공간에서 사용하세요. / Local AI requires a local desktop workspace.",
@@ -78,8 +111,9 @@ export class LocalAssistantController implements vscode.Disposable {
       vscode.workspace
         .getConfiguration("pureobom")
         .get<number>("ollamaPort", 11434),
-      undefined,
+      timeoutSeconds * 1000,
       processor,
+      thinking,
     );
   }
   async models() {
@@ -88,12 +122,99 @@ export class LocalAssistantController implements vscode.Disposable {
       models: await this.client().models(),
     };
   }
+  async modelOptions(model: unknown) {
+    return this.client().modelOptions(inputString(model, 200));
+  }
   cancel() {
     this.running?.abort();
   }
   invalidate() {
     this.cancel();
     this.pending = undefined;
+    this.observed = undefined;
+  }
+  async observe(
+    context: string | undefined,
+    payload: Record<string, unknown>,
+  ): Promise<ObservationView> {
+    const doc = this.current(context);
+    if (!supportsObservationInputs(doc.languageId) || !this.observeFunction)
+      throw Error(
+        "계산 예시는 선택한 JS/TS 기능에서 사용할 수 있습니다. / Calculation examples require a selected JS/TS function.",
+      );
+    const focusId = inputString(payload.focusFunctionId, 1000);
+    const focus = this.focus(context, focusId, "explain")!;
+    const source = doc.getText(),
+      version = doc.version;
+    const items = await this.observeFunction(
+      context,
+      focus,
+      inputString(payload.inputs, 8000),
+    );
+    if (
+      this.current(context) !== doc ||
+      doc.version !== version ||
+      doc.getText() !== source
+    )
+      throw Error(
+        "파일이 바뀌었습니다. 다시 계산하세요. / Source changed. Calculate again.",
+      );
+    const id = randomUUID();
+    this.observed = {
+      view: { id, items: structuredClone(items) },
+      context: context!,
+      version,
+      source,
+      focusId,
+    };
+    return { id, items };
+  }
+  private checkedObservation(id: string, context: string | undefined) {
+    const doc = this.current(context),
+      observed = this.observed;
+    if (
+      !observed ||
+      observed.view.id !== id ||
+      observed.context !== context ||
+      observed.version !== doc.version ||
+      observed.source !== doc.getText()
+    )
+      throw Error(
+        "계산 기록이 바뀌었습니다. 다시 계산하세요. / Calculation record is stale. Calculate again.",
+      );
+    return { doc, observed };
+  }
+  async observationSource(
+    id: string,
+    context: string | undefined,
+    caseIndex: unknown,
+    stepIndex: unknown,
+  ) {
+    const { doc, observed } = this.checkedObservation(id, context);
+    if (
+      !Number.isInteger(caseIndex) ||
+      (caseIndex as number) < 0 ||
+      !Number.isInteger(stepIndex) ||
+      (stepIndex as number) < 0
+    )
+      throw Error("Invalid calculation source reference");
+    const step =
+      observed.view.items[caseIndex as number]?.execution?.steps[
+        stepIndex as number
+      ];
+    if (!step || step.line < 1 || step.line > doc.lineCount)
+      throw Error("Invalid calculation source reference");
+    const editor = await vscode.window.showTextDocument(doc, {
+      viewColumn: vscode.ViewColumn.One,
+      preserveFocus: true,
+    });
+    this.checkedObservation(id, context);
+    const range = doc.lineAt(step.line - 1).range;
+    editor.selection = new vscode.Selection(range.start, range.end);
+    editor.revealRange(
+      range,
+      vscode.TextEditorRevealType.InCenterIfOutsideViewport,
+    );
   }
   private focus(context: string | undefined, id: unknown, task: unknown) {
     if (task !== "explain" || !this.resolveFocus)
@@ -110,6 +231,7 @@ export class LocalAssistantController implements vscode.Disposable {
   async generate(
     context: string | undefined,
     payload: Record<string, unknown>,
+    onProgress?: LocalAIProgress,
   ): Promise<AssistantResult> {
     const doc = this.current(context);
     if (!vscode.workspace.isTrusted)
@@ -120,6 +242,8 @@ export class LocalAssistantController implements vscode.Disposable {
       throw Error(
         "진행 중인 요청을 취소하거나 기다려 주세요. / Wait for or cancel the current request.",
       );
+    const timeoutSeconds = localAITimeoutSeconds(payload.timeoutSeconds);
+    const thinking = thinkingSelection(payload.thinking);
     const input: AssistantInput = {
       source: doc.getText(),
       language: doc.languageId,
@@ -135,6 +259,22 @@ export class LocalAssistantController implements vscode.Disposable {
           }
         : {}),
     };
+    if (payload.observationId !== undefined) {
+      const observed = this.observed;
+      if (
+        input.task !== "explain" ||
+        !observed ||
+        observed.view.id !== payload.observationId ||
+        observed.context !== context ||
+        observed.version !== doc.version ||
+        observed.source !== input.source ||
+        observed.focusId !== payload.focusFunctionId
+      )
+        throw Error(
+          "예시 계산이 바뀌었습니다. 선택한 기능에서 다시 계산하세요. / Calculation examples changed. Calculate again for the selected function.",
+        );
+      input.observations = structuredClone(observed.view.items);
+    }
     const version = doc.version;
     const controller = new AbortController();
     this.running = controller;
@@ -144,7 +284,14 @@ export class LocalAssistantController implements vscode.Disposable {
         (payload.processor === undefined
           ? "auto"
           : payload.processor) as InferenceProcessor,
-      ).generate(inputString(payload.model, 200), input, controller.signal);
+        timeoutSeconds,
+        thinking,
+      ).generate(
+        inputString(payload.model, 200),
+        input,
+        controller.signal,
+        onProgress,
+      );
       const validation: AssistantValidation = response.proposal.edits.length
         ? doc.languageId === "python"
           ? await validatePython(response.proposal.updated)
@@ -192,8 +339,13 @@ export class LocalAssistantController implements vscode.Disposable {
         model: response.model.name,
         digest: response.model.digest,
         elapsedMs: response.elapsedMs,
+        timeoutSeconds: response.timeoutMs / 1000,
         processor: response.processor,
+        thinking: response.thinking,
         validation,
+        ...(input.observations
+          ? { observations: structuredClone(input.observations) }
+          : {}),
         ...(input.focus
           ? {
               focus: {

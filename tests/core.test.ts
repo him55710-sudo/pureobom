@@ -224,7 +224,7 @@ describe("restricted calculation preview", () => {
     const f = { path: "a.ts", content: `function f(){return ${expression}}` };
     expect(simulate([f], f.path, "f", []).ok).toBe(false);
   });
-  it("bounds recursion and refuses loops", () => {
+  it("bounds recursion and non-terminating loops", () => {
     const f = { path: "a.ts", content: "function f(){return f()}" };
     expect(simulate([f], f.path, "f", []).ok).toBe(false);
     const loop = {

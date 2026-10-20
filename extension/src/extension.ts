@@ -6,6 +6,11 @@ import { inputString, requestMessage } from "./protocol";
 import type { Scenario } from "../../src/core/scenarioModel";
 import { interfaceDemo } from "../../src/interfaceDemo";
 import { productResource } from "../../src/product";
+import {
+  decodePreviewMessage,
+  encodePreviewMessage,
+  usesPreviewTransport,
+} from "../../src/core/previewValues";
 
 export function activate(context: vscode.ExtensionContext) {
   const controller = new Controller(
@@ -70,7 +75,12 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         const r = requestMessage(raw);
         id = r.id;
-        const p = r.payload || {};
+        const decoded = usesPreviewTransport(r.action)
+          ? decodePreviewMessage(r.payload)
+          : r.payload || {};
+        if (!decoded || typeof decoded !== "object" || Array.isArray(decoded))
+          throw Error("Invalid request payload");
+        const p = decoded as Record<string, unknown>;
         let result: unknown;
         switch (r.action) {
           case "benchmarkPrepare":
@@ -114,11 +124,44 @@ export function activate(context: vscode.ExtensionContext) {
           case "projectCancel":
             controller.checks.cancel();
             break;
+          case "projectBaseline":
+            await controller.checks.pinBaseline(
+              r.contextId,
+              inputString(p.id, 100),
+            );
+            break;
+          case "projectBaselineClear":
+            controller.checks.clearBaseline();
+            break;
           case "localModels":
             result = await controller.assistant.models();
             break;
+          case "localModelOptions":
+            result = await controller.assistant.modelOptions(p.model);
+            break;
           case "localGenerate":
-            result = await controller.assistant.generate(r.contextId, p);
+            result = await controller.assistant.generate(
+              r.contextId,
+              p,
+              (phase) => {
+                void currentPanel.webview.postMessage({
+                  type: "progress",
+                  id,
+                  phase,
+                });
+              },
+            );
+            break;
+          case "localObserve":
+            result = await controller.assistant.observe(r.contextId, p);
+            break;
+          case "localObservationSource":
+            await controller.assistant.observationSource(
+              inputString(p.observationId, 100),
+              r.contextId,
+              p.caseIndex,
+              p.stepIndex,
+            );
             break;
           case "localCancel":
             controller.assistant.cancel();
@@ -195,6 +238,9 @@ export function activate(context: vscode.ExtensionContext) {
           case "source":
             await controller.source(r.contextId, p.line);
             break;
+          case "traceSource":
+            await controller.traceSource(r.contextId, p.traceId, p.index);
+            break;
           case "diagnosticSource":
             await controller.diagnosticSource(
               r.contextId,
@@ -252,7 +298,9 @@ export function activate(context: vscode.ExtensionContext) {
         await currentPanel.webview.postMessage({
           type: "response",
           id,
-          result,
+          result: usesPreviewTransport(r.action)
+            ? encodePreviewMessage(result)
+            : result,
         });
       } catch (e) {
         await currentPanel.webview.postMessage({

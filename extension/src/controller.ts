@@ -26,7 +26,7 @@ import { LocalAssistantController } from "./localAssistantController";
 import { ProjectChecks } from "./projectChecks";
 import { Benchmarks } from "./benchmarks";
 import { inputString, type PatchSummary, type ViewState } from "./protocol";
-import type { FormatSummary } from "./protocol";
+import type { FormatSummary, SimulationView } from "./protocol";
 import type { FunctionFormatResult } from "../../src/core/formatFunction";
 
 const FILE_BYTES = 512 * 1024,
@@ -57,6 +57,12 @@ export class Controller implements vscode.Disposable {
   private sources = new Map<string, { uri: vscode.Uri; file: SourceFile }>();
   private patches = new Map<string, PendingPatch>();
   private previews = new Map<string, string>();
+  private simulation?: {
+    id: string;
+    contextId: string;
+    trace: Simulation["trace"];
+    sources: Map<string, { uri: vscode.Uri; content: string }>;
+  };
   private epoch = 0;
   private timer?: ReturnType<typeof setTimeout>;
   private registration: vscode.Disposable;
@@ -136,9 +142,27 @@ export class Controller implements vscode.Disposable {
         if (!fn) return undefined;
         return { name: fn.name.slice(0, 400), start: fn.start, end: fn.end };
       },
+      async (context, focus, inputs) => {
+        const doc = this.current(context);
+        const result = await client.call<
+          import("../../src/core/localAssistant").AssistantObservation[]
+        >("observe", {
+          files: [...this.sources.values()].map((source) => source.file),
+          path: this.path(doc),
+          focus,
+          inputs,
+        });
+        this.current(context);
+        return result;
+      },
     );
     this.checks = new ProjectChecks((context) => this.current(context));
-    this.checks.changes.event((projectCheck) => this.publish({ projectCheck }));
+    this.checks.changes.event((projectCheck) =>
+      this.publish({
+        projectCheck,
+        checkComparison: this.checks.comparison,
+      }),
+    );
     this.benchmarks = new Benchmarks(this.checks);
     this.benchmarks.changes.event((benchmark) => this.publish({ benchmark }));
     try {
@@ -307,6 +331,7 @@ export class Controller implements vscode.Disposable {
     this.assistant.invalidate();
     this.epoch++;
     this.patches.clear();
+    this.simulation = undefined;
     this.publish({
       contextId: randomUUID(),
       busy: true,
@@ -531,7 +556,16 @@ export class Controller implements vscode.Disposable {
     let total = 0,
       skipped = 0;
     for (const uri of uris.slice(0, 300)) {
-      if (/(?:^|\/)(?:\.[^/]+|package-lock\.json)(?:\/|$)/.test(uri.path)) {
+      const folder = vscode.workspace.getWorkspaceFolder(uri);
+      const localPath = folder
+        ? uri.path.slice(folder.uri.path.replace(/\/$/, "").length + 1)
+        : undefined;
+      // Only exclude hidden entries inside the selected project. A hidden
+      // ancestor (for example .codex/worktrees) is not project content.
+      if (
+        !localPath ||
+        /(?:^|\/)(?:\.[^/]+|package-lock\.json)(?:\/|$)/.test(localPath)
+      ) {
         skipped++;
         continue;
       }
@@ -970,25 +1004,99 @@ export class Controller implements vscode.Disposable {
     });
     await this.setDocument(doc);
   }
+  async traceSource(
+    contextId: string | undefined,
+    traceId: unknown,
+    index: unknown,
+  ) {
+    this.current(contextId);
+    const snapshot = this.simulation;
+    if (
+      !snapshot ||
+      snapshot.id !== traceId ||
+      snapshot.contextId !== contextId ||
+      !Number.isInteger(index) ||
+      Number(index) < 0
+    )
+      throw Error(
+        "계산 기록이 바뀌었습니다. 다시 계산해 주세요. / Calculation changed. Evaluate again.",
+      );
+    const step = snapshot.trace[Number(index)];
+    const source = step?.path ? snapshot.sources.get(step.path) : undefined;
+    if (!source)
+      throw Error(
+        "이 항목에는 원본 위치가 없습니다. / No source location for this entry.",
+      );
+    const doc = await vscode.workspace.openTextDocument(source.uri);
+    this.current(contextId);
+    if (this.simulation !== snapshot || doc.getText() !== source.content)
+      throw Error(
+        "계산에 사용한 코드가 바뀌었습니다. 다시 읽고 계산해 주세요. / Calculation source changed. Refresh and evaluate again.",
+      );
+    if (
+      !Number.isInteger(step.line) ||
+      step.line < 1 ||
+      step.line > doc.lineCount
+    )
+      throw Error(
+        "원본 위치를 확인할 수 없습니다. / Source location unavailable.",
+      );
+    const editor = await vscode.window.showTextDocument(doc, {
+      viewColumn: vscode.ViewColumn.One,
+      preview: false,
+      preserveFocus: true,
+    });
+    // Opening the target can legitimately switch the active document/context.
+    // Recheck the exact text before selecting a line after this asynchronous step.
+    if (doc.isClosed || doc.getText() !== source.content)
+      throw Error(
+        "계산에 사용한 코드가 바뀌었습니다. 다시 계산해 주세요. / Calculation source changed. Evaluate again.",
+      );
+    const position = new vscode.Position(step.line - 1, 0);
+    editor.selection = new vscode.Selection(position, position);
+    editor.revealRange(
+      new vscode.Range(position, position),
+      vscode.TextEditorRevealType.InCenterIfOutsideViewport,
+    );
+  }
   async simulate(
     contextId: string | undefined,
     name: string,
     input: string,
-  ): Promise<Simulation> {
+  ): Promise<SimulationView> {
     const doc = this.current(contextId);
     const args: unknown = JSON.parse(input);
     if (!Array.isArray(args) || args.length > 20)
       throw Error("입력값을 JSON 배열로 적어 주세요. 예: [50000]");
     if (!this.state.analysis!.functions.some((f) => f.name === name))
       throw Error("현재 파일에 없는 기능입니다.");
+    const sources = new Map(
+      [...this.sources].map(([path, source]) => [
+        path,
+        {
+          uri: source.uri,
+          content: source.file.content,
+        },
+      ]),
+    );
     const result = await this.client.call<Simulation>("simulate", {
-      files: [...this.sources.values()].map((s) => s.file),
+      files: [...sources].map(([path, source]) => ({
+        path,
+        content: source.content,
+      })),
       path: this.path(doc),
       name,
       args,
     });
     this.current(contextId);
-    return result;
+    const traceId = randomUUID();
+    this.simulation = {
+      id: traceId,
+      contextId: contextId!,
+      trace: result.trace.map((step) => ({ ...step })),
+      sources,
+    };
+    return { ...result, traceId };
   }
   async compare(
     contextId: string | undefined,

@@ -6,7 +6,8 @@ import {
 } from "node:http";
 import type { AddressInfo } from "node:net";
 import { afterEach, describe, expect, it } from "vitest";
-import { OllamaClient } from "../extension/src/ollama";
+import { OllamaClient, OllamaRequestError } from "../extension/src/ollama";
+import type { LocalAIPhase } from "../src/core/localAIProgress";
 import type { AssistantInput } from "../src/core/localAssistant";
 
 const servers: Server[] = [];
@@ -62,9 +63,9 @@ function fixture(path: string | undefined) {
       content: JSON.stringify({
         summary: "배송비",
         citations: [{ quote: "fee = 3000", explanation: "값" }],
-        edits: [],
-        risks: [],
-        checks: [],
+        inputChecks: "입력 검사가 없습니다.",
+        callerRequirements: "사용처의 조건은 알 수 없습니다.",
+        examples: [],
       }),
     },
   };
@@ -76,7 +77,21 @@ describe("Ollama loopback protocol (controlled HTTP fixture, not real inference)
       seen.push({ route: req.url, body });
       reply(res, fixture(req.url));
     });
-    const result = await new OllamaClient(port).generate(model.name, input);
+    const phases: LocalAIPhase[] = [];
+    const result = await new OllamaClient(port).generate(
+      model.name,
+      input,
+      undefined,
+      (phase) => phases.push(phase),
+    );
+    expect(phases).toEqual([
+      "connection",
+      "models",
+      "model",
+      "connection",
+      "generation",
+      "validation",
+    ]);
     expect(seen.map((s) => s.route)).toEqual([
       "/api/status",
       "/api/tags",
@@ -94,6 +109,7 @@ describe("Ollama loopback protocol (controlled HTTP fixture, not real inference)
     expect(chat.shift).toBe(false);
     expect(chat.options).not.toHaveProperty("num_gpu");
     expect(result.processor).toBe("auto");
+    expect(result.timeoutMs).toBe(180000);
     expect(chat.options.num_ctx).toBeLessThan(32768);
     expect(result.contextSize).toBe(chat.options.num_ctx);
   });
@@ -125,7 +141,7 @@ describe("Ollama loopback protocol (controlled HTTP fixture, not real inference)
     ).rejects.toThrow(/OLLAMA_NO_CLOUD/);
     expect(seen).toEqual(["/api/status"]);
   });
-  it("requests direct answers only when the model advertises a supported off switch", async () => {
+  it("preserves each model's default instead of silently switching thinking off", async () => {
     for (const thinking of [
       { values: [false, true], default: true },
       { values: ["low", "medium", "high"], default: "medium" },
@@ -142,12 +158,144 @@ describe("Ollama loopback protocol (controlled HTTP fixture, not real inference)
             : fixture(req.url),
         );
       });
-      await new OllamaClient(port).generate(model.name, input);
-      if (thinking?.values.some((value) => value === false))
-        expect(chat.think).toBe(false);
-      else expect(chat).not.toHaveProperty("think");
+      const result = await new OllamaClient(port).generate(model.name, input);
+      expect(chat).not.toHaveProperty("think");
+      expect(result.thinking).toEqual({
+        requested: null,
+        ...(thinking ? { modelDefault: thinking.default } : {}),
+      });
       expect(chat.options.num_predict).toBe(4096);
     }
+  });
+  it.each([false, true, "low", "high", "true"])(
+    "forwards the advertised thinking value %s without coercing its type",
+    async (selection) => {
+      let chat: any;
+      const port = await server((req, res, body) => {
+        if (req.url === "/api/chat") chat = body;
+        const base = fixture(req.url);
+        reply(
+          res,
+          req.url === "/api/show"
+            ? {
+                ...base,
+                thinking: {
+                  values: [false, true, "low", "high", "true"],
+                  default: true,
+                },
+              }
+            : req.url === "/api/chat"
+              ? {
+                  ...base,
+                  message: {
+                    ...base!.message,
+                    thinking:
+                      "Controlled internal trace must not enter the product result",
+                  },
+                }
+              : base,
+        );
+      });
+      const result = await new OllamaClient(
+        port,
+        undefined,
+        "auto",
+        selection,
+      ).generate(model.name, input);
+      expect(chat.think).toBe(selection);
+      expect(chat.options.num_predict).toBe(4096);
+      expect(result.thinking).toEqual({
+        requested: selection,
+        modelDefault: true,
+      });
+      expect(JSON.stringify(result)).not.toContain("Controlled internal trace");
+    },
+  );
+  it("loads settings without source and rejects a now-unsupported choice before chat", async () => {
+    const bodies: unknown[] = [];
+    let chats = 0,
+      changed = false;
+    const port = await server((req, res, body) => {
+      if (req.url === "/api/chat") chats++;
+      bodies.push(body);
+      reply(
+        res,
+        req.url === "/api/show"
+          ? {
+              ...fixture(req.url),
+              thinking: {
+                values: changed ? [false] : [false, true],
+                default: false,
+              },
+            }
+          : fixture(req.url),
+      );
+    });
+    const client = new OllamaClient(port, undefined, "auto", true);
+    expect((await client.modelOptions(model.name)).thinking).toEqual({
+      values: [false, true],
+      default: false,
+    });
+    changed = true;
+    await expect(client.generate(model.name, input)).rejects.toThrow(
+      /supported thinking settings/,
+    );
+    expect(chats).toBe(0);
+    expect(
+      bodies.every(
+        (body) =>
+          body === undefined ||
+          JSON.stringify(body) === JSON.stringify({ model: model.name }),
+      ),
+    ).toBe(true);
+  });
+  it("rejects explicit values when capability metadata is absent and malformed selections before networking", async () => {
+    const routes: string[] = [];
+    const port = await server((req, res) => {
+      routes.push(req.url!);
+      reply(res, fixture(req.url));
+    });
+    for (const bad of [0, {}, [], "", " high", "high\n", "x".repeat(81)])
+      expect(
+        () => new OllamaClient(port, undefined, "auto", bad as boolean),
+      ).toThrow(/thinking setting/);
+    expect(routes).toEqual([]);
+    await expect(
+      new OllamaClient(port, undefined, "auto", false).generate(
+        model.name,
+        input,
+      ),
+    ).rejects.toThrow(/supported thinking settings/);
+    expect(routes).not.toContain("/api/chat");
+  });
+  it("discards malformed capability entries while preserving supported named levels", async () => {
+    const port = await server((req, res) =>
+      reply(
+        res,
+        req.url === "/api/show"
+          ? {
+              ...fixture(req.url),
+              thinking: {
+                values: [
+                  true,
+                  false,
+                  "medium",
+                  "medium",
+                  1,
+                  null,
+                  {},
+                  "",
+                  "bad\n",
+                ],
+                default: "not-advertised",
+              },
+            }
+          : fixture(req.url),
+      ),
+    );
+    expect(
+      (await new OllamaClient(port).modelOptions(model.name)).thinking,
+    ).toEqual({ values: [true, false, "medium"] });
   });
   it("filters cloud aliases and rejects remote metadata before chat", async () => {
     let chat = false;
@@ -197,11 +345,25 @@ describe("Ollama loopback protocol (controlled HTTP fixture, not real inference)
     await expect(pending).rejects.toThrow(/cancelled/);
     await expect(
       new OllamaClient(port, 30).generate(model.name, input),
-    ).rejects.toThrow(/timed out/);
+    ).rejects.toMatchObject({
+      name: "OllamaRequestError",
+      phase: "generation",
+      reason: "timeout",
+      timeoutMs: 30,
+    });
     const big = await server((_req, res) =>
       res.end(" ".repeat(2 * 1024 * 1024 + 1)),
     );
     await expect(new OllamaClient(big).models()).rejects.toThrow(/2MB/);
+  });
+  it("uses an explicitly selected bounded deadline and leaves the default unchanged", async () => {
+    const port = await server((req, res) => reply(res, fixture(req.url)));
+    expect(
+      (await new OllamaClient(port, 300000).generate(model.name, input))
+        .timeoutMs,
+    ).toBe(300000);
+    for (const timeout of [0, -1, 1.5, NaN, Infinity, 600001])
+      expect(() => new OllamaClient(port, timeout)).toThrow(/time limit/);
   });
   it("rejects partial or tool-bearing completions", async () => {
     const port = await server((req, res) =>
@@ -215,5 +377,63 @@ describe("Ollama loopback protocol (controlled HTTP fixture, not real inference)
     await expect(
       new OllamaClient(port).generate(model.name, input),
     ).rejects.toThrow(/Incomplete/);
+  });
+  it("identifies a preflight timeout without claiming model generation or sending source", async () => {
+    const seen: string[] = [],
+      phases: LocalAIPhase[] = [];
+    const port = await server((req) => {
+      seen.push(req.url!);
+    });
+    await expect(
+      new OllamaClient(port).generate(model.name, input, undefined, (phase) =>
+        phases.push(phase),
+      ),
+    ).rejects.toMatchObject({
+      name: "OllamaRequestError",
+      phase: "connection",
+      reason: "timeout",
+      timeoutMs: 5000,
+    });
+    expect(phases).toEqual(["connection"]);
+    expect(seen).toEqual(["/api/status"]);
+  }, 15000);
+  it("keeps the failing network stage and allows cancellation before chat transmission", async () => {
+    for (const [route, phase] of [
+      ["/api/tags", "models"],
+      ["/api/show", "model"],
+      ["/api/chat", "generation"],
+    ]) {
+      const port = await server((req, res) => {
+        if (req.url === route) {
+          res.writeHead(503);
+          res.end();
+        } else reply(res, fixture(req.url));
+      });
+      try {
+        await new OllamaClient(port).generate(model.name, input);
+        throw Error("Expected HTTP failure");
+      } catch (error) {
+        expect(error).toBeInstanceOf(OllamaRequestError);
+        expect(error).toMatchObject({ phase, reason: "request" });
+        expect((error as Error).message).toContain("503");
+      }
+    }
+    const seen: string[] = [];
+    const port = await server((req, res) => {
+      seen.push(req.url!);
+      reply(res, fixture(req.url));
+    });
+    const cancel = new AbortController();
+    await expect(
+      new OllamaClient(port).generate(
+        model.name,
+        input,
+        cancel.signal,
+        (phase) => {
+          if (phase === "generation") cancel.abort();
+        },
+      ),
+    ).rejects.toThrow(/cancelled/);
+    expect(seen).not.toContain("/api/chat");
   });
 });

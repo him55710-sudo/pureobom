@@ -4,13 +4,27 @@ import {
   assistantLanguages,
   assistantLimits,
   supportsWhitespaceConstraint,
+  supportsObservationInputs,
   type AssistantTask,
 } from "../../src/core/localAssistant";
-import type { AssistantResult } from "../src/localAssistantController";
+import type {
+  AssistantResult,
+  ObservationView,
+} from "../src/localAssistantController";
 import type { InferenceProcessor, LocalModel } from "../src/ollama";
 import type { ViewState } from "../src/protocol";
 import { request } from "./bridge";
+import {
+  thinkingLabel,
+  type ThinkingMetadata,
+  type ThinkingValue,
+} from "../../src/core/localAIThinking";
 import "./local-assistant.css";
+import {
+  localAIPhases,
+  localAITimeoutChoices,
+  type LocalAIPhase,
+} from "../../src/core/localAIProgress";
 
 export function LocalAssistant({
   state,
@@ -24,6 +38,9 @@ export function LocalAssistant({
   const [models, setModels] = useState<LocalModel[]>([]);
   const [model, setModel] = useState("");
   const [processor, setProcessor] = useState<InferenceProcessor>("auto");
+  const [timeoutSeconds, setTimeoutSeconds] = useState(180);
+  const [thinking, setThinking] = useState<ThinkingValue | null>(null);
+  const [thinkingOptions, setThinkingOptions] = useState<ThinkingMetadata>();
   const [origin, setOrigin] = useState("");
   const [task, setTask] = useState<AssistantTask>("explain");
   const [focusChoice, setFocusChoice] = useState(initialFocus);
@@ -33,9 +50,28 @@ export function LocalAssistant({
       : undefined;
   const [whitespaceOnly, setWhitespaceOnly] = useState(false);
   const [instruction, setInstruction] = useState("");
+  const [exampleInputs, setExampleInputs] = useState("");
+  const [observed, setObserved] = useState<{
+    context: string;
+    focusId: string;
+    inputs: string;
+    result: ObservationView;
+  }>();
+  const observation =
+    observed?.context === state.contextId &&
+    observed.focusId === focusedFunction?.id &&
+    observed.inputs === exampleInputs
+      ? observed.result
+      : undefined;
   const [busy, setBusy] = useState(false);
   const [generationStarted, setGenerationStarted] = useState<number>();
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [progress, setProgress] = useState<{
+    context: string;
+    phase: LocalAIPhase;
+  }>();
+  const phase =
+    progress?.context === state.contextId ? progress.phase : undefined;
   const [error, setError] = useState("");
   const [notice, setNotice] = useState<Words>();
   const [generated, setGenerated] = useState<{
@@ -57,6 +93,17 @@ export function LocalAssistant({
       ? generated.result
       : undefined;
   const t = (ko: string, en: string) => (lang === "ko" ? ko : en);
+  async function selectModel(name: string) {
+    setModel(name);
+    setThinking(null);
+    setThinkingOptions(undefined);
+    if (!name) return;
+    const options = await request<{ thinking: ThinkingMetadata }>(
+      "localModelOptions",
+      { model: name },
+    );
+    if (mounted.current) setThinkingOptions(options.thinking);
+  }
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -88,6 +135,7 @@ export function LocalAssistant({
     setError("");
     setNotice(undefined);
     if (generating) {
+      setProgress(undefined);
       setElapsedSeconds(0);
       setGenerationStarted(Date.now());
     }
@@ -106,6 +154,7 @@ export function LocalAssistant({
       if (mounted.current) {
         setBusy(false);
         setGenerationStarted(undefined);
+        setProgress(undefined);
       }
     }
   }
@@ -117,6 +166,8 @@ export function LocalAssistant({
     (state.sourceBytes ?? Infinity) <= assistantLimits.sourceBytes;
   const canConstrainWhitespace =
     task === "edit" && supportsWhitespaceConstraint(state.language || "");
+  const canObserve =
+    !!focusedFunction && supportsObservationInputs(state.language || "");
   function clearProposal() {
     setGenerated(undefined);
     setReviewed(false);
@@ -130,8 +181,8 @@ export function LocalAssistant({
         </h2>
         <p>
           {t(
-            "현재 파일 하나와 아래 요청만 선택한 로컬 모델로 보냅니다. 모델의 추론은 틀릴 수 있어 원문 근거와 변경안을 함께 확인합니다.",
-            "Only the current file and your request go to the selected local model. Review source evidence and changes because model reasoning can be wrong.",
+            "현재 파일과 요청, 선택한 예시 계산 결과를 로컬 모델로 보냅니다. 모델의 추론은 틀릴 수 있어 원문 근거와 계산 결과·변경안을 함께 확인합니다.",
+            "The current file, your request and any selected calculation examples go to the local model. Review source evidence, observed results and changes because model reasoning can be wrong.",
           )}
         </p>
         <p className="muted">
@@ -182,7 +233,8 @@ export function LocalAssistant({
               if (!mounted.current) return;
               setModels(next.models);
               setOrigin(next.origin);
-              setModel(next.models[0]?.name || "");
+              await selectModel(next.models[0]?.name || "");
+              if (!mounted.current) return;
               setNotice(
                 next.models.length
                   ? {
@@ -207,8 +259,11 @@ export function LocalAssistant({
               value={model}
               disabled={busy}
               onChange={(e) => {
-                setModel(e.target.value);
-                clearProposal();
+                const name = e.target.value;
+                void run(async () => {
+                  clearProposal();
+                  await selectModel(name);
+                });
               }}
             >
               {models.map((m) => (
@@ -217,6 +272,52 @@ export function LocalAssistant({
                 </option>
               ))}
             </select>
+          </label>
+        ) : null}
+        {model ? (
+          <label>
+            {t("모델 추론 설정", "Model thinking")}
+            <select
+              value={JSON.stringify(thinking)}
+              aria-label={t("모델 추론 설정", "Model thinking")}
+              disabled={busy}
+              aria-describedby="local-thinking-description"
+              onChange={(event) => {
+                setThinking(
+                  JSON.parse(event.target.value) as ThinkingValue | null,
+                );
+                clearProposal();
+              }}
+            >
+              <option value="null">
+                {thinkingLabel(null)[lang]}
+                {thinkingOptions?.default !== undefined
+                  ? ` (${thinkingLabel(thinkingOptions.default)[lang]})`
+                  : ""}
+              </option>
+              {thinkingOptions?.values.map((value) => (
+                <option
+                  key={JSON.stringify(value)}
+                  value={JSON.stringify(value)}
+                >
+                  {thinkingLabel(value)[lang]}
+                </option>
+              ))}
+            </select>
+            <span className="muted" id="local-thinking-description">
+              {t(
+                "모델이 지원하는 설정만 표시합니다. 추론 설정에 따라 답변이 늦어지거나 출력 한도에 도달할 수 있으며, 설명의 정확도는 별도로 확인해야 합니다.",
+                "Only settings advertised by the model are shown. Thinking may increase response time or reach the output limit; check explanation accuracy separately.",
+              )}
+            </span>
+            {!thinkingOptions?.values.length ? (
+              <span className="muted">
+                {t(
+                  "지원 설정이 확인되지 않아 모델 기본값을 사용합니다. 다시 연결하면 정보를 갱신합니다.",
+                  "Supported settings are unavailable; the model default is used. Reconnect to refresh them.",
+                )}
+              </span>
+            ) : null}
           </label>
         ) : null}
         <label>
@@ -244,12 +345,38 @@ export function LocalAssistant({
           </span>
         </label>
         <label>
+          {t("답변 생성 대기 한도", "Response time limit")}
+          <select
+            value={timeoutSeconds}
+            disabled={busy}
+            onChange={(event) => {
+              setTimeoutSeconds(Number(event.target.value));
+              clearProposal();
+            }}
+          >
+            {localAITimeoutChoices.map((seconds) => (
+              <option key={seconds} value={seconds}>
+                {seconds / 60}
+                {t("분", " minutes")}
+                {seconds === 180 ? t(" (기본)", " (default)") : ""}
+              </option>
+            ))}
+          </select>
+          <span className="muted">
+            {t(
+              "느린 PC에서는 대기 시간을 늘릴 수 있습니다. 연결 확인 시간은 별도이며, 기다리는 동안 취소할 수 있습니다.",
+              "Allow more time on a slow PC. Connection checks have separate limits; you can cancel while waiting.",
+            )}
+          </span>
+        </label>
+        <label>
           {t("하고 싶은 작업", "Task")}
           <select
             value={task}
             disabled={busy}
             onChange={(e) => {
               setTask(e.target.value as AssistantTask);
+              setObserved(undefined);
               clearProposal();
             }}
           >
@@ -279,6 +406,7 @@ export function LocalAssistant({
                   context: state.contextId,
                   id: event.target.value,
                 });
+                setObserved(undefined);
                 clearProposal();
               }}
             >
@@ -326,6 +454,164 @@ export function LocalAssistant({
             }
           />
         </label>
+        {canObserve && (
+          <details className="local-setup">
+            <summary>
+              {t(
+                "예시 입력으로 설명 확인하기 (선택)",
+                "Check the explanation with examples (optional)",
+              )}
+            </summary>
+            <p>
+              {t(
+                "AI 없이 먼저 계산하고, 확인한 결과를 설명에 함께 보냅니다. 지원되는 JS/TS 구문에 한한 계산이며 실제 앱 테스트를 대신하지 않습니다.",
+                "Calculate without AI first, then include these observations in the explanation. This covers supported JS/TS syntax and does not replace application tests.",
+              )}
+            </p>
+            <label>
+              {t(
+                "예시 입력 · 예시마다 인수를 배열로 묶기",
+                "Example inputs · one argument array per example",
+              )}
+              <textarea
+                rows={3}
+                maxLength={8000}
+                disabled={busy || state.busy}
+                value={exampleInputs}
+                placeholder="[[0], [5]]"
+                onChange={(event) => {
+                  setExampleInputs(event.target.value);
+                  setObserved(undefined);
+                  clearProposal();
+                }}
+              />
+            </label>
+            <p className="muted">
+              {t("인수 순서", "Argument order")}:{" "}
+              {focusedFunction.params.map((p) => p.name).join(", ") ||
+                t("없음", "none")}{" "}
+              · {t("최대 8개 예시", "Up to 8 examples")}
+            </p>
+            <button
+              disabled={busy || !eligible || !exampleInputs.trim()}
+              onClick={() =>
+                void run(async () => {
+                  clearProposal();
+                  setObserved(undefined);
+                  const response = await request<ObservationView>(
+                    "localObserve",
+                    {
+                      focusFunctionId: focusedFunction.id,
+                      inputs: exampleInputs,
+                    },
+                    state.contextId,
+                  );
+                  if (
+                    mounted.current &&
+                    activeContext.current === state.contextId
+                  )
+                    setObserved({
+                      context: state.contextId,
+                      focusId: focusedFunction.id,
+                      inputs: exampleInputs,
+                      result: response,
+                    });
+                })
+              }
+            >
+              {t("AI 없이 예시 계산", "Calculate examples without AI")}
+            </button>
+          </details>
+        )}
+        {observation && (
+          <section aria-label={t("예시 계산 결과", "Calculation observations")}>
+            <h3>
+              {t(
+                "설명에 첨부할 계산 결과",
+                "Observations to include in the explanation",
+              )}
+            </h3>
+            <p className="muted">
+              {t(
+                "이 입력들에서 관찰한 결과입니다. 확인 불가는 실제 코드의 예외나 결함이 확인됐다는 뜻이 아닙니다. 모델 설명과 대조해 주세요.",
+                "These results apply to these inputs. Unavailable does not establish a real exception or bug. Compare them with the model's explanation.",
+              )}
+            </p>
+            <ol>
+              {observation.items.map((row, index) => (
+                <li key={index}>
+                  <span>{t("입력", "Inputs")}</span>
+                  <pre>{row.args}</pre>
+                  <span>
+                    {row.status === "returned"
+                      ? t("계산 결과", "Observed value")
+                      : t("확인 불가", "Unavailable")}
+                  </span>
+                  <pre>{row.value}</pre>
+                  {row.execution && (
+                    <details>
+                      <summary>
+                        {t(
+                          "계산 과정을 확인하기",
+                          "Inspect calculation records",
+                        )}
+                      </summary>
+                      <p className="muted">
+                        {t(
+                          "현재 파일에서 기록한 산술 계산·분기·반환과 반복 요약입니다. 계산식 아래에는 계산에 사용한 값과 결과가 표시됩니다. 전체 실행 과정이나 앱 테스트는 아닙니다. 반복 요약은 반복 종료 시 기록됩니다.",
+                          "Recorded arithmetic, conditions, returns and loop summaries in this file. Arithmetic shows evaluated operands and their result below the source expression. This is not a full execution trace or an application test. Loop summaries are recorded on exit.",
+                        )}
+                      </p>
+                      {row.execution.omitted && (
+                        <p role="note">
+                          {t(
+                            "다른 파일 또는 표시 한도 때문에 일부 기록을 첨부하지 않았습니다.",
+                            "Some records were excluded because they belong to another file or exceed display limits.",
+                          )}
+                        </p>
+                      )}
+                      {row.execution.steps.length ? (
+                        <ol>
+                          {row.execution.steps.map((step, stepIndex) => (
+                            <li key={step.order}>
+                              <button
+                                disabled={busy}
+                                onClick={() =>
+                                  void run(() =>
+                                    request(
+                                      "localObservationSource",
+                                      {
+                                        observationId: observation.id,
+                                        caseIndex: index,
+                                        stepIndex,
+                                      },
+                                      state.contextId,
+                                    ),
+                                  )
+                                }
+                              >
+                                {t("기록", "Record")} {step.order} · L
+                                {step.line}
+                              </button>
+                              <pre>{step.text}</pre>
+                            </li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <p>
+                          {t(
+                            "첨부할 기록이 없습니다. 기록이 없다는 이유로 실행된 동작을 추측하지 않습니다.",
+                            "No records to attach. Missing records do not establish which operations ran.",
+                          )}
+                        </p>
+                      )}
+                    </details>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
         {canConstrainWhitespace ? (
           <label className="local-ack">
             <input
@@ -375,17 +661,31 @@ export function LocalAssistant({
                   {
                     model,
                     processor,
+                    timeoutSeconds,
+                    thinking,
                     task,
                     instruction,
                     lang,
                     ...(focusedFunction
                       ? { focusFunctionId: focusedFunction.id }
                       : {}),
+                    ...(observation ? { observationId: observation.id } : {}),
                     ...(canConstrainWhitespace && whitespaceOnly
                       ? { editConstraint: "whitespace-only" }
                       : {}),
                   },
                   state.contextId,
+                  (nextPhase) => {
+                    if (
+                      mounted.current &&
+                      activeContext.current === state.contextId &&
+                      activeLanguage.current === lang
+                    )
+                      setProgress({
+                        context: state.contextId,
+                        phase: nextPhase,
+                      });
+                  },
                 );
                 if (
                   mounted.current &&
@@ -415,10 +715,7 @@ export function LocalAssistant({
         {busy ? (
           <p role="status">
             {generationStarted !== undefined
-              ? t(
-                  "로컬 모델 응답을 기다리고 있습니다. PC와 모델에 따라 몇 분이 걸릴 수 있습니다. 취소하거나 파일을 바꾸면 요청이 중단됩니다.",
-                  "Waiting for the local model. This can take minutes depending on your PC and model. Cancel or change the file to stop the request.",
-                )
+              ? `${phase ? localAIPhases[phase][lang] : t("요청 준비 중", "Preparing request")}… ${t("취소하거나 파일을 바꾸면 요청이 중단됩니다.", "Cancel or change the file to stop the request.")}`
               : t(
                   "요청한 작업을 처리하고 있습니다.",
                   "Processing the requested action.",
@@ -426,8 +723,9 @@ export function LocalAssistant({
             {generationStarted !== undefined ? (
               <span role="timer" aria-live="off">
                 {" "}
-                · {elapsedSeconds}
-                {t("초 경과", "s elapsed")}
+                · {t("전체 요청 경과", "Total request elapsed")}{" "}
+                {elapsedSeconds}
+                {t("초", "s")}
               </span>
             ) : null}
           </p>
@@ -471,9 +769,103 @@ export function LocalAssistant({
             {result.processor === "cpu"
               ? t("CPU 요청", "CPU requested")
               : t("Ollama 자동 설정", "Ollama automatic")}{" "}
-            · {t("추론 결과 · 검토 필요", "Model inference · review required")}
+            · {t("추론 결과 · 검토 필요", "Model inference · review required")}{" "}
+            · {t("설정한 대기 한도", "Selected time limit")}{" "}
+            {(result.timeoutSeconds ?? 180) / 60}
+            {t("분", " min")}
           </p>
+          {result.thinking && (
+            <p className="muted">
+              {t("요청한 추론 설정", "Requested thinking")}:{" "}
+              {thinkingLabel(result.thinking.requested)[lang]}
+              {result.thinking.requested === null &&
+              result.thinking.modelDefault !== undefined
+                ? ` (${thinkingLabel(result.thinking.modelDefault)[lang]})`
+                : ""}
+            </p>
+          )}
           <p className="local-summary">{result.summary}</p>
+          {result.explanation && (
+            <>
+              <h3>{t("입력 검사에 대한 설명", "Input checks explained")}</h3>
+              <p>{result.explanation.inputChecks}</p>
+              <h3>
+                {t("호출 조건에 대한 설명", "Caller requirements explained")}
+              </h3>
+              <p>{result.explanation.callerRequirements}</p>
+              {result.explanation.examples.length > 0 && (
+                <>
+                  <h3>
+                    {t(
+                      "예시별 계산과 모델 설명",
+                      "Each observation and its model explanation",
+                    )}
+                  </h3>
+                  <p className="muted">
+                    {t(
+                      "계산 값은 프로그램이 제공하고 설명은 모델이 작성했습니다. 항목이 모두 있어도 설명이 정확하다는 뜻은 아닙니다.",
+                      "Values come from the program; explanations come from the model. Complete coverage does not establish correctness.",
+                    )}
+                  </p>
+                  {result.explanation.examples.map((item) => {
+                    const observed = result.observations?.[item.case - 1];
+                    const citation = result.citations[item.citation - 1];
+                    return (
+                      <div className="local-citation" key={item.case}>
+                        <h4>
+                          {t("예시", "Example")} {item.case}
+                        </h4>
+                        {observed && (
+                          <>
+                            <p>{t("입력", "Input")}</p>
+                            <pre>{observed.args}</pre>
+                            <p>
+                              {observed.status === "returned"
+                                ? t("프로그램 계산 값", "Program observation")
+                                : t(
+                                    "프로그램 확인 불가",
+                                    "Program could not establish a result",
+                                  )}
+                            </p>
+                            <pre>{observed.value}</pre>
+                          </>
+                        )}
+                        <p>
+                          <strong>{t("모델 설명", "Model explanation")}</strong>
+                          : {item.explanation}
+                        </p>
+                        {citation && (
+                          <button
+                            disabled={busy}
+                            onClick={() =>
+                              void run(() =>
+                                request(
+                                  "localSource",
+                                  { id: result.id, index: item.citation - 1 },
+                                  state.contextId,
+                                ),
+                              )
+                            }
+                          >
+                            {t("예시", "Example")} {item.case} ·{" "}
+                            {t("원문 근거", "Source evidence")} L{citation.line}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+            </>
+          )}
+          {result.observations && (
+            <p className="muted">
+              {t(
+                "위 예시 계산 결과를 첨부한 설명입니다. 모델은 이 결과와 모순되는 답을 할 수 있으므로 값·원문과 대조하세요.",
+                "Generated with the observations above. The model may still contradict them; compare its claims with the values and source.",
+              )}
+            </p>
+          )}
           <h3>{t("원문에서 확인", "Check against the source")}</h3>
           {result.citations.map((c, i) => (
             <div className="local-citation" key={`${c.start}-${i}`}>

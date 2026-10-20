@@ -1,0 +1,101 @@
+{
+  "recordedAt": "2026-10-19T20:07:20.397Z",
+  "sourceBase": "de96d349ba350f8bfa4aabd5dbfc23f84088ad8b",
+  "scope": "0.7 development bounded JS/TS interpreter. Stable/Pages unchanged. No model requests, runtime user-source execution, scientific validation or measured optimization.",
+  "focused": {
+    "passed": 118,
+    "files": 5,
+    "logSha256": "9baa90d6d6a891eebf7301d7026c92983c0230743873c9db51171b170d134e0b",
+    "newCases": 35,
+    "independentNodeFixtures": 23
+  },
+  "initialFailures": [
+    {
+      "kind": "TypeScript build",
+      "reason": "Object.hasOwn required object receiver; replaced with standard own-property call for known strings/arrays."
+    },
+    {
+      "kind": "focused tests",
+      "passed": 116,
+      "failed": 1,
+      "reason": "Fixture assumed 400 iterations would fit the existing operation budget. Preserve budget rejection; separately verify visible trace omission below the budget.",
+      "logSha256": "07b85d6d661a5e2667fa8f7f88566f5c18807373d1bcd4fb71c83907991d768b"
+    },
+    {
+      "kind": "private probe",
+      "reason": "Probe incorrectly assumed an exception on a selected input. Compare against the actual Node return/exception instead. Original failure preserved locally.",
+      "logSha256": "2577de1ccde29874e60623a3afe204450a14fa6ca61a16c25e318ca3604cdd72"
+    }
+  ],
+  "fullLocal": {
+    "exitCode": 1,
+    "passed": 290,
+    "failed": 2,
+    "skipped": 9,
+    "failedSuites": 1,
+    "reason": "Two Java test timeouts at 5000ms and C# helper setup timeout; not counted as success.",
+    "logSha256": "251638f639e4e237cb25a219be6211d7581ebe9aa2391b7aad42d404d4085355"
+  },
+  "builds": {
+    "web": {
+      "success": true,
+      "logSha256": "8f63857f144878e1de460d85cd4fa0becf545d53ef00b6c27017096d83911c53"
+    },
+    "extension": {
+      "success": true,
+      "logSha256": "c673cc7f32e979cc1dadf99bc29830c3c8eeab2c4b164f815767aa2ccc048420"
+    }
+  },
+  "actualPrivateProject": {
+    "target": "Previously unavailable originally requested function",
+    "sourceUnchanged": true,
+    "originalAssertionCases": 3,
+    "separatelySelectedCases": 11,
+    "matchingResults": 14,
+    "nodeExceptionCasesReportedUnavailable": 1,
+    "originalProjectTestSuiteRerun": false,
+    "privateSourceIdentifiersInputsOutputsPublished": false,
+    "note": "Original assertion cases are not three independently authored test suites. Earlier model explanation/edit failures and scientific validity remain separate."
+  },
+  "browserUi": {
+    "status": "not_verified",
+    "attempts": 2,
+    "reason": "Browser webview attach timed out. First attempt was confirmed absent from tab inventory before retry. Local UI server stopped."
+  },
+  "development": {
+    "status": "passed",
+    "passed": 58,
+    "vscode": "1.96.4",
+    "timestamp": "2026-10-19T20:06:41.444Z",
+    "check": "Bounded iteration: actual worker/controller evaluates while, captured local updates, continue, map and negative at indexes; compares a prepared literal edit without changing source; excessive work remains unavailable",
+    "logSha256": "790e0911bf7883d21213bdc3d5ac8bae0fd9328698e612c3431f282e496e6ba6"
+  },
+  "installed": {
+    "status": "not_run_locally"
+  },
+  "ci": {
+    "status": "passed",
+    "evidence": "iteration-preview-ci.json",
+    "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39316887882",
+    "perOs": {
+      "core": 301,
+      "development": 58,
+      "installed": 58
+    },
+    "installedFilesVerified": 11,
+    "scope": "Windows and Ubuntu. Later documentation commits are separate from this tested runtime commit."
+  },
+  "sdkRerun": {
+    "passed": 17,
+    "files": 2,
+    "sourceAndTimeoutChanges": false,
+    "logSha256": "0fbb9e2e4bbec79b5cf70266ccd64283c05632ce7e666b241f2e9d581bd12e7d",
+    "note": "Separate rerun of only the failed Java/C# files; original full-run failure preserved."
+  },
+  "runtimeCommit": "5242fcc38ef28b05b16c8d2330b6321df3207765",
+  "remainingKnownIssues": [
+    "Other-file trace line buttons currently target the active document; file-aware navigation needs a separate fix.",
+    "Direct browser UI verification did not complete.",
+    "Model explanation/edit quality, broader syntax/languages and optimization remain incomplete."
+  ]
+}

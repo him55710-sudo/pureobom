@@ -1,0 +1,175 @@
+{
+  "collectedAt": "2026-10-19T21:58:57.724Z",
+  "runtimeCommit": "49b1a2b34f311538503f2e190123041d35d92805",
+  "runtimeSourceSha256": {
+    "src/core/localAssistant.ts": "2e575d61eedebc17dd6a0e17a05c7e9178950823ece88bffb7385528abba6afe",
+    "extension/src/ollama.ts": "4507b2443fdf4984548ebabc20dde88f4b963b5cb0faf252ed5dd0a07e042a35",
+    "extension/ui/LocalAssistant.tsx": "fc95a0053e7564ada32b4f63bd89e0ecad1e43a00d0fde9f96fb25c2f555c066"
+  },
+  "scope": "Structured explanation follow-up on the same private source, fixed Korean evaluation question and seven previously selected observations. Same cases are reused; do not sum per-model counts into broader coverage. No private identifiers, source, concrete inputs/results or raw model replies are published.",
+  "implementation": "3B began from the uncommitted runtime candidate later committed as 49b1a2b. 7B began after that commit. Only explanation schema, guidance, validation and presentation changed; source/question/observations remain the same. Both requests explicitly use a ten-minute generation deadline; earlier baseline deadlines vary, so this is not a controlled speed comparison.",
+  "attempts": [
+    {
+      "model": "qwen2.5-coder:3b",
+      "startedAt": "2026-10-19T21:44:36.582Z",
+      "processor": "cpu",
+      "timeoutMs": 600000,
+      "contextSize": 16384,
+      "outputTokenLimit": 4096,
+      "sourceUnchanged": true,
+      "nativeReturnedMatches": 6,
+      "nativeExceptionProductUnavailable": 1,
+      "outcome": "reference-validation-failed",
+      "semanticOutcome": "failed",
+      "rawAnswerComplete": true,
+      "productAccepted": false,
+      "clientHttpElapsedMs": 277978,
+      "structuralReview": {
+        "exactSourceQuotes": 4,
+        "totalQuotes": 4,
+        "observationsSupplied": 7,
+        "exampleRows": 7,
+        "distinctValidCaseNumbers": 7,
+        "invalidCitationReferences": 2
+      },
+      "semanticReview": {
+        "kind": "Agent review against unchanged source, fixed evaluation question and native observations; not an independent third-party evaluation.",
+        "findings": [
+          "All seven case numbers are present, but two entries cite nonexistent source-citation indexes. The product correctly rejects the response.",
+          "The runtime-check field lists input requirements, including incorrect requirements, instead of describing validation actually performed.",
+          "The caller-requirement and summary wrongly require in-range input despite visible clamping.",
+          "Boundary-case explanations misidentify supplied out-of-range inputs as in-range inputs.",
+          "An empty-input case is misclassified and assigned a different return outcome instead of the earlier native exception.",
+          "Singleton handling is mentioned, but duplicate-position conditions are generalized from collection length and are inadequately explained."
+        ]
+      },
+      "stages": [
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 42
+        },
+        {
+          "route": "/api/tags",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 602
+        },
+        {
+          "route": "/api/show",
+          "timeoutMs": 10000,
+          "outcome": "received",
+          "elapsedMs": 549
+        },
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 15
+        },
+        {
+          "route": "/api/chat",
+          "timeoutMs": 600000,
+          "outcome": "received",
+          "elapsedMs": 277978
+        }
+      ],
+      "server": {
+        "done": true,
+        "doneReason": "stop",
+        "promptTokens": 2151,
+        "outputTokens": 893,
+        "totalDurationNs": 277877508700
+      }
+    },
+    {
+      "model": "qwen2.5-coder:7b",
+      "startedAt": "2026-10-19T21:49:52.101Z",
+      "processor": "cpu",
+      "timeoutMs": 600000,
+      "contextSize": 16384,
+      "outputTokenLimit": 4096,
+      "sourceUnchanged": true,
+      "nativeReturnedMatches": 6,
+      "nativeExceptionProductUnavailable": 1,
+      "outcome": "semantic-failed",
+      "semanticOutcome": "failed",
+      "rawAnswerComplete": true,
+      "productAccepted": true,
+      "clientHttpElapsedMs": 509283,
+      "structuralReview": {
+        "exactSourceQuotes": 4,
+        "totalQuotes": 4,
+        "observationsSupplied": 7,
+        "exampleRows": 7,
+        "distinctValidCaseNumbers": 7,
+        "invalidCitationReferences": 0
+      },
+      "semanticReview": {
+        "kind": "Agent review against unchanged source, fixed evaluation question and native observations; not an independent third-party evaluation.",
+        "findings": [
+          "The completed answer passes exact-quote and per-example reference validation, with all seven examples present.",
+          "It describes the main behavior, out-of-range handling and empty-input error correctly at a high level.",
+          "The input-check and caller-requirement fields repeat the same conditions instead of distinguishing implemented validation from unchecked preconditions.",
+          "The range requirement contradicts the visible clamping behavior, and ordering or data-shape requirements are not explained.",
+          "The singleton case is assigned an incorrect returned outcome despite the supplied observation.",
+          "Both duplicate-position cases are described as errors, contradicting their supplied returned observations; the latter also assumes a condition absent from that input.",
+          "Most examples reuse a boundary-operation citation, which does not itself establish the claimed downstream outcome. Existing-reference checks do not prove this semantic relationship."
+        ]
+      },
+      "stages": [
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 14
+        },
+        {
+          "route": "/api/tags",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 62
+        },
+        {
+          "route": "/api/show",
+          "timeoutMs": 10000,
+          "outcome": "received",
+          "elapsedMs": 145
+        },
+        {
+          "route": "/api/status",
+          "timeoutMs": 5000,
+          "outcome": "received",
+          "elapsedMs": 3
+        },
+        {
+          "route": "/api/chat",
+          "timeoutMs": 600000,
+          "outcome": "received",
+          "elapsedMs": 509283
+        }
+      ],
+      "server": {
+        "done": true,
+        "doneReason": "stop",
+        "promptTokens": 2151,
+        "outputTokens": 838,
+        "totalDurationNs": 509273552500
+      }
+    }
+  ],
+  "limitations": [
+    "Exact source quotes and complete example indexes do not prove semantic correctness.",
+    "This is one function and one evaluation question, not all-language or whole-project accuracy.",
+    "Original project tests and scientific validity are outside this explanation comparison.",
+    "CPU-only cloud-disabled loopback inference uses existing model files and no paid API."
+  ],
+  "reviewCriteria": [
+    "Describe the selected function purpose, inputs and returned data without inventing roles.",
+    "Distinguish runtime checks actually present from unchecked caller preconditions.",
+    "Explain requested boundary outcomes using unchanged source and supplied observations; distinguish returns, exceptions and interpreter limitations.",
+    "Answer the fixed question completely without proposing changes.",
+    "Evaluate source-quote and example-index validity separately from meaning."
+  ]
+}

@@ -327,6 +327,13 @@ code,
 .line-link {
   white-space: nowrap;
 }
+.line-link.trace-source-link {
+  display: inline-block;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
 .step-content .line-link {
   margin-left: 8px;
 }

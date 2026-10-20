@@ -10,6 +10,12 @@ Understand the code AI wrote. Change a rule. See which cases change.
 
 **VS Code extension · Korean / English · Local processing · MIT**
 
+Development evidence: [Read nested function bodies without AI](docs/NESTED_FUNCTIONS.md) · [Actual explanation splitting experiment: failed, not adopted](docs/SPLIT_EXPLANATION_EXPERIMENT.md).
+
+Run existing `test` / `build` / `check` / `typecheck` / `lint` package scripts discovered by VS Code, with their declared commands and pre/post scripts shown before execution. [Project checks and actual-project evidence](docs/PROJECT_CHECKS.md). No AI connection is required.
+
+Keep a completed check as a session baseline and [compare command outcomes after editing](docs/CHECK_COMPARISON.md). Changed commands/settings/manifests prevent comparison; two successful exits do not prove equivalent behavior. A real private-project formatting/edit/undo workflow is recorded without publishing its source.
+
 [HTML/CSS source facts and value edits](docs/HTML_CSS_SOURCE.md) now use bundled parsers in the browser and VS Code. They read tags, text, selectors and declarations without executing scripts or guessing rendered layout. Ordinary text, selected attributes and CSS values support preview, apply and undo; actual page behavior still needs checking.
 
 The [external modern-normalize check](docs/evidence/local-ai/web-source-project.md) runs all 54 upstream Chrome tests through VS Code: a deliberate CSS edit adds two failures, and undo restores the baseline. Seven pre-existing failures and eight assertion-free TODOs are disclosed; this is not an all-tests-passed claim.
@@ -102,7 +108,7 @@ This is an **early preview**, not an AI coding agent or a replacement for a deve
 | Languages | JS/TS/JSX/TSX and related extensions; JSON overview. Other imported text is preserved, not explained. |
 | Editing | Literals and comparison operators. No whole-feature generation or multi-file refactoring. |
 | Understanding | Syntax-grounded descriptions, a built-in name glossary and your local project terms; no inferred business intent. |
-| Comparison | Restricted AST interpretation of supported synchronous calculations. No arbitrary code execution, network, DOM, loops or external packages. |
+| Comparison | Restricted AST interpretation of supported synchronous calculations. The 0.7 development branch adds [bounded while loops, local updates and array callbacks](docs/BOUNDED_PREVIEW.md). No arbitrary code execution, network, DOM or external packages. Published 0.6 does not include the iteration addition. |
 | Verification | Syntax checks, limited static hints and VS Code-reported current-file diagnostics. No pre-apply type check, whole-project verification, application tests or security audit. |
 | File limits | Up to 300 imported text files, 512 KB/file and 8 MB total. Exports contain imported files only. |
 | Privacy | Analysis stays on-device. Normal hosted-demo asset requests still reach its host; browser workspaces persist in IndexedDB outside demo mode. |

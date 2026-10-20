@@ -1,0 +1,98 @@
+{
+  "commit": "c6248bc7f8d132098c5488d5fc3ce265eff9686e",
+  "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39345196986",
+  "collectedAt": "2026-10-20T00:08:35.523Z",
+  "scope": "Full core and actual VS Code development/production-installed regression checks. New nested reading navigation was exercised separately in the actual browser UI with a simulated editor. Native model replies are controlled fixtures and do not assess actual model semantic quality.",
+  "jobs": [
+    {
+      "id": 118375992481,
+      "name": "verify (ubuntu-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39345196986/job/118375992481",
+      "conclusion": "success",
+      "corePassed": 354,
+      "coreFiles": 35,
+      "newNestingCases": 4,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 69,
+        "timestamp": "2026-10-20T00:04:59.584Z"
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 69,
+        "timestamp": "2026-10-20T00:05:55.361Z",
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "dcbe0d592bb74498442a179fccfe508fb34e4263ece5624438d018b5aac95630",
+        "verifiedFiles": {
+          "out/extension.cjs": "0e45c7603085a3c4912c19eb2c64a5d9c535f31d9ef3ac8e5199e907d67a685e",
+          "out/worker.cjs": "40e77d6e2c7f29e2fc051f5cc67de4909d0989c78c434e72942455de6553d66c",
+          "runtime/benchmark.py": "bb136c4c7bdd452aa7a75d216aa5998c41c98fc2cf9cfc089e2edae5ae80c6f9",
+          "runtime/python_source.py": "3b4ddd3535ee4bc0c578bc20463640d94b2f30ef74b463db6f7e1416a04f9ef1",
+          "runtime/go_source.go": "8c49ca4cd6b1e5fdc2b1eae3ea22b9a7c0bed7bb6a1ac0fabfcad7816d29c3ca",
+          "runtime/PureobomJavaSource.java": "6b3ef1aa18ad1b834c0e98ab6c4538d5ece40afd098bc9da6b0e0bb37fe4b9f4",
+          "runtime/PureobomCSharpSource.cs": "86d605f322f2331e864d55613bf0b43948c6dc424b364895c5d344e771d4fdf3",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "ff5f79d75941c1a83a83dcc941577249cac080be5765de795647918c5ea98f4c",
+          "media/view.css": "32e6f66eab202f7b1a632537718f3c9337ce98e24800badec2fad64a692811e7"
+        },
+        "extensionMode": "production"
+      },
+      "packageChecks": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    },
+    {
+      "id": 118375992788,
+      "name": "verify (windows-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39345196986/job/118375992788",
+      "conclusion": "success",
+      "corePassed": 354,
+      "coreFiles": 35,
+      "newNestingCases": 4,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 69,
+        "timestamp": "2026-10-20T00:06:29.638Z"
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 69,
+        "timestamp": "2026-10-20T00:07:36.343Z",
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "1be8e2c535fadfd4d173bc8a2427a81030bb4a49fea07fbb169c15cd9622a44b",
+        "verifiedFiles": {
+          "out/extension.cjs": "0e45c7603085a3c4912c19eb2c64a5d9c535f31d9ef3ac8e5199e907d67a685e",
+          "out/worker.cjs": "40e77d6e2c7f29e2fc051f5cc67de4909d0989c78c434e72942455de6553d66c",
+          "runtime/benchmark.py": "dc403b72ad1a349071ab7a8543ce44563415e485d85111c9fc8764156b59660b",
+          "runtime/python_source.py": "1e972114a1cc94eb9260c9530955f49a96f473d322fe4209a58ec97d6e34d4cb",
+          "runtime/go_source.go": "a8e185b81d3aa62a9cbfafdec9d8a8926c9ead6bfe4533fe9038d0a7ad714824",
+          "runtime/PureobomJavaSource.java": "6d439b2668972bf3c32e1574ad714d63ed0c5444de5bef80448e72f19f5b7b10",
+          "runtime/PureobomCSharpSource.cs": "ed8a9bc9d9f081dbe5d61d260ea68a70d0403ee4b1469298a1a2a121e7f544ac",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "ff5f79d75941c1a83a83dcc941577249cac080be5765de795647918c5ea98f4c",
+          "media/view.css": "32e6f66eab202f7b1a632537718f3c9337ce98e24800badec2fad64a692811e7"
+        },
+        "extensionMode": "production"
+      },
+      "packageChecks": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    }
+  ]
+}

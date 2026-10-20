@@ -1,0 +1,149 @@
+{
+  "collectedAt": "2026-10-19T21:37:06.312Z",
+  "finalRuntimeCommit": "fd9d0b279209171dccd420e48485f414a7123a78",
+  "scope": "Request-phase diagnostics and selectable response deadlines. Local stages were tested before commit; stage scope is explicit below. Final runtime full native and installed coverage is in local-ai-phases-ci.json. Model semantic outcomes are separate in observed-explanation-models.json.",
+  "runtimeSourceSha256": {
+    "src/core/localAIProgress.ts": "40d27d00ff9d731ead424b621a05e3caf352908ece9df617f4d5e5ef93cbed92",
+    "extension/src/ollama.ts": "b97ec2a897ad0b7d67bcb8d2ba71505be9af10b6a8761d3aebd00e120d0ce990",
+    "extension/src/localAssistantController.ts": "07c71880b61150286b53043bbc4a21328c658642763cf75f5798234e737c15ce",
+    "extension/src/extension.ts": "de6417d0be07bf50ba9e4b0986eeeab2d124ebc443f49f001e745f649ed54692",
+    "extension/ui/bridge.ts": "f15532a9c8d1208339fb710da717cf68e98e77ff1a892e0226fcf1b294829eeb",
+    "extension/ui/LocalAssistant.tsx": "74c0d547ae6c855f714a0ba78b871f02b1e160b0a973b452c85159c63aafe19e",
+    "tests/local-ai-progress.test.ts": "aaaf49cb5c78ba69b42459080ba3838137db22d46bea08363b94de5a08b120c4",
+    "tests/ollama.test.ts": "a7251bb200e4a137d7fc5a9ae061fa2334c25b65e0466e9f24e62391afe5b219",
+    "extension/test/explanationObservations.ts": "17411fb9796711fda8e6aa9ea0ebe363983eebd1fc278d0ace60b82bd1021147"
+  },
+  "logs": [
+    {
+      "path": "test-results/local-ai-phases-core.log",
+      "sha256": "954414af75e55b65319e19c21cd3365d2690e9d02d6ff850fcad6690f32797f5",
+      "status": "passed",
+      "detail": "Phase-only candidate: 34 core tests passed in four files; predates selectable deadlines."
+    },
+    {
+      "path": "test-results/local-ai-phases-build-final.log",
+      "sha256": "190ed4fcaa9cff82440286820a5b5d96af15ab385fe3ec005ba177685815525c",
+      "status": "passed",
+      "detail": "Phase-only extension build passed; predates selectable deadlines."
+    },
+    {
+      "path": "test-results/local-ai-phases-web.log",
+      "sha256": "90d2e49c6a7deefb6a9c6539d4b587cb8442b356175c0695b51c42f117795dc2",
+      "status": "passed",
+      "detail": "Phase-only web build passed; predates selectable deadlines."
+    },
+    {
+      "path": "test-results/local-ai-phases-native.log",
+      "sha256": "caa22a02729ab9fe452510083b07c54b7dcd56ba1891b86598632ce86fc2e7b9",
+      "status": "passed",
+      "detail": "Phase-only candidate: three focused actual development-host checks passed; not final deadline-native evidence."
+    },
+    {
+      "path": "test-results/local-ai-phases-package.log",
+      "sha256": "8799af50e2db836fd3442b129d36f8a54ca7007feeb3ce6eb28d5fe4b1b7ddaa",
+      "status": "passed",
+      "detail": "Phase-only candidate VSIX package built; not the final deadline build."
+    },
+    {
+      "path": "test-results/local-ai-phases-installed.log",
+      "sha256": "9bbe8d989e0f6ce6d743d9bc18bb194afb401e6246ae6b9644d162f0f2f980e4",
+      "status": "passed",
+      "detail": "Phase-only candidate: three focused production-installed checks passed, with eleven installed file hashes."
+    },
+    {
+      "path": "test-results/local-ai-deadlines-core.log",
+      "sha256": "e282422dbe3ad08f69751acbd2c7a2de5c1696b3dba09022932ec1b06a7840fa",
+      "status": "passed",
+      "detail": "Selectable deadlines: 36 core tests passed in four files."
+    },
+    {
+      "path": "test-results/local-ai-deadlines-build.log",
+      "sha256": "54530daed4d2c858f16e3da91170eeda6330fc4cb10ada9cb896fc19e111f804",
+      "status": "passed",
+      "detail": "Selectable deadlines: extension TypeScript and bundle build passed."
+    },
+    {
+      "path": "test-results/local-ai-deadlines-ui-build.log",
+      "sha256": "f30967407d27edaef900122419669b76646abb2b7423279bb93fbd623e4ee2ee",
+      "status": "passed",
+      "detail": "Final UI explanation caveat and selected deadline display: extension build passed."
+    }
+  ],
+  "earlierPhaseOnlyNative": {
+    "development": {
+      "scope": "explanation-observations-only",
+      "vscode": "1.96.4",
+      "checks": [
+        "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+        "Explanation observations: host-retained results reach the actual local-model client and returned view; modifying the response or supplying fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+        "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+      ],
+      "passed": 3,
+      "timestamp": "2026-10-19T21:20:33.637Z"
+    },
+    "installed": {
+      "scope": "explanation-observations-only",
+      "vscode": "1.96.4",
+      "checks": [
+        "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+        "Explanation observations: host-retained results reach the actual local-model client and returned view; modifying the response or supplying fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+        "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+      ],
+      "passed": 3,
+      "timestamp": "2026-10-19T21:21:27.209Z",
+      "installation": {
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "d9b23295bffdb8d8bea2e116cc07fdf7d9b62e1ccc1b417ef2facd00b772d379",
+        "verifiedFiles": {
+          "out/extension.cjs": "6a33b9a2d6f7ea92bf7774975305c156dcd3e36bf322ac96ac4846f769f7316e",
+          "out/worker.cjs": "93cd569975d9ac251db261f2b0c9ea125163555489002c9a715ed8ec2c95fbfc",
+          "runtime/benchmark.py": "dc403b72ad1a349071ab7a8543ce44563415e485d85111c9fc8764156b59660b",
+          "runtime/python_source.py": "1e972114a1cc94eb9260c9530955f49a96f473d322fe4209a58ec97d6e34d4cb",
+          "runtime/go_source.go": "a8e185b81d3aa62a9cbfafdec9d8a8926c9ead6bfe4533fe9038d0a7ad714824",
+          "runtime/PureobomJavaSource.java": "6d439b2668972bf3c32e1574ad714d63ed0c5444de5bef80448e72f19f5b7b10",
+          "runtime/PureobomCSharpSource.cs": "ed8a9bc9d9f081dbe5d61d260ea68a70d0403ee4b1469298a1a2a121e7f544ac",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "7b6e9e094ec018b5b4bd49b74651e333b14af7426912bffeb0255a715889e0ad",
+          "media/view.css": "40a42296aa22f213072fe33a2a02f3df0ceda8f4da7cdcc1213d3fb5efe910ae"
+        },
+        "extensionMode": "production"
+      }
+    }
+  },
+  "finalRuntimeCI": "local-ai-phases-ci.json",
+  "browser": {
+    "kind": "Actual built React UI and worker; public fixture and simulated editor/model with timed progress events. Not a native editor screen test or real inference.",
+    "checks": [
+      "Korean: choose five minutes, observe connection and generation, finish with selected limit shown and progress cleared.",
+      "English: choose ten minutes, observe generation, cancel and clear active state.",
+      "Changing language clears the old response; model-observation caveat is shown."
+    ],
+    "screenshots": [
+      {
+        "path": "local-ai-phases-ko.png",
+        "sha256": "37aa8e58ce765c1af83f448971c58b8cc9f320bc9b5f9c0f9c5e18d9f46add5e"
+      },
+      {
+        "path": "local-ai-phases-en.png",
+        "sha256": "1431754f15e1e4903f5a103e2a00fa15b5300d5e88c19797770579f418031457"
+      }
+    ]
+  },
+  "safeguardsTested": [
+    "Actual HTTP stage and configured timeout survive request errors.",
+    "Progress is bound to request ID and document context; unsupported and late phases are ignored.",
+    "Cancellation triggered at generation progress stops before sending source.",
+    "Only 180, 300 and 600 seconds are accepted; default remains 180.",
+    "Bridge deadline tracks the selected server deadline plus 60 seconds.",
+    "Existing input/context/output limits and preflight time limits are retained."
+  ],
+  "cleanup": "Owned browser harness was stopped and tab closed. Both owned evaluation servers were terminated only after their requests ended; other local servers were not changed.",
+  "limits": [
+    "No proof of accurate model interpretation or general improvement in model quality.",
+    "The same seven real-project inputs are reused, not new independent coverage per model attempt.",
+    "No private source, identifiers, concrete inputs/results or raw model replies are included.",
+    "Stable release and Pages are unchanged; no deployment or performance gain is established."
+  ]
+}

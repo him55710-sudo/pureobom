@@ -1,0 +1,166 @@
+{
+  "collectedAt": "2026-10-19T20:59:04.719Z",
+  "scope": "Optional bounded calculation observations for JS/TS explanations. Private-project aggregates, public core/native fixtures and controlled model responses are separate evidence.",
+  "basedOn": "e3dd32e6478a0ba93fdf78b35848cf60f2e3e138",
+  "implementationState": "Uncommitted candidate at measurement time; runtime source SHA-256 entries bind the evidence. HEAD alone is not the tested implementation.",
+  "runtimeSourceSha256": {
+    "src/core/assistantObservations.ts": "c2d50a24fa4d5c060d574428d89dd4fd13adb693383e022afe950734a970f3c8",
+    "src/core/localAssistant.ts": "8e5893d667b55e34c702e0c9a6c212f308da00da1c385a5d48fb579723ef1a4e",
+    "src/core/simulate.ts": "89422d395e89ffec7ffe9bdfc8b5b04d728ca6fcdc33e67e168a7991312a2d18",
+    "extension/src/controller.ts": "2cf8c643e1d28f9eb5704bd3102cc57efc5438be2c11bee0673e6e01e261ab04",
+    "extension/src/localAssistantController.ts": "e89f5584eb5ab74db20bfb89fbe835f68b73341f935e0c08fdc1972ae85eacf6",
+    "extension/src/extension.ts": "541e3b871323757170b5edb3f1fb4ca01b3944871b02f28369ea05188525020a",
+    "extension/src/worker.ts": "b7444db0ada4715fac4000f23c95e45521947b8971bb714db5973957e2923b7a",
+    "extension/ui/LocalAssistant.tsx": "29656d54cfc8b5bf4dd4a67eb7cd846f474cd7aec5768c3320ba170c0b780e83"
+  },
+  "logs": [
+    {
+      "path": "test-results/observations-focused-first.log",
+      "sha256": "f37edc7865f572fc62bb1145e6f7eca046eb93a1cbaf18d8b8486be22d48ad92",
+      "status": "passed",
+      "detail": "68 passed in five files; eight new observation tests."
+    },
+    {
+      "path": "test-results/observations-native-build.log",
+      "sha256": "b2c32fb30c071f15e80f7c6ca6e11678c6ca87e075f404c6e2972b5ff68d428a",
+      "status": "passed",
+      "detail": "Extension TypeScript and bundle build passed."
+    },
+    {
+      "path": "test-results/observations-web-build.log",
+      "sha256": "aeebdc64be11bc336831f8d54e46f0d8773c5204072f541d34f408ef234f9996",
+      "status": "passed",
+      "detail": "Web TypeScript and Vite build passed."
+    },
+    {
+      "path": "test-results/observations-native-first.log",
+      "sha256": "ab091920faf8bad8caa7c9389a6c204594b0fe0062af1abd0448e76371a68472",
+      "status": "passed",
+      "detail": "Three focused development native checks passed."
+    },
+    {
+      "path": "test-results/observations-package.log",
+      "sha256": "42d2c83473af3721ece97a9b4e3904fee0f692623f78f77f450ea98956f353f1",
+      "status": "passed",
+      "detail": "Fresh VSIX packaging passed."
+    },
+    {
+      "path": "test-results/observations-installed-first.log",
+      "sha256": "4027f5287ebb3f5681ca8025a2e4bc64255e6f3d1c1052e99c202939a2dad397",
+      "status": "passed",
+      "detail": "Three focused production-installed checks passed; eleven file hashes verified."
+    }
+  ],
+  "native": {
+    "development": {
+      "scope": "explanation-observations-only",
+      "vscode": "1.96.4",
+      "checks": [
+        "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+        "Explanation observations: host-retained results reach the actual local-model client and returned view; modifying the response or supplying fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+        "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+      ],
+      "passed": 3,
+      "timestamp": "2026-10-19T20:54:11.647Z"
+    },
+    "installed": {
+      "scope": "explanation-observations-only",
+      "vscode": "1.96.4",
+      "checks": [
+        "Explanation observations: actual worker calculates selected JS/TS examples and preserves special values without contacting any model; invalid argument lists are rejected",
+        "Explanation observations: host-retained results reach the actual local-model client and returned view; modifying the response or supplying fabricated observation fields cannot replace them; full source is preserved (model answer is controlled)",
+        "Explanation observations: wrong handles, edit tasks, different functions, superseded examples and an edited document are rejected before model inference; native undo restores exact source"
+      ],
+      "passed": 3,
+      "timestamp": "2026-10-19T20:55:44.504Z",
+      "installation": {
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "0fc8e73d17f44b47397f424cd55f67db69e3a3318365f6eacce4909ac65f4e44",
+        "verifiedFiles": {
+          "out/extension.cjs": "e64a436a72dee6002ead67245fc68d006df3bc8a000f5fdb279311ea5dce1298",
+          "out/worker.cjs": "93cd569975d9ac251db261f2b0c9ea125163555489002c9a715ed8ec2c95fbfc",
+          "runtime/benchmark.py": "dc403b72ad1a349071ab7a8543ce44563415e485d85111c9fc8764156b59660b",
+          "runtime/python_source.py": "1e972114a1cc94eb9260c9530955f49a96f473d322fe4209a58ec97d6e34d4cb",
+          "runtime/go_source.go": "a8e185b81d3aa62a9cbfafdec9d8a8926c9ead6bfe4533fe9038d0a7ad714824",
+          "runtime/PureobomJavaSource.java": "6d439b2668972bf3c32e1574ad714d63ed0c5444de5bef80448e72f19f5b7b10",
+          "runtime/PureobomCSharpSource.cs": "ed8a9bc9d9f081dbe5d61d260ea68a70d0403ee4b1469298a1a2a121e7f544ac",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "863119c94ac25f59ca0647f557348d7f558e5ef6082774f0b37b18cff16cf057",
+          "media/view.css": "40a42296aa22f213072fe33a2a02f3df0ceda8f4da7cdcc1213d3fb5efe910ae"
+        },
+        "extensionMode": "production"
+      }
+    }
+  },
+  "actualProject": {
+    "kind": "private-user-project",
+    "sameOriginalExplanationTarget": true,
+    "sourceUnchanged": true,
+    "evaluationCheckoutCleanBefore": true,
+    "caseOrigin": "Seven previously evaluator-selected boundary inputs; not original project tests.",
+    "boundedWorkerAction": "observe",
+    "independentReference": "Direct Node execution of reviewed unchanged source",
+    "returnedMatches": 6,
+    "nativeExceptionProductUnavailable": 1,
+    "claim": "The unavailable case does not prove a native exception; this was independently observed. No universal correctness or model-quality claim.",
+    "rawData": "Source, identifiers, concrete inputs/results and requests retained locally only."
+  },
+  "modelAttempts": [
+    {
+      "model": "qwen2.5-coder:7b",
+      "processor": "cpu",
+      "observations": false,
+      "status": "generation-timeout",
+      "chatReached": true,
+      "timeoutMs": 180000,
+      "contextSize": 16384,
+      "outputTokenLimit": 4096,
+      "sourceUnchanged": true,
+      "semanticQuality": "unassessed; no complete response"
+    },
+    {
+      "model": "qwen2.5-coder:3b",
+      "processor": "cpu",
+      "observationsPrepared": true,
+      "status": "preflight-timeout",
+      "chatReached": false,
+      "exactPreflightEndpoint": "not captured",
+      "sourceUnchanged": true,
+      "semanticQuality": "unassessed; observations were not sent to chat",
+      "correction": "Initially described as a 180-second generation timeout. The missing captured chat request and absence of a chat request in server logs show it failed before inference; no 180-second generation claim."
+    }
+  ],
+  "ui": {
+    "kind": "Browser harness; actual extension UI and worker, public fixture source, simulated editor and controlled model reply",
+    "passed": [
+      "Calculate three examples without model connection",
+      "Changing input removes observations",
+      "Recalculate changed input",
+      "Korean and English descriptions and values",
+      "Controlled explanation shows observations attached",
+      "Selecting another function removes prior explanation and observations"
+    ],
+    "nativeScreenClickVerification": false,
+    "realModelInference": false,
+    "screenshots": [
+      "observations-ko.png",
+      "observations-en.png"
+    ]
+  },
+  "ci": {
+    "status": "passed",
+    "commit": "7a6e36818b753be88f41c39caa005664b7a990e4",
+    "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39323929101",
+    "evidence": "explanation-observations-ci.json",
+    "perOS": {
+      "core": 312,
+      "development": 64,
+      "installed": 64,
+      "installedFiles": 11,
+      "packageChecks": 7
+    }
+  },
+  "runtimeCommit": "7a6e36818b753be88f41c39caa005664b7a990e4"
+}

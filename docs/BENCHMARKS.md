@@ -31,6 +31,10 @@ Python을 찾지 못하면 VS Code 설정 **Pureobom: Benchmark Python** (`pureo
 
 Node 프로젝트라면 실제 `node` 실행 파일과 스크립트 인수를 사용할 수 있다. Windows의 `npm.cmd`, `pnpm.cmd`, `*.bat`는 직접 측정하지 않는다. 다른 언어도 기존 실행 도구·네이티브 실행 파일을 등록할 수 있지만 개별 언어의 컴파일러 설치나 벤치마크 작성까지 자동화하지 않는다. `dependsOn`, `runOn`, 터미널 프로필, 확장 프로그램의 터미널 환경 주입은 실행하지 않는다. 준비가 필요한 경우 선택한 프로그램 안에서 명시적으로 처리한다.
 
+[기존 package 검사 스크립트](PROJECT_CHECKS.md)는 VS Code가 제공하는 shell 작업으로 검사 목록에 나타날 수 있지만, 이 성능 측정은 계속 process 작업만 받는다. 스크립트 발견을 새 성능 측정 지원으로 해석하지 않는다.
+
+실제 웹 화면처럼 프로세스 종료 시간만으로 판단하기 어려운 변경은 별도 동작 검사가 필요하다. [실제 Canvas 후보 평가](CANVAS_EVALUATION.md)는 픽셀 관찰과 동기 호출 시간 측정을 분리하고, 기본 설정의 불일치 때문에 호출 수가 줄어도 후보를 채택하지 않은 사례다. 해당 어댑터는 프로젝트별 실험이며 이 명령 측정 기능의 자동 브라우저 검사로 제공하지 않는다.
+
 ## 측정값이 뜻하는 것
 
 Windows Python 가상환경의 `Scripts/python.exe`는 실제 인터프리터를 별도 프로세스로 띄우는 실행기다. [Python 설명](https://docs.python.org/3.12/library/venv.html), [CPython 실행기 소스](https://github.com/python/cpython/blob/main/PC/venvlauncher.c). 이 경로와 `pyvenv.cfg`가 확인되면 실행기 메모리를 비교에서 제외하고 이유를 표시한다. 다른 임의 실행기·자식 프로세스의 전체 메모리를 재구성하는 기능은 없다.

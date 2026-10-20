@@ -1,5 +1,67 @@
 # 로컬 AI 검증 자료 · 2026-10-16
 
+2026-10-20 검사 전후 비교: [사용 흐름·범위](../../CHECK_COMPARISON.md), [핵심 11개·native 흐름 3개·실제 프로젝트·한/영 UI·VSIX](check-comparison-verification.json). 같은 조건의 완료 결과를 비교하고 오래된 결과·변경된 manifest는 비교하지 않는다. 실제 고정 사용자 프로젝트의 기준 검사·줄바꿈 정리 후 검사·undo 후 검사 모두 정상 종료했고 파일 바이트 차이/일치를 확인했다. 원문은 공개하지 않으며 전체 동작 동일성·과학적 타당성·최적화나 모델 성공으로 세지 않는다.
+
+`d9e11b2`의 [Windows·Ubuntu CI](check-comparison-ci.json)는 각 핵심 **369개/37파일**, 실제 VS Code 개발·production 설치 **각 72개**, 설치 파일 11개·패키지 검사 7개를 통과했다. 기능 런타임은 `c602693`이며 후속 커밋은 테스트 동기화만 바꿨다. 로컬 확장·worker·UI JS/CSS 네 파일은 양쪽 설치본과 일치하고, 로컬 개발 VSIX의 실행 파일 11개는 Windows 설치본과 일치한다. [최초·진단 실패](check-comparison-ci-first-failure.json), [재로드 순서 실패와 보완](check-comparison-ci-reload-failure.json)도 유지한다.
+
+2026-10-20 기존 검사 스크립트 연결: [사용법·범위](../../PROJECT_CHECKS.md), [핵심 4개·native 흐름 2개·실제 프로젝트·한/영 화면](package-scripts-verification.json). 그룹 없는 package 검사 스크립트를 읽고 본문/앞뒤 명령을 검토하며, manifest 변경 시 실행을 거절한다. 고정 비공개 프로젝트에서 task 설정을 추가하지 않고 기존 명령 정상 종료·소스 보존을 확인했다. 첫 로컬 npm PATH 누락 실패도 보존한다. 모델 없이 동작하며 의미 정확도·성능 향상을 판정하지 않는다.
+
+`387a70f`의 [Windows·Ubuntu CI](package-scripts-ci.json): 각 핵심 358개·실제 개발/production 설치 각 71개·설치 파일 11개 해시·패키지 검사 7개 통과. 로컬 확장·worker·UI 네 파일과 양쪽 설치본이 일치하며, 로컬 개발 VSIX는 Windows 설치 실행 파일 11개와 일치한다.
+
+2026-10-20 안쪽 함수 읽기: [사용법·제약](../../NESTED_FUNCTIONS.md), [부분 핵심 18개·한/영 UI·실제 콜백 원문 대조](nested-functions-verification.json). 모델 없는 문법 탐색이며 실제 사용자 코드의 원문은 공개하지 않는다.
+
+`c6248bc`의 [Windows·Ubuntu CI](nested-functions-ci.json)는 각각 핵심 354개·VS Code 개발/production 설치 각 69개·설치 파일 11개·패키지 검사 7개를 통과했다. 로컬 확장·worker·UI JS/CSS 네 파일과 설치본 해시가 일치한다. 모델 의미 평가·새 탐색의 native 클릭 검증과 구별한다.
+
+같은 실제 설명 과제의 [분할 실험 방법과 실패](../../SPLIT_EXPLANATION_EXPERIMENT.md), [단계별 익명 결과](split-explanation-experiment.json): 전체 600.014초에 8단계 중 형식 통과 3개, 인용 거절 1개, 응답 전 취소 1개, 미시도 3개. 받은 결과에도 의미 오류가 남아 미채택이다. 동일 메시지 비교·일반 속도 벤치마크·전체 프로젝트 검증으로 세지 않는다.
+
+2026-10-20 추론 설정: [사용법과 평가 경계](../../LOCAL_AI_THINKING.md), [부분 핵심 36개·native 7개·한/영 화면·요청 동일성](thinking-settings-verification.json), [실제 4B 켜기 요청](thinking-settings-model.json). 같은 비공개 과제와 전체 chat 본문에서 추론 값만 바꿨고 600.016초에 생성 한도로 종료됐다. 완성 답변을 받지 못해 의미 정확도는 미평가이며 이전 끄기 요청의 의미 실패를 해결한 근거가 아니다. [최초 Windows CI 시간 초과](thinking-settings-ci-first-failure.json)도 별도 보존한다.
+
+추론 기능과 화면 후속 `e832712`의 [최종 교차 OS CI](thinking-settings-ci.json): 각 핵심 350개·개발/production 설치 각 69개·설치 파일 11개 해시·패키지 검사 7개 통과. Ubuntu의 첫 성공과 Windows의 같은 코드 재실행 성공이며 최초 5초 테스트 시간 초과의 원인 해결을 뜻하지 않는다.
+
+2026-10-20 산술 기록 후 실제 모델: [같은 비공개 과제의 7B·4B 두 요청](arithmetic-model-followup.json)은 약 499·428초에 완료됐다. 두 응답 모두 인용/예시 구조 검사를 통과했으나 반환값·입력 검증 설명 오류로 과제는 실패했다. [검토 범위·해석 한계](../../ARITHMETIC_RECORDS.md). 같은 소스·질문·일곱 입력의 반복이며 속도 벤치마크나 제삼자 정확도 평가가 아니다. 비공개 원문·구체 입력/결과·원시 모델 답변은 공개하지 않는다.
+
+2026-10-20 배열 비교 후속: [빈 배열·빈 자리의 결과 차이](../../SPARSE_COMPARISON.md), [수정 전 세 실패와 로컬 검증](sparse-comparison-verification.json). 핵심 부분 29개·확장 빌드가 통과했다. 공개 회귀 예제로 확인한 비교 엔진 결함이며 비공개 사용자 프로젝트의 오류 발견·모델 성공으로 세지 않는다.
+
+배열 비교 소스 `25d0c27`의 [Windows·Ubuntu CI](sparse-comparison-ci.json)는 각 핵심 342개·개발/production 설치 각 68개·설치 파일 11개 해시·패키지 검사 7개를 통과했다. 새 비교 검사·웹뷰 전달·한/영 보고서 판정을 실제 로그에서 확인했다.
+
+2026-10-20 산술 기록 후속: [원래 수식·실제 피연산자·결과](../../ARITHMETIC_RECORDS.md), [부분 검사·한/영 UI·실제 코드 익명 집계](arithmetic-records-verification.json). 핵심 부분 88개·확장 빌드·native 개발 예시 6개/원문 이동 3개가 통과했다. 같은 비공개 과제의 기존 일곱 사례에서 반환 여섯 개 일치·한 개 확인 불가를 유지했다. 새 모델 요청은 없으며 기존 설명 의미 실패를 해결했다고 주장하지 않는다.
+
+산술 기능의 테스트 후속 `00eedd7`은 [Windows·Ubuntu 최종 CI](arithmetic-records-ci.json)에서 각 핵심 335개·개발/production 설치 각 67개·설치 파일 11개 해시·패키지 검사 7개를 통과했다. 첫 실패와 수정 이유도 보존한다. 로컬 worker 및 UI JS/CSS는 두 운영체제 설치본과 일치하며 같은 기능의 환경별 반복을 새 기능 수나 모델 정확도로 합산하지 않는다.
+
+2026-10-20 예시별 실행 기록: [계산 과정 표시·원문 이동](../../EXPLANATION_EXECUTION.md), [로컬 검사·화면·초기 실패](execution-records-verification.json), [같은 실제 과제의 7B 응답](execution-records-model.json). 실제 응답은 약 512초에 완료돼 여섯 반환값을 맞게 기술했으나 원인·입력 조건 설명이 틀려 과제는 실패했다. 기록 표시·전달 검증과 모델 의미 품질을 구분한다. 소스·구체 입력/반환값·원시 모델 응답은 공개하지 않는다.
+
+기능 소스 `0cf6b34`의 [Windows·Ubuntu 최종 CI](execution-records-ci.json): 각 핵심 329개·개발/production 설치 각 66개·설치 파일 11개 해시·패키지 검사 7개 통과. 실제 로그의 새 기록·깊은 복사·원문 이동 검사를 확인했다. 같은 기능의 운영체제/배포 방식별 반복이며 모델 정확도 점수로 합산하지 않는다.
+
+2026-10-20 실제 웹 화면 평가: [방법·판정](../../CANVAS_EVALUATION.md), [익명 표본 기록](canvas-evaluation.json), [정적 집계 화면](canvas-evaluation.html). 실제 비공개 웹 진입점·자산에서 에이전트가 작성한 후보를 비교했다. 기본 설정의 57개 지점 중 2곳에서 픽셀 차이가 재현돼 미채택했다. 모든 첫 실패·재실행·측정 조건을 유지하며, API 모델 응답이나 앱 속도 개선의 증거로 세지 않는다. 원래 프로젝트 테스트 8개는 기준선 검사이며 변경한 렌더 경로를 다루지 않는다.
+
+2026-10-20 설명 구조 후속: [입력 검사·호출 조건·예시별 설명과 누락 검사](../../STRUCTURED_EXPLANATIONS.md), [로컬 검사·화면 범위](explanation-coverage-verification.json), [실제 모델 평가](explanation-coverage-models.json). `49b1a2b`의 [Windows·Ubuntu CI](explanation-coverage-ci.json)는 각 핵심 324개·개발/production 설치 각 65개·설치 파일 11개 해시·패키지 검사 7개를 통과했다. 모든 항목의 존재와 실제 인용 연결을 확인하며 모델 의미의 참·거짓은 별도 검토다. 기존 실제 실패 기록은 유지한다.
+
+실제 3B는 약 278초에 완성됐으나 없는 인용 번호 두 개를 사용해 거절됐다. 7B는 약 509초에 완성돼 구조 검사를 통과했지만 세 경계 사례가 계산 결과와 모순됐다. 같은 비공개 과제·같은 일곱 입력이며 일반 모델 정확도나 최적화 성공으로 세지 않는다.
+
+2026-10-20 요청 단계 후속: [같은 실제 과제의 네 요청·검토 기준](observed-explanation-models.json). 3B 기본 3분, 4B 선택 5분, 7B 선택 10분 요청은 약 158·242·315초에 완성됐으나 의미 오류나 요구 사항 누락이 남았다. 4B 기본 3분 요청은 생성 시간 초과였다. [단계 표시와 직접 선택하는 대기 한도](../../LOCAL_AI.md)는 이를 구분·진단하는 기능이며 설명 정확도 개선 근거는 아니다. 아래 화면은 실제 UI와 공개 fixture의 모의 진행 상태다.
+
+기능 커밋 `fd9d0b2`의 [Windows·Ubuntu CI](local-ai-phases-ci.json)는 각 핵심 318개·개발/production 설치 각 64개·설치 파일 11개 해시·패키지 검사 7개를 통과했다. [로컬 단계별 로그 해시·부분 native·브라우저 범위](local-ai-phases-verification.json)를 따로 기록한다. 이 검사들의 모델 답변은 제어된 fixture이며 실제 모델 품질과 구분한다.
+
+![한국어 생성 단계](local-ai-phases-ko.png)
+
+![영어 생성 단계](local-ai-phases-en.png)
+
+2026-10-20 설명 근거 후속: [사용자 예시를 AI 없이 계산하고 설명에 첨부](../../EXPLANATION_OBSERVATIONS.md), [부분 개발/설치 검사·실제 코드 대조·모델 실패 기록](explanation-observations.json). 실제 코드 반환 6개 일치와 확인 불가 1개를 모델 품질이나 기존 프로젝트 테스트 성공으로 합산하지 않는다. 한국어/영어 UI는 공개 fixture이며 비공개 소스를 포함하지 않는다.
+
+기능 소스 `7a6e368`의 [Windows·Ubuntu CI](explanation-observations-ci.json)는 각 핵심 312개·개발/production 설치 각 64개·설치 파일 11개 해시·패키지 검사에 성공했다. 부분 실행·실제 모델 실패·직접 브라우저 조작 근거는 따로 유지한다.
+
+2026-10-20 계산 출처 후속: [파일별 원본 이동](../../TRACE_NAVIGATION.md), [핵심/실제 개발/새 설치 검증과 실패 이력](trace-navigation.json). 이전 반복 계산 버전의 다른 파일 줄 이동 결함을 수정했다. 공개 fixture로 검사했으며 비공개 프로젝트 전체 성공·모델 품질·성능 개선으로 세지 않는다.
+
+긴 경로 표시를 포함한 `13752f4`의 [Windows·Ubuntu 최종 CI](trace-navigation-ci.json)는 각 핵심 304개·개발/production 설치 각 61개·설치 파일 11개 해시·패키지 검사에 성공했다. 로컬 부분 실행/전체 실패와 직접 UI 미확인을 구분한다.
+
+2026-10-20 반복 계산 후속: [한도 있는 반복문·배열 콜백](../../BOUNDED_PREVIEW.md)으로 실제 사용자 코드의 원래 대상 함수가 계산된다. 원래 assertion 3사례와 선정 11사례가 Node와 일치했다. 이전 모델 실패와 전체 언어/연구 타당성은 별도다. [검사 실패를 포함한 실행 기록](iteration-preview.json).
+
+반복 계산 기능 커밋 `5242fcc`의 [Windows·Ubuntu CI](iteration-preview-ci.json): 각 핵심 301개·개발/production 설치 각 58개·설치 파일 11개 해시·추출 도구 성공. 로컬 시간 초과·UI 연결 실패와 남은 다른 파일 trace 이동 결함은 별도로 유지한다.
+
+2026-10-20 계산 표시 후속: [특수 값 보존·프로젝트 경로 수정·실제 코드 대조](preview-values.md). 변경하지 않은 비공개 코드의 지원 가능한 함수에서 선정한 입력 4개가 Node와 일치했다. 원래 요청 대상 함수는 계속 확인 불가다. 모델 평가·프로젝트 원래 테스트와 합산하지 않는다. [수정 전 공개 예제](preview-values-before.json), [실행별 실패·성공 기록](preview-values-verification.json), [한국어](preview-values-ko.jpg)/[영어](preview-values-en.jpg) 화면을 구분한다.
+
+값 전달 한도 보완까지 포함한 `66a6781`의 [Windows·Ubuntu CI](preview-values-ci.json): 각 핵심 266개·개발/설치 각 57개·production 모드·파일 11개 해시·추출 도구 성공. [격리 변경안 PR #1](https://github.com/him55710-sudo/pureobom/pull/1)에 공개했으며 안정판 배포나 실제 사용자 과제 완료로 처리하지 않는다.
+
 2026-10-20 CPU 후속: [같은 실제 과제의 원문 구분·CPU 요청](focused-context-cpu.md). 세 번 완성 응답을 받았으나 인용 또는 의미 검토에서 모두 실패했다. 인용 통과와 설명 정확성을 분리한다. 한국어/영어 CPU 선택과 이전 결과 해제를 확인했으며, 기존 timeout과 포매터 성공은 그대로 보존한다.
 
 CPU 옵션 제품 커밋 `954d6cf`의 [Windows·Ubuntu CI](focused-context-cpu-ci.json): 각 핵심 **260개**, 개발/설치 각 **55개**, production 모드·파일 11개 해시·추출 도구 검사를 통과했다. 실제 사용자 코드의 모델 응답은 별도 평가이며 이 CI의 통과 수에 넣지 않는다.

@@ -71,10 +71,17 @@ describe("scenario comparison", () => {
     ).toThrow();
   });
   it.each([
-    ['"NaN"', '0 / 0', "changed"],
-    ['{ a: 1, b: undefined }', '{ b: undefined, a: 1 }', "same"],
-    ['{ a: undefined }', '{}', "changed"],
-    ['-0', '0', "changed"],
+    ['"NaN"', "0 / 0", "changed"],
+    ["{ a: 1, b: undefined }", "{ b: undefined, a: 1 }", "same"],
+    ["{ a: undefined }", "{}", "changed"],
+    ["-0", "0", "changed"],
+    ["[]", "[,]", "changed"],
+    ["[,]", "[undefined]", "changed"],
+    ["[,1]", "[1,,]", "changed"],
+    ["[,1]", "[,1]", "same"],
+    ["[[]]", "[[,]]", "changed"],
+    ["[,,]", "[,]", "changed"],
+    ["{ a: [,] }", "{ a: [] }", "changed"],
   ])("compares %s and %s without JSON coercion", (before, after, status) => {
     const source = {
       path: "values.ts",
@@ -94,7 +101,7 @@ describe("scenario comparison", () => {
   it("displays special values distinctly from strings", () => {
     expect(displayValue({ value: NaN })).toBe('{"value": NaN}');
     expect(displayValue({ value: "NaN" })).toBe('{"value": "NaN"}');
-    expect(displayValue([undefined, null, -0])).toBe('[undefined, null, -0]');
+    expect(displayValue([undefined, null, -0])).toBe("[undefined, null, -0]");
   });
   it("suggests both old and new numeric boundaries", () => {
     const cases = suggestScenarios(
