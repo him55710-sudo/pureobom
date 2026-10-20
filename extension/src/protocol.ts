@@ -15,6 +15,7 @@ export type ViewState = {
   analysis?: FileAnalysis;
   diagnostics?: import("../../src/core/editorDiagnostics").EditorDiagnostics;
   projectCheck?: import("./projectChecks").ProjectCheck;
+  checkComparison?: import("./checkComparison").CheckComparison;
   benchmark?: import("./benchmarks").BenchmarkState;
   project?: ProjectAnalysis;
   scanNote?: string;

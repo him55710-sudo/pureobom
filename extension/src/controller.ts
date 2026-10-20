@@ -157,7 +157,12 @@ export class Controller implements vscode.Disposable {
       },
     );
     this.checks = new ProjectChecks((context) => this.current(context));
-    this.checks.changes.event((projectCheck) => this.publish({ projectCheck }));
+    this.checks.changes.event((projectCheck) =>
+      this.publish({
+        projectCheck,
+        checkComparison: this.checks.comparison,
+      }),
+    );
     this.benchmarks = new Benchmarks(this.checks);
     this.benchmarks.changes.event((benchmark) => this.publish({ benchmark }));
     try {

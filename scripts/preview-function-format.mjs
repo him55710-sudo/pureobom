@@ -9,7 +9,33 @@ const execution = process.argv.includes("--execution");
 const arithmetic = process.argv.includes("--arithmetic");
 const thinking = process.argv.includes("--thinking");
 const nested = process.argv.includes("--nested");
-const packageChecks = process.argv.includes("--package-checks");
+const checkComparison = process.argv.includes("--check-comparison");
+const packageChecks =
+  process.argv.includes("--package-checks") || checkComparison;
+const fixtureCheck = {
+  id: "after",
+  name: "check",
+  folder: "public-sample",
+  file: "sample.ts",
+  sourceSha256: "b".repeat(64),
+  startedAt: "2026-01-01T00:02:00Z",
+  elapsedMs: 1400,
+  status: "failed",
+  exitCode: 1,
+  stale: false,
+};
+let fixtureComparison = {
+  baseline: {
+    ...fixtureCheck,
+    id: "before",
+    sourceSha256: "a".repeat(64),
+    startedAt: "2026-01-01T00:00:00Z",
+    status: "passed",
+    exitCode: 0,
+  },
+  outcome: "passed-to-failed",
+  sourceChanged: true,
+};
 const focus =
   process.argv.includes("--focus") ||
   progress ||
@@ -17,23 +43,25 @@ const focus =
   arithmetic ||
   thinking;
 const folder = resolve(
-  packageChecks
-    ? "test-results/package-checks-ui"
-    : nested
-      ? "test-results/nested-functions-ui"
-      : thinking
-        ? "test-results/local-ai-thinking-ui"
-        : arithmetic
-          ? "test-results/arithmetic-records-ui"
-          : execution
-            ? "test-results/execution-records-ui"
-            : progress
-              ? "test-results/local-ai-progress-ui"
-              : focus
-                ? "test-results/focused-explanation-ui"
-                : rust
-                  ? "test-results/rust-source-ui"
-                  : "test-results/function-format-ui",
+  checkComparison
+    ? "test-results/check-comparison-ui"
+    : packageChecks
+      ? "test-results/package-checks-ui"
+      : nested
+        ? "test-results/nested-functions-ui"
+        : thinking
+          ? "test-results/local-ai-thinking-ui"
+          : arithmetic
+            ? "test-results/arithmetic-records-ui"
+            : execution
+              ? "test-results/execution-records-ui"
+              : progress
+                ? "test-results/local-ai-progress-ui"
+                : focus
+                  ? "test-results/focused-explanation-ui"
+                  : rust
+                    ? "test-results/rust-source-ui"
+                    : "test-results/function-format-ui",
 );
 const path = rust ? "sample.rs" : "sample.ts";
 await mkdir(folder, { recursive: true });
@@ -91,6 +119,9 @@ async function state() {
     trusted: true,
     busy: false,
     analysis,
+    ...(checkComparison
+      ? { projectCheck: fixtureCheck, checkComparison: fixtureComparison }
+      : {}),
   };
 }
 async function rpc(r) {
@@ -100,6 +131,17 @@ async function rpc(r) {
     JSON.stringify(calls, null, 2),
   );
   if (r.action === "ready") return { state: await state() };
+  if (r.action === "projectBaselineClear" && checkComparison) {
+    fixtureComparison = { outcome: "no-baseline" };
+    return { state: await state() };
+  }
+  if (r.action === "projectBaseline" && checkComparison) {
+    fixtureComparison = {
+      baseline: { ...fixtureCheck },
+      outcome: "awaiting-run",
+    };
+    return { state: await state() };
+  }
   if (r.action === "projectTasks" && packageChecks)
     return {
       result: [
@@ -289,15 +331,17 @@ async function rpc(r) {
   if (r.action === "source") return { result: {} };
   throw Error("Unsupported fixture action: " + r.action);
 }
-const fixtureTitle = packageChecks
-  ? "Package check scripts"
-  : nested
-    ? "Nested functions"
-    : focus
-      ? "Focused explanation"
-      : rust
-        ? "Rust source"
-        : "Function layout";
+const fixtureTitle = checkComparison
+  ? "Project check comparison"
+  : packageChecks
+    ? "Package check scripts"
+    : nested
+      ? "Nested functions"
+      : focus
+        ? "Focused explanation"
+        : rust
+          ? "Rust source"
+          : "Function layout";
 const simulatedProgress = progress
   ? `
 if(m.action==='localCancel') {

@@ -1,6 +1,11 @@
 import * as vscode from "vscode";
 import { createHash, randomUUID } from "node:crypto";
 import {
+  compareChecks,
+  completedCheck,
+  type CheckRecord,
+} from "./checkComparison";
+import {
   isPackageCheck,
   readPackageScript,
   type PackageScript,
@@ -184,6 +189,8 @@ export class ProjectChecks implements vscode.Disposable {
   private resultUri?: string;
   private resultTask?: vscode.Task;
   private resultSettings?: string;
+  private resultIdentity?: string;
+  private baseline?: CheckRecord;
   private disposables: vscode.Disposable[] = [];
   constructor(
     private current: (context: string | undefined) => vscode.TextDocument,
@@ -241,6 +248,80 @@ export class ProjectChecks implements vscode.Disposable {
     if (!this.result) return;
     this.result = { ...this.result, ...next };
     this.changes.fire(this.result);
+  }
+  get comparison() {
+    return compareChecks(
+      this.baseline,
+      this.result && this.resultIdentity
+        ? { check: this.result, identity: this.resultIdentity }
+        : undefined,
+    );
+  }
+  /** Only host-owned, still-current results can become historical baselines. */
+  async pinBaseline(context: string | undefined, id: string) {
+    const result = this.result;
+    const { doc, folder } = this.context(context);
+    if (
+      this.active ||
+      this.measurement ||
+      !result ||
+      result.id !== id ||
+      result.stale ||
+      !completedCheck(result) ||
+      this.resultUri !== doc.uri.toString()
+    )
+      throw Error(
+        "최신 완료 결과만 기준으로 보관할 수 있습니다. / Only the current completed check can be kept as a baseline.",
+      );
+    this.requireSaved(folder);
+    const version = doc.version;
+    const tasks = await vscode.tasks.fetchTasks();
+    const task = tasks.find(
+      (task) =>
+        eligible(task, folder) &&
+        fingerprint(task) === fingerprint(this.resultTask!),
+    );
+    const packageInfo =
+      task &&
+      (await readPackageScript(folder.uri.fsPath, task.definition).catch(
+        () => undefined,
+      ));
+    const bytes = await vscode.workspace.fs.readFile(doc.uri);
+    this.confirm(context, doc, version);
+    if (
+      this.active ||
+      this.measurement ||
+      this.result !== result ||
+      result.stale ||
+      !task ||
+      (task.definition.type === "npm" && !packageInfo) ||
+      this.identity(task, doc, packageInfo?.fingerprint) !==
+        this.resultIdentity ||
+      hash(bytes) !== result.sourceSha256
+    )
+      throw Error(
+        "파일 또는 검사 설정이 바뀌었습니다. 다시 검사하세요. / Files or check configuration changed. Run again.",
+      );
+    this.baseline = { check: { ...result }, identity: this.resultIdentity! };
+    this.changes.fire(this.result);
+  }
+  clearBaseline() {
+    this.baseline = undefined;
+    if (this.result) this.changes.fire(this.result);
+  }
+  private identity(
+    task: vscode.Task,
+    doc: vscode.TextDocument,
+    packageFingerprint?: string,
+  ) {
+    return hash(
+      JSON.stringify({
+        uri: doc.uri.toString(),
+        task: fingerprint(task),
+        settings: executionSettings(task),
+        packageFingerprint,
+      }),
+    );
   }
   private markStale(staleReason: string) {
     if (this.result && !this.result.stale)
@@ -324,10 +405,13 @@ export class ProjectChecks implements vscode.Disposable {
       throw Error("검사가 진행 중입니다. / A check is already running.");
     if (reviewed !== true)
       throw Error("실행할 명령을 먼저 확인하세요. / Review the command first.");
-    const { selected, doc, folder, bytes } = await this.select(context, id);
+    const { selected, doc, folder, bytes, identity } = await this.select(
+      context,
+      id,
+    );
     if (this.active || this.measurement)
       throw Error("A check is already running.");
-    return this.execute(selected, doc, folder, bytes);
+    return this.execute(selected, doc, folder, bytes, identity);
   }
   /** Resolve a previously listed task again without executing it. */
   async select(context: string | undefined, id: string) {
@@ -361,7 +445,13 @@ export class ProjectChecks implements vscode.Disposable {
     this.confirm(context, doc, version);
     if (executionSettings(selected) !== choice.settings)
       throw Error("Task configuration changed. Refresh the list.");
-    return { selected, doc, folder, bytes };
+    return {
+      selected,
+      doc,
+      folder,
+      bytes,
+      identity: this.identity(selected, doc, packageInfo?.fingerprint),
+    };
   }
   confirm(
     context: string | undefined,
@@ -399,6 +489,7 @@ export class ProjectChecks implements vscode.Disposable {
     doc: vscode.TextDocument,
     folder: vscode.WorkspaceFolder,
     bytes: Uint8Array,
+    identity: string,
   ) {
     const runId = randomUUID();
     const run: Run = {
@@ -412,6 +503,7 @@ export class ProjectChecks implements vscode.Disposable {
     this.resultUri = doc.uri.toString();
     this.resultTask = selected;
     this.resultSettings = executionSettings(selected);
+    this.resultIdentity = identity;
     this.result = {
       id: runId,
       name: selected.name,

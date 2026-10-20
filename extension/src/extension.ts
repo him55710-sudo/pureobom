@@ -124,6 +124,15 @@ export function activate(context: vscode.ExtensionContext) {
           case "projectCancel":
             controller.checks.cancel();
             break;
+          case "projectBaseline":
+            await controller.checks.pinBaseline(
+              r.contextId,
+              inputString(p.id, 100),
+            );
+            break;
+          case "projectBaselineClear":
+            controller.checks.clearBaseline();
+            break;
           case "localModels":
             result = await controller.assistant.models();
             break;

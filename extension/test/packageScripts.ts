@@ -105,6 +105,16 @@ export async function packageScriptChecks(
     assert.equal(c.checks.result!.exitCode, expected === "passed" ? 0 : 1);
   }
   await run("passed");
+  const baselineId = c.checks.result!.id;
+  await assert.rejects(
+    c.checks.pinBaseline(c.state.contextId, "unrelated-run"),
+    /completed check/,
+  );
+  await c.checks.pinBaseline(c.state.contextId, baselineId);
+  assert.equal(c.checks.comparison.outcome, "awaiting-run");
+  const baseline = c.checks.comparison.baseline!;
+  baseline.sourceSha256 = "tampered view";
+  assert.notEqual(c.checks.comparison.baseline!.sourceSha256, "tampered view");
   const rule = c.state.analysis!.rules.find((r) => r.name === "amount");
   assert.ok(rule);
   const patch = await c.prepare(c.state.contextId, {
@@ -115,7 +125,28 @@ export async function packageScriptChecks(
   await ready();
   await doc.save();
   await ready();
+  await assert.rejects(
+    c.checks.pinBaseline(c.state.contextId, baselineId),
+    /completed check|Run again/,
+  );
+  assert.equal(
+    c.checks.comparison.baseline!.stale,
+    false,
+    "history remains a snapshot",
+  );
+  assert.equal(
+    c.checks.evidence(doc.uri, c.checks.comparison.baseline!.sourceSha256),
+    undefined,
+    "history cannot verify edited source",
+  );
   await run("failed");
+  assert.equal(c.checks.comparison.outcome, "passed-to-failed");
+  assert.equal(c.checks.comparison.sourceChanged, true);
+  assert.equal(
+    c.state.checkComparison!.outcome,
+    "passed-to-failed",
+    "comparison reaches webview state",
+  );
   await vscode.window.showTextDocument(doc, {
     viewColumn: vscode.ViewColumn.One,
     preserveFocus: false,
@@ -126,6 +157,9 @@ export async function packageScriptChecks(
   await ready();
   assert.equal(doc.getText(), original);
   await run("passed");
+  assert.equal(c.checks.comparison.outcome, "both-passed");
+  assert.equal(c.checks.comparison.sourceChanged, false);
+  assert.equal(c.checks.comparison.baseline!.id, baselineId);
   assert.deepEqual((await hookText()).trim().split(/\r?\n/), [
     "before",
     "after",
@@ -140,6 +174,29 @@ export async function packageScriptChecks(
   assert.equal(
     Buffer.from(await vscode.workspace.fs.readFile(doc.uri)).toString(),
     original,
+  );
+  const newManifest = JSON.parse(Buffer.from(originalManifest).toString());
+  newManifest.description = "Changed configuration for comparison verification";
+  try {
+    await vscode.workspace.fs.writeFile(
+      manifest,
+      Buffer.from(JSON.stringify(newManifest)),
+    );
+    await run("passed");
+    assert.equal(
+      c.checks.comparison.outcome,
+      "different-command",
+      "manifest changes invalidate comparisons even when the check still passes",
+    );
+    await c.checks.pinBaseline(c.state.contextId, c.checks.result!.id);
+    assert.equal(c.checks.comparison.outcome, "awaiting-run");
+  } finally {
+    await vscode.workspace.fs.writeFile(manifest, originalManifest);
+    c.checks.clearBaseline();
+  }
+  assert.equal(c.checks.comparison.outcome, "no-baseline");
+  reports.push(
+    "Project check comparison: actual npm pass is pinned, wrong-run and stale pin requests are rejected, source edit produces pass-to-fail, native undo restores both-passed with identical source bytes; changed manifest prevents comparison; historical snapshots cannot verify current code, can be replaced and cleared",
   );
   reports.push(
     "Package scripts: actual npm command passes, model-free source edit makes the original assertion fail, native undo restores pass and exact source; declared npm hooks run according to npm success/failure semantics",
