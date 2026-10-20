@@ -103,6 +103,11 @@ export async function packageScriptChecks(
       "package check " + expected,
     );
     assert.equal(c.checks.result!.exitCode, expected === "passed" ? 0 : 1);
+    assert.equal(
+      c.checks.result!.stale,
+      false,
+      "Package check must still describe this saved fixture: " + JSON.stringify(c.checks.result),
+    );
   }
   await run("passed");
   const baselineId = c.checks.result!.id;
