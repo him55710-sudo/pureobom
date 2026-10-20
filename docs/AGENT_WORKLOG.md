@@ -2,6 +2,16 @@
 
 공개 개발 기록의 시작일: 2026-10-16. 완료된 작업과 예정 작업을 구별한다. 이 기록은 재현할 수 있는 작업 사실이며 에이전트의 비공개 내부 추론 기록이 아니다. 모델 출력·도구 로그에 개인정보나 비밀이 있으면 공개하지 않는다.
 
+## 2026-10-20 · 기존 검사 스크립트를 설정 파일 추가 없이 연결
+
+- **실제 공백:** task의 test/build 그룹만 받던 필터에서 그룹 없는 package `check`가 누락됐다. `test`·`build`는 VS Code가 이미 자동 분류할 수 있었으므로 모든 자동 검색이 없었다고 설명하지 않는다. 검증 버전의 공식 npm task provider와 사용자 프로젝트의 기존 manifest를 대조했다. [사용법·설계·1차 자료](PROJECT_CHECKS.md).
+- **구현:** `extension/src/packageScripts.ts`, `projectChecks.ts`, `ProjectChecks.tsx`에서 VS Code가 발견한 정확한 `test`/`build`/`check`/`typecheck`/`lint`를 읽고 실제 본문·선언된 pre/post를 보여 준다. 목록 읽기는 비실행이다. manifest 전체 해시·task·관련 npm 설정을 시작 전 다시 검사하며 바뀌면 재검토한다. 유효 JSON·128KiB·작업 공간 범위/실제 경로를 확인한다. 다른 이름의 명령은 명시적 process/shell task를 사용한다. 모델 명령을 생성하거나 패키지 관리자를 설치하지 않는다.
+- **검사:** 핵심 4개와 확장 빌드 통과. native 흐름 2개에서 실제 npm provider의 그룹 없는 발견·미검토 실행 차단·manifest 변경 차단, 기존 assertion 통과→의도한 값 수정 후 실패→native undo 후 통과·정확한 원문 복구를 확인했다. pre/post가 npm의 성공/실패 조건에 따라 실행된 것도 확인했다. 공개 fixture의 의도한 오류이며 실제 upstream 버그가 아니다.
+- **환경 실패와 정리:** 첫 native 실행은 검증 PATH에 npm이 없어 exit 1이었다. 테스트용 npm 10.9.2를 준비한 뒤 같은 제품/검사로 통과했다. 준비 명령의 첫 시도는 대상 폴더 부재로 실패했고, 폴더 생성 후 패키지 관리자가 추가한 test 전용 lockfile 변경은 정확히 원복했다. 사용자 설정이나 제품 의존성에 npm을 추가하지 않았다. 첫 로그 해시·성공 로그·검증 환경을 [근거](evidence/local-ai/package-scripts-verification.json)에 함께 남겼다.
+- **실제 사용자 프로젝트:** 고정 복사본에 task 설정이 없음을 확인했다. 기존 pnpm 검사 스크립트를 provider에서 발견하고 본문 대조·명시적 검토 후 실행했다. exit 0, stale false, 원문/manifest 동일·깨끗한 checkout을 확인했다. 원래 사용자 작업 폴더는 변경하지 않았다. 소요 시간은 명령 작업 시간이며 성능 비교가 아니다. 테스트 수·과학적 타당성·현재 전체 애플리케이션 정확도를 추정하지 않는다. 비공개 경로·원문·manifest·원시 결과는 로컬에만 보존한다.
+- **UI와 범위:** 실제 빌드 UI/worker와 공개 모의 목록에서 한국어/영어 본문·pre/post 표시, 확인 전 비활성화·후 활성화·목록 갱신 후 초기화를 확인했다. 임시 탭/서버를 종료했다. 성능 측정은 기존 process 작업 범위이며 shell 기반 package 발견을 측정 지원으로 합산하지 않는다. 기존 모델 의미 실패와 전체 계획 미완료는 유지한다.
+- **최종 배포 형태 검증:** `387a70f2df445083e287049186e8f2cbb89c3254`의 [Windows·Ubuntu CI](evidence/local-ai/package-scripts-ci.json)는 각 핵심 358개/36파일·VS Code 개발/production 설치 각 71개·설치 파일 11개·패키지 검사 7개를 통과했다. 새 package 흐름 두 개를 양쪽 실제 로그에서 확인했다. 로컬 확장·worker·UI 네 파일을 두 OS 설치본과 대조했고 개발 VSIX를 생성해 Windows 설치 실행 파일 11개와 대조했다. 안정 릴리스·Pages는 게시하지 않았다.
+
 ## 2026-10-20 · 안쪽 함수 탐색과 설명 분할 실험의 실패
 
 - **읽기 문제와 변경:** 선택한 함수의 콜백을 “아래에서 읽으라”고 안내하지만 바로 이어 읽기 어려웠다. `functionNesting.ts`, `ReadingView.tsx`, `journey.css`, `analyze.ts`에서 원문 범위로 직접 자식·가장 가까운 부모를 연결하고 익명 함수 한/영 이름과 선택 후 제목 초점을 추가했다. 원문 위치와 고유 ID를 사용하며 실행 순서나 호출 관계를 추측하지 않는다. [설계·사용법](NESTED_FUNCTIONS.md).

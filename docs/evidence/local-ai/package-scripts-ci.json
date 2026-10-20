@@ -1,0 +1,114 @@
+{
+  "commit": "387a70f2df445083e287049186e8f2cbb89c3254",
+  "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39347058454",
+  "collectedAt": "2026-10-20T00:27:10.878Z",
+  "scope": "Core and actual VS Code development/production-installed checks including built-in npm script discovery and real process pass/fail/undo. UI screenshots and private-project execution are separate evidence, not model quality or application-wide correctness.",
+  "jobs": [
+    {
+      "id": 118382082441,
+      "name": "verify (windows-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39347058454/job/118382082441",
+      "conclusion": "success",
+      "corePassed": 358,
+      "coreFiles": 36,
+      "newPackageScriptCases": 4,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 71,
+        "timestamp": "2026-10-20T00:24:34.596Z",
+        "checks": [
+          "Package scripts: built-in npm task discovery includes ungrouped check, displays actual script and pre/post declarations, excludes dev/watch/install/publish, never executes while listing and rejects a changed manifest before launch",
+          "Package scripts: actual npm command passes, model-free source edit makes the original assertion fail, native undo restores pass and exact source; declared npm hooks run according to npm success/failure semantics"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 71,
+        "timestamp": "2026-10-20T00:25:48.808Z",
+        "checks": [
+          "Package scripts: built-in npm task discovery includes ungrouped check, displays actual script and pre/post declarations, excludes dev/watch/install/publish, never executes while listing and rejects a changed manifest before launch",
+          "Package scripts: actual npm command passes, model-free source edit makes the original assertion fail, native undo restores pass and exact source; declared npm hooks run according to npm success/failure semantics"
+        ],
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "d6077dfaf7cd7798d91d90059e9a0c8e070e8ef375a916297847e35bdcf83546",
+        "verifiedFiles": {
+          "out/extension.cjs": "ebb76c2fef11876e16b6c45d449f779f7ce5f99fd3e2b025d4cbda3e677af680",
+          "out/worker.cjs": "40e77d6e2c7f29e2fc051f5cc67de4909d0989c78c434e72942455de6553d66c",
+          "runtime/benchmark.py": "dc403b72ad1a349071ab7a8543ce44563415e485d85111c9fc8764156b59660b",
+          "runtime/python_source.py": "1e972114a1cc94eb9260c9530955f49a96f473d322fe4209a58ec97d6e34d4cb",
+          "runtime/go_source.go": "a8e185b81d3aa62a9cbfafdec9d8a8926c9ead6bfe4533fe9038d0a7ad714824",
+          "runtime/PureobomJavaSource.java": "6d439b2668972bf3c32e1574ad714d63ed0c5444de5bef80448e72f19f5b7b10",
+          "runtime/PureobomCSharpSource.cs": "ed8a9bc9d9f081dbe5d61d260ea68a70d0403ee4b1469298a1a2a121e7f544ac",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "1e565e078539556f36e33d12ce49241c52031aecb1d4fd576beb31b602c659d4",
+          "media/view.css": "32e6f66eab202f7b1a632537718f3c9337ce98e24800badec2fad64a692811e7"
+        },
+        "extensionMode": "production"
+      },
+      "packageChecks": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    },
+    {
+      "id": 118382082577,
+      "name": "verify (ubuntu-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39347058454/job/118382082577",
+      "conclusion": "success",
+      "corePassed": 358,
+      "coreFiles": 36,
+      "newPackageScriptCases": 4,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 71,
+        "timestamp": "2026-10-20T00:23:11.502Z",
+        "checks": [
+          "Package scripts: built-in npm task discovery includes ungrouped check, displays actual script and pre/post declarations, excludes dev/watch/install/publish, never executes while listing and rejects a changed manifest before launch",
+          "Package scripts: actual npm command passes, model-free source edit makes the original assertion fail, native undo restores pass and exact source; declared npm hooks run according to npm success/failure semantics"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 71,
+        "timestamp": "2026-10-20T00:24:04.508Z",
+        "checks": [
+          "Package scripts: built-in npm task discovery includes ungrouped check, displays actual script and pre/post declarations, excludes dev/watch/install/publish, never executes while listing and rejects a changed manifest before launch",
+          "Package scripts: actual npm command passes, model-free source edit makes the original assertion fail, native undo restores pass and exact source; declared npm hooks run according to npm success/failure semantics"
+        ],
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "48644eb92c45b26c031d3f9eb7ed99a23e149306042ac099baefa526aef9ff4b",
+        "verifiedFiles": {
+          "out/extension.cjs": "ebb76c2fef11876e16b6c45d449f779f7ce5f99fd3e2b025d4cbda3e677af680",
+          "out/worker.cjs": "40e77d6e2c7f29e2fc051f5cc67de4909d0989c78c434e72942455de6553d66c",
+          "runtime/benchmark.py": "bb136c4c7bdd452aa7a75d216aa5998c41c98fc2cf9cfc089e2edae5ae80c6f9",
+          "runtime/python_source.py": "3b4ddd3535ee4bc0c578bc20463640d94b2f30ef74b463db6f7e1416a04f9ef1",
+          "runtime/go_source.go": "8c49ca4cd6b1e5fdc2b1eae3ea22b9a7c0bed7bb6a1ac0fabfcad7816d29c3ca",
+          "runtime/PureobomJavaSource.java": "6b3ef1aa18ad1b834c0e98ab6c4538d5ece40afd098bc9da6b0e0bb37fe4b9f4",
+          "runtime/PureobomCSharpSource.cs": "86d605f322f2331e864d55613bf0b43948c6dc424b364895c5d344e771d4fdf3",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "1e565e078539556f36e33d12ce49241c52031aecb1d4fd576beb31b602c659d4",
+          "media/view.css": "32e6f66eab202f7b1a632537718f3c9337ce98e24800badec2fad64a692811e7"
+        },
+        "extensionMode": "production"
+      },
+      "packageChecks": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    }
+  ]
+}

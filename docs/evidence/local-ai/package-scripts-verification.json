@@ -1,0 +1,112 @@
+{
+  "runtimeCommit": "387a70f2df445083e287049186e8f2cbb89c3254",
+  "recordedAt": "2026-10-20T00:23:08.779Z",
+  "scope": "Existing package scripts discovered by VS Code; review and real task execution, not an AI or complete-application quality assessment",
+  "runtimeHashes": {
+    "extension/out/extension.cjs": "ebb76c2fef11876e16b6c45d449f779f7ce5f99fd3e2b025d4cbda3e677af680",
+    "extension/out/worker.cjs": "40e77d6e2c7f29e2fc051f5cc67de4909d0989c78c434e72942455de6553d66c",
+    "extension/media/view.js": "1e565e078539556f36e33d12ce49241c52031aecb1d4fd576beb31b602c659d4",
+    "extension/media/view.css": "32e6f66eab202f7b1a632537718f3c9337ce98e24800badec2fad64a692811e7"
+  },
+  "logHashes": {
+    "core": "9454f3913465ad651fc92ea65093cbe81ace698dc27ad803501ef670b0ddcda8",
+    "build": "7e694a421feb1ce8668233883d4d016dca4e25b14f43cda33d07511c1792ef45",
+    "nativeFirstFailure": "36054d5685dec94779377151ffb5450a3c241927266cc2fbce81132730226400",
+    "nativeSuccess": "f0c10ae321ed05fd3de1e1197228bf0e01f7ea389bf0796e81ace91a7c822131",
+    "privateNative": "bb6309fbc6ab9ebaa82fe9509fa0094d02e4f30936e21010f56758504531c111"
+  },
+  "core": {
+    "passed": 4,
+    "files": 1
+  },
+  "native": {
+    "scope": "package-scripts-only",
+    "vscode": "1.96.4",
+    "checks": [
+      "Package scripts: built-in npm task discovery includes ungrouped check, displays actual script and pre/post declarations, excludes dev/watch/install/publish, never executes while listing and rejects a changed manifest before launch",
+      "Package scripts: actual npm command passes, model-free source edit makes the original assertion fail, native undo restores pass and exact source; declared npm hooks run according to npm success/failure semantics"
+    ],
+    "passed": 2,
+    "timestamp": "2026-10-20T00:17:44.821Z",
+    "packageManager": "npm 10.9.2",
+    "windowsAutomationShell": "cmd.exe",
+    "checksAreDistinctFlowsNotTestCaseCounts": true
+  },
+  "setupFailures": [
+    {
+      "stage": "first-native-launch",
+      "cause": "npm absent from the test process PATH",
+      "observedStatus": "failed",
+      "exitCode": 1,
+      "resolution": "Prepared npm in ignored local test storage and added its shim directory to the test process PATH; same product and test assertions then passed."
+    },
+    {
+      "stage": "tool-preparation",
+      "cause": "First package-manager command targeted a directory that had not yet been created",
+      "resolution": "Created the owned test directory. Package manager temporarily updated the workspace lockfile with a test-only importer; restored that exact setup-only lockfile change. No product dependency added."
+    }
+  ],
+  "privateProject": {
+    "fixedCheckout": true,
+    "originalProjectNotModified": true,
+    "configuredTaskFileAbsent": true,
+    "taskConfigurationWritten": false,
+    "ungroupedExistingScriptDiscovered": true,
+    "manifestCommandMatched": true,
+    "reviewRequired": true,
+    "commandExitedSuccessfully": true,
+    "exitCode": 0,
+    "stale": false,
+    "elapsedMs": 10088,
+    "sourceAndManifestUnchanged": true,
+    "checkoutCleanAfterRun": true,
+    "assertionCountNotInferred": true,
+    "scientificValidityNotAssessed": true,
+    "wholeApplicationCorrectnessNotEstablished": true,
+    "modelRequests": 0
+  },
+  "browser": {
+    "actualBuiltUIAndWorker": true,
+    "editorAndTaskList": "controlled public fixture",
+    "languages": [
+      "ko",
+      "en"
+    ],
+    "declaredScriptVisible": true,
+    "prePostDeclarationsVisible": true,
+    "runDisabledBeforeAcknowledgment": true,
+    "runEnabledAfterAcknowledgment": true,
+    "reloadingListResetsAcknowledgment": true,
+    "listRequests": 2,
+    "runRequests": 0,
+    "nativeUIOperationNotClaimed": true
+  },
+  "screenshots": [
+    "package-scripts-ko.png",
+    "package-scripts-en.png"
+  ],
+  "cleanup": {
+    "temporaryBrowserTabClosed": true,
+    "fixtureServerStopped": true
+  },
+  "limitations": [
+    "Task names do not prove correctness or one-shot behavior. Users must review the actual command and scripts.",
+    "Only exact npm-provider script names test/build/check/typecheck/lint are included. Other commands can use explicit process/shell tasks.",
+    "The built-in task provider, local package manager and project dependencies must already be available.",
+    "No test-count extraction, full-project snapshot, optimization measurement, scientific or model-quality verdict is provided."
+  ],
+  "localVSIX": {
+    "version": "0.7.0",
+    "development": true,
+    "sha256": "7da2557e946132963aec49d34cf2317f504e9b266b1f5910c5a6e1c22786e3da",
+    "verifiedRuntimeFiles": {
+      "extension/out/extension.cjs": "ebb76c2fef11876e16b6c45d449f779f7ce5f99fd3e2b025d4cbda3e677af680",
+      "extension/out/worker.cjs": "40e77d6e2c7f29e2fc051f5cc67de4909d0989c78c434e72942455de6553d66c",
+      "extension/media/view.js": "1e565e078539556f36e33d12ce49241c52031aecb1d4fd576beb31b602c659d4",
+      "extension/media/view.css": "32e6f66eab202f7b1a632537718f3c9337ce98e24800badec2fad64a692811e7"
+    },
+    "matchesWindowsCIInstalledRuntimeFiles": 11
+  },
+  "ci": "package-scripts-ci.json",
+  "localRuntimeMatchesBothCIInstallations": true
+}
