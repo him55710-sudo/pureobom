@@ -4,8 +4,12 @@
 
 ## 현재 상태
 
+- **최신 런타임 검증:** `d9e11b2`의 [Windows·Ubuntu CI](evidence/local-ai/check-comparison-ci.json)는 각 핵심 **369개/37파일**, 실제 VS Code 개발·production 설치 **각 72개**, 설치 파일 11개·패키지 검사 7개를 통과했다. 기능 런타임은 `c602693`이며 후속 커밋은 테스트 동기화만 바꿨다. 로컬 확장·worker·UI JS/CSS 네 파일은 양쪽 설치본과 일치하고, 로컬 개발 VSIX의 실행 파일 11개는 Windows 설치본과 일치한다. 안정 배포·전체 품질 완료와 구분한다.
+
+- **수정 전후 검사 비교:** [완료 결과를 세션 기준으로 보관](CHECK_COMPARISON.md)하고 같은 조건의 다음 실행과 비교한다. 핵심 11개와 실제 VS Code 공개 흐름에서 정상 종료→실패→undo 후 정상 종료, 잘못된 기준 요청·manifest 변경 차단을 확인했다. 고정 사용자 프로젝트에서도 원래 검사→기준 보관→함수 줄바꿈 정리→검사→undo→검사까지 세 번 정상 종료했고 바이트 차이·복구가 표시됐다. 원본은 건드리지 않았다. [익명 결과](evidence/local-ai/check-comparison-verification.json). 종료 코드 비교이며 전체 동작 동일성·성능·테스트 범위를 판정하지 않는다.
+
 - **기존 검사 스크립트 연결:** [VS Code가 발견한 package 검사](PROJECT_CHECKS.md)를 그룹 없이 선택할 수 있게 했다. 실제 스크립트·앞뒤 명령을 표시하고 manifest 변경 후 실행을 차단한다. 핵심 4개·native 흐름 2개와 한/영 UI를 확인했고, 고정 사용자 프로젝트에서 별도 task 설정 없이 원래 검사 명령이 정상 종료했다. 원본·manifest를 보존했으며 테스트 수·전체 정확도·최적화 성과로 확대하지 않는다. [익명 근거·초기 환경 실패](evidence/local-ai/package-scripts-verification.json).
-- **최신 런타임 검증:** `387a70f`의 [Windows·Ubuntu CI](evidence/local-ai/package-scripts-ci.json)는 각 핵심 358개·실제 VS Code 개발/production 설치 각 71개·설치 파일 11개·패키지 검사 7개를 통과했다. 로컬 개발 VSIX의 실행 파일 11개도 Windows 설치본과 일치했다. 안정 배포·전체 품질 완료와 구분한다.
+- **스크립트 연결 단계 검증:** `387a70f`의 [Windows·Ubuntu CI](evidence/local-ai/package-scripts-ci.json)는 각 핵심 358개·실제 VS Code 개발/production 설치 각 71개·설치 파일 11개·패키지 검사 7개를 통과했다. 로컬 개발 VSIX의 실행 파일 11개도 Windows 설치본과 일치했다. 안정 배포·전체 품질 완료와 구분한다.
 - **안쪽 함수 읽기:** [콜백·부모 함수 탐색](NESTED_FUNCTIONS.md)을 추가했다. 부분 핵심 18개(새 관계 4개), 한/영 UI와 실제 고정 프로젝트의 콜백 원문 위치를 확인했다. 모델 없이 사용하는 문법 탐색이며 호출 순서나 모든 언어의 의미 정확도를 보장하지 않는다.
 - **안쪽 함수 단계 검증:** `c6248bc`의 [Windows·Ubuntu 전체 CI](evidence/local-ai/nested-functions-ci.json)는 각 핵심 354개·VS Code 개발/production 설치 각 69개·설치 파일 11개·패키지 검사 7개를 통과했다. 로컬 확장·worker·UI JS/CSS 네 파일이 양쪽 설치본과 일치한다.
 - **설명 분할 실험 미채택:** [같은 실제 과제를 개요와 일곱 사례로 나눈 요청](SPLIT_EXPLANATION_EXPERIMENT.md)은 전체 600.014초에 종료됐다. 예정 8단계 중 형식 통과 3개에도 의미 오류가 남았고 3개는 미시도였다. 전체 과제 실패로 남기며 제품에 분할 실행 기능을 넣지 않았다.

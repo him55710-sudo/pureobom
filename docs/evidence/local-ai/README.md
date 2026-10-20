@@ -1,5 +1,9 @@
 # 로컬 AI 검증 자료 · 2026-10-16
 
+2026-10-20 검사 전후 비교: [사용 흐름·범위](../../CHECK_COMPARISON.md), [핵심 11개·native 흐름 3개·실제 프로젝트·한/영 UI·VSIX](check-comparison-verification.json). 같은 조건의 완료 결과를 비교하고 오래된 결과·변경된 manifest는 비교하지 않는다. 실제 고정 사용자 프로젝트의 기준 검사·줄바꿈 정리 후 검사·undo 후 검사 모두 정상 종료했고 파일 바이트 차이/일치를 확인했다. 원문은 공개하지 않으며 전체 동작 동일성·과학적 타당성·최적화나 모델 성공으로 세지 않는다.
+
+`d9e11b2`의 [Windows·Ubuntu CI](check-comparison-ci.json)는 각 핵심 **369개/37파일**, 실제 VS Code 개발·production 설치 **각 72개**, 설치 파일 11개·패키지 검사 7개를 통과했다. 기능 런타임은 `c602693`이며 후속 커밋은 테스트 동기화만 바꿨다. 로컬 확장·worker·UI JS/CSS 네 파일은 양쪽 설치본과 일치하고, 로컬 개발 VSIX의 실행 파일 11개는 Windows 설치본과 일치한다. [최초·진단 실패](check-comparison-ci-first-failure.json), [재로드 순서 실패와 보완](check-comparison-ci-reload-failure.json)도 유지한다.
+
 2026-10-20 기존 검사 스크립트 연결: [사용법·범위](../../PROJECT_CHECKS.md), [핵심 4개·native 흐름 2개·실제 프로젝트·한/영 화면](package-scripts-verification.json). 그룹 없는 package 검사 스크립트를 읽고 본문/앞뒤 명령을 검토하며, manifest 변경 시 실행을 거절한다. 고정 비공개 프로젝트에서 task 설정을 추가하지 않고 기존 명령 정상 종료·소스 보존을 확인했다. 첫 로컬 npm PATH 누락 실패도 보존한다. 모델 없이 동작하며 의미 정확도·성능 향상을 판정하지 않는다.
 
 `387a70f`의 [Windows·Ubuntu CI](package-scripts-ci.json): 각 핵심 358개·실제 개발/production 설치 각 71개·설치 파일 11개 해시·패키지 검사 7개 통과. 로컬 확장·worker·UI 네 파일과 양쪽 설치본이 일치하며, 로컬 개발 VSIX는 Windows 설치 실행 파일 11개와 일치한다.

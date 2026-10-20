@@ -1,0 +1,123 @@
+{
+  "commit": "d9e11b26a7b2e189d9cee053281068a9e5cf7a35",
+  "runtimeCommit": "c6026937b087a85bb5a8cdf7c442d08cb1e64b3a",
+  "run": "https://github.com/him55710-sudo/pureobom/actions/runs/39350545834",
+  "collectedAt": "2026-10-20T01:03:57.740Z",
+  "scope": "Core and actual VS Code development/production installation checks including retained project check baselines. Test-only follow-ups synchronize manifest events and editor analysis; runtime files remain from c602693. Command exits are not semantic equivalence, model quality, scientific validity or application-wide correctness.",
+  "earlierFailures": [
+    "check-comparison-ci-first-failure.json",
+    "check-comparison-ci-reload-failure.json"
+  ],
+  "jobs": [
+    {
+      "id": 118393435249,
+      "name": "verify (windows-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39350545834/job/118393435249",
+      "conclusion": "success",
+      "corePassed": 369,
+      "coreFiles": 37,
+      "newComparisonCases": 11,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 72,
+        "timestamp": "2026-10-20T01:00:54.831Z",
+        "checks": [
+          "Package scripts: built-in npm task discovery includes ungrouped check, displays actual script and pre/post declarations, excludes dev/watch/install/publish, never executes while listing and rejects a changed manifest before launch",
+          "Project check comparison: actual npm pass is pinned, wrong-run and stale pin requests are rejected, source edit produces pass-to-fail, native undo restores both-passed with identical source bytes; changed manifest prevents comparison; historical snapshots cannot verify current code, can be replaced and cleared",
+          "Package scripts: actual npm command passes, model-free source edit makes the original assertion fail, native undo restores pass and exact source; declared npm hooks run according to npm success/failure semantics"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 72,
+        "timestamp": "2026-10-20T01:02:38.794Z",
+        "checks": [
+          "Package scripts: built-in npm task discovery includes ungrouped check, displays actual script and pre/post declarations, excludes dev/watch/install/publish, never executes while listing and rejects a changed manifest before launch",
+          "Project check comparison: actual npm pass is pinned, wrong-run and stale pin requests are rejected, source edit produces pass-to-fail, native undo restores both-passed with identical source bytes; changed manifest prevents comparison; historical snapshots cannot verify current code, can be replaced and cleared",
+          "Package scripts: actual npm command passes, model-free source edit makes the original assertion fail, native undo restores pass and exact source; declared npm hooks run according to npm success/failure semantics"
+        ],
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "a626c48f36af8f41582e4e6157c14935e768894c9ef963c352926111c00e7445",
+        "verifiedFiles": {
+          "out/extension.cjs": "69ba76447bd1bacf0f3052f27b665a15ee00a68a8cd892c6b7a0328c096141fb",
+          "out/worker.cjs": "40e77d6e2c7f29e2fc051f5cc67de4909d0989c78c434e72942455de6553d66c",
+          "runtime/benchmark.py": "dc403b72ad1a349071ab7a8543ce44563415e485d85111c9fc8764156b59660b",
+          "runtime/python_source.py": "1e972114a1cc94eb9260c9530955f49a96f473d322fe4209a58ec97d6e34d4cb",
+          "runtime/go_source.go": "a8e185b81d3aa62a9cbfafdec9d8a8926c9ead6bfe4533fe9038d0a7ad714824",
+          "runtime/PureobomJavaSource.java": "6d439b2668972bf3c32e1574ad714d63ed0c5444de5bef80448e72f19f5b7b10",
+          "runtime/PureobomCSharpSource.cs": "ed8a9bc9d9f081dbe5d61d260ea68a70d0403ee4b1469298a1a2a121e7f544ac",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "19e4cd56417f2d57c9ef090474cc341eeebe319f48ff54c6323501772af7c8ca",
+          "media/view.css": "32e6f66eab202f7b1a632537718f3c9337ce98e24800badec2fad64a692811e7"
+        },
+        "extensionMode": "production"
+      },
+      "packageChecks": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    },
+    {
+      "id": 118393435570,
+      "name": "verify (ubuntu-latest)",
+      "url": "https://github.com/him55710-sudo/pureobom/actions/runs/39350545834/job/118393435570",
+      "conclusion": "success",
+      "corePassed": 369,
+      "coreFiles": 37,
+      "newComparisonCases": 11,
+      "development": {
+        "vscode": "1.96.4",
+        "passed": 72,
+        "timestamp": "2026-10-20T00:58:30.223Z",
+        "checks": [
+          "Package scripts: built-in npm task discovery includes ungrouped check, displays actual script and pre/post declarations, excludes dev/watch/install/publish, never executes while listing and rejects a changed manifest before launch",
+          "Project check comparison: actual npm pass is pinned, wrong-run and stale pin requests are rejected, source edit produces pass-to-fail, native undo restores both-passed with identical source bytes; changed manifest prevents comparison; historical snapshots cannot verify current code, can be replaced and cleared",
+          "Package scripts: actual npm command passes, model-free source edit makes the original assertion fail, native undo restores pass and exact source; declared npm hooks run according to npm success/failure semantics"
+        ]
+      },
+      "installed": {
+        "vscode": "1.96.4",
+        "passed": 72,
+        "timestamp": "2026-10-20T00:59:28.249Z",
+        "checks": [
+          "Package scripts: built-in npm task discovery includes ungrouped check, displays actual script and pre/post declarations, excludes dev/watch/install/publish, never executes while listing and rejects a changed manifest before launch",
+          "Project check comparison: actual npm pass is pinned, wrong-run and stale pin requests are rejected, source edit produces pass-to-fail, native undo restores both-passed with identical source bytes; changed manifest prevents comparison; historical snapshots cannot verify current code, can be replaced and cleared",
+          "Package scripts: actual npm command passes, model-free source edit makes the original assertion fail, native undo restores pass and exact source; declared npm hooks run according to npm success/failure semantics"
+        ],
+        "kind": "installed-vsix",
+        "version": "0.7.0",
+        "vsixSha256": "c2ceaba8444ebe8bef0f1bd4c071b0cbeaeec06db832e024f2d2c4e43c76ae63",
+        "verifiedFiles": {
+          "out/extension.cjs": "69ba76447bd1bacf0f3052f27b665a15ee00a68a8cd892c6b7a0328c096141fb",
+          "out/worker.cjs": "40e77d6e2c7f29e2fc051f5cc67de4909d0989c78c434e72942455de6553d66c",
+          "runtime/benchmark.py": "bb136c4c7bdd452aa7a75d216aa5998c41c98fc2cf9cfc089e2edae5ae80c6f9",
+          "runtime/python_source.py": "3b4ddd3535ee4bc0c578bc20463640d94b2f30ef74b463db6f7e1416a04f9ef1",
+          "runtime/go_source.go": "8c49ca4cd6b1e5fdc2b1eae3ea22b9a7c0bed7bb6a1ac0fabfcad7816d29c3ca",
+          "runtime/PureobomJavaSource.java": "6b3ef1aa18ad1b834c0e98ab6c4538d5ece40afd098bc9da6b0e0bb37fe4b9f4",
+          "runtime/PureobomCSharpSource.cs": "86d605f322f2331e864d55613bf0b43948c6dc424b364895c5d344e771d4fdf3",
+          "runtime/rust/tree-sitter-rust.wasm": "24c89bd9252255e4aebbcbd7d2d308bd92c86dd95a130fdc80efa49577b8d738",
+          "runtime/rust/web-tree-sitter.wasm": "beca80e44cccbf2299ed4d1e3fa6462a9a6fe818aeebf847547a392227ce4acc",
+          "media/view.js": "19e4cd56417f2d57c9ef090474cc341eeebe319f48ff54c6323501772af7c8ca",
+          "media/view.css": "32e6f66eab202f7b1a632537718f3c9337ce98e24800badec2fad64a692811e7"
+        },
+        "extensionMode": "production"
+      },
+      "packageChecks": [
+        "Packaged Rust WASM: parsing, Unicode/CRLF offsets, exact literal editing, malformed syntax and injection rejection verified outside the workspace.",
+        "Release 0.7.0: checksums, source manifest, demo assets, licenses, VSIX contents and packaged worker verified.",
+        "Packaged Python measurement worker verified outside the workspace.",
+        "Packaged Python AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Go AST reader and exact literal edit verified outside the workspace.",
+        "Packaged Java AST reader and exact literal edit verified outside the workspace.",
+        "Packaged C# Roslyn reader and exact literal edits verified outside the workspace."
+      ]
+    }
+  ]
+}
