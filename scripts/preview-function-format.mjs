@@ -9,6 +9,7 @@ const execution = process.argv.includes("--execution");
 const arithmetic = process.argv.includes("--arithmetic");
 const thinking = process.argv.includes("--thinking");
 const nested = process.argv.includes("--nested");
+const packageChecks = process.argv.includes("--package-checks");
 const focus =
   process.argv.includes("--focus") ||
   progress ||
@@ -16,21 +17,23 @@ const focus =
   arithmetic ||
   thinking;
 const folder = resolve(
-  nested
-    ? "test-results/nested-functions-ui"
-    : thinking
-      ? "test-results/local-ai-thinking-ui"
-      : arithmetic
-        ? "test-results/arithmetic-records-ui"
-        : execution
-          ? "test-results/execution-records-ui"
-          : progress
-            ? "test-results/local-ai-progress-ui"
-            : focus
-              ? "test-results/focused-explanation-ui"
-              : rust
-                ? "test-results/rust-source-ui"
-                : "test-results/function-format-ui",
+  packageChecks
+    ? "test-results/package-checks-ui"
+    : nested
+      ? "test-results/nested-functions-ui"
+      : thinking
+        ? "test-results/local-ai-thinking-ui"
+        : arithmetic
+          ? "test-results/arithmetic-records-ui"
+          : execution
+            ? "test-results/execution-records-ui"
+            : progress
+              ? "test-results/local-ai-progress-ui"
+              : focus
+                ? "test-results/focused-explanation-ui"
+                : rust
+                  ? "test-results/rust-source-ui"
+                  : "test-results/function-format-ui",
 );
 const path = rust ? "sample.rs" : "sample.ts";
 await mkdir(folder, { recursive: true });
@@ -97,6 +100,31 @@ async function rpc(r) {
     JSON.stringify(calls, null, 2),
   );
   if (r.action === "ready") return { state: await state() };
+  if (r.action === "projectTasks" && packageChecks)
+    return {
+      result: [
+        {
+          id: "package-check",
+          name: "check",
+          source: "npm",
+          folder: "public-sample",
+          kind: "shell",
+          command: JSON.stringify(["npm", "run", "check"], null, 2),
+          cwd: "public-sample",
+          packageScript: {
+            file: "package.json",
+            name: "check",
+            command: "node --test",
+            before: "node scripts/prepare-tests.cjs",
+            after: "node scripts/report-tests.cjs",
+          },
+        },
+      ],
+    };
+  if (r.action === "projectRun" && packageChecks)
+    throw Error(
+      "UI fixture only; no command is executed. / 화면 검증용이며 명령을 실행하지 않습니다.",
+    );
   if (r.action === "localModels" && focus)
     return {
       result: {
@@ -261,13 +289,15 @@ async function rpc(r) {
   if (r.action === "source") return { result: {} };
   throw Error("Unsupported fixture action: " + r.action);
 }
-const fixtureTitle = nested
-  ? "Nested functions"
-  : focus
-    ? "Focused explanation"
-    : rust
-      ? "Rust source"
-      : "Function layout";
+const fixtureTitle = packageChecks
+  ? "Package check scripts"
+  : nested
+    ? "Nested functions"
+    : focus
+      ? "Focused explanation"
+      : rust
+        ? "Rust source"
+        : "Function layout";
 const simulatedProgress = progress
   ? `
 if(m.action==='localCancel') {

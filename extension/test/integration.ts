@@ -5,6 +5,7 @@ import { relative, isAbsolute } from "node:path";
 import type { Controller } from "../src/controller";
 import { localAssistantChecks } from "./localAssistant";
 import { projectChecks } from "./projectChecks";
+import { packageScriptChecks } from "./packageScripts";
 import { benchmarkChecks } from "./benchmarks";
 import { pythonSourceChecks } from "./pythonSource";
 import { goSourceChecks } from "./goSource";
@@ -96,13 +97,18 @@ export async function run() {
   await ready();
   if (
     process.env.PUREOBOM_ONLY_TRACE_SOURCE === "1" ||
-    process.env.PUREOBOM_ONLY_OBSERVATIONS === "1"
+    process.env.PUREOBOM_ONLY_OBSERVATIONS === "1" ||
+    process.env.PUREOBOM_ONLY_PACKAGE_SCRIPTS === "1"
   ) {
     const scope =
-      process.env.PUREOBOM_ONLY_OBSERVATIONS === "1"
-        ? "explanation-observations-only"
-        : "trace-source-only";
-    if (scope === "explanation-observations-only")
+      process.env.PUREOBOM_ONLY_PACKAGE_SCRIPTS === "1"
+        ? "package-scripts-only"
+        : process.env.PUREOBOM_ONLY_OBSERVATIONS === "1"
+          ? "explanation-observations-only"
+          : "trace-source-only";
+    if (scope === "package-scripts-only")
+      await packageScriptChecks(c, ready, reports);
+    else if (scope === "explanation-observations-only")
       await explanationObservationChecks(c, ready, reports);
     else await traceSourceChecks(c, ready, reports);
     await vscode.workspace.fs.writeFile(
@@ -766,6 +772,7 @@ export async function run() {
   await traceSourceChecks(c, ready, reports);
   await explanationObservationChecks(c, ready, reports);
   await projectChecks(c, ready, reports);
+  await packageScriptChecks(c, ready, reports);
   await benchmarkChecks(c, ready, reports);
   const report = {
     installation,

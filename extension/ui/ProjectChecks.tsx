@@ -59,8 +59,8 @@ export function ProjectChecks({
       <h2>{t("실제 프로젝트 검사", "Run a project check")}</h2>
       <p>
         {t(
-          "프로젝트에 등록한 테스트·빌드 명령을 확인하고 실행합니다. AI 연결 없이도 사용할 수 있습니다. 수정한 파일은 먼저 저장하세요.",
-          "Review and run a test or build command registered in your project. No AI connection is required. Save your changes first.",
+          "프로젝트의 검사 명령을 확인하고 실행합니다. 등록한 test/build 작업과 VS Code가 발견한 test·build·check·typecheck·lint 스크립트를 읽습니다. AI 연결 없이 사용할 수 있으며 수정한 파일은 먼저 저장하세요.",
+          "Review project checks: registered test/build tasks and test, build, check, typecheck or lint scripts discovered by VS Code. No AI connection is required. Save your changes first.",
         )}
       </p>
       <button
@@ -86,8 +86,8 @@ export function ProjectChecks({
       {choices?.uriContext === state.contextId && !tasks.length ? (
         <p className="banner">
           {t(
-            "실행 가능한 test/build 작업이 없습니다. 프로젝트의 .vscode/tasks.json에 group을 test 또는 build로 지정한 일회성 process/shell 작업을 등록하세요.",
-            "No runnable test/build task found. Add a one-shot process/shell task with group test or build to .vscode/tasks.json.",
+            "표시할 검사 명령이 없습니다. package.json의 검사 스크립트를 쓰려면 VS Code의 npm 스크립트 자동 검색과 필요한 패키지 관리자를 확인하세요. 다른 명령은 .vscode/tasks.json에 group이 test 또는 build인 일회성 process/shell 작업으로 등록할 수 있습니다.",
+            "No check found. For package.json scripts, check VS Code npm script auto-detection and your package manager. Other commands can be registered as one-shot process/shell tasks with group test or build in .vscode/tasks.json.",
           )}
         </p>
       ) : null}
@@ -116,6 +116,43 @@ export function ProjectChecks({
             {task.source} · {task.kind} · {task.cwd}
           </p>
           <pre>{task.command}</pre>
+          {task.packageScript && (
+            <div className="package-script-review">
+              <h3>
+                {t(
+                  "프로젝트에 적힌 스크립트",
+                  "Script declared in the project",
+                )}
+              </h3>
+              <p>
+                {task.packageScript.file} · {task.packageScript.name}
+              </p>
+              <pre>{task.packageScript.command}</pre>
+              {(task.packageScript.before !== undefined ||
+                task.packageScript.after !== undefined) && (
+                <>
+                  <p>
+                    {t(
+                      "함께 선언된 앞·뒤 스크립트입니다. 실행 여부는 패키지 관리자와 설정에 따릅니다.",
+                      "Related pre/post scripts are declared below. Whether they run depends on your package manager and settings.",
+                    )}
+                  </p>
+                  {task.packageScript.before !== undefined && (
+                    <pre>{`pre${task.packageScript.name}: ${task.packageScript.before}`}</pre>
+                  )}
+                  {task.packageScript.after !== undefined && (
+                    <pre>{`post${task.packageScript.name}: ${task.packageScript.after}`}</pre>
+                  )}
+                </>
+              )}
+              <p className="muted">
+                {t(
+                  "검토 후 스크립트가 바뀌면 목록을 다시 읽어야 합니다. 한 번 실행하고 종료하는 검사를 선택하세요.",
+                  "Reload the list if the script changes after review. Choose a check that runs once and exits.",
+                )}
+              </p>
+            </div>
+          )}
           <p>
             {t(
               "표시한 명령 한 개만 실행합니다. dependsOn 선행 작업은 포함하지 않습니다. 필요한 준비 단계는 이 명령에 포함하세요. 실행 로그는 VS Code 터미널에서 확인합니다.",
