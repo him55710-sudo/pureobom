@@ -1,5 +1,11 @@
 # 로컬 AI 검증 자료 · 2026-10-16
 
+2026-10-20 안쪽 함수 읽기: [사용법·제약](../../NESTED_FUNCTIONS.md), [부분 핵심 18개·한/영 UI·실제 콜백 원문 대조](nested-functions-verification.json). 모델 없는 문법 탐색이며 실제 사용자 코드의 원문은 공개하지 않는다.
+
+`c6248bc`의 [Windows·Ubuntu CI](nested-functions-ci.json)는 각각 핵심 354개·VS Code 개발/production 설치 각 69개·설치 파일 11개·패키지 검사 7개를 통과했다. 로컬 확장·worker·UI JS/CSS 네 파일과 설치본 해시가 일치한다. 모델 의미 평가·새 탐색의 native 클릭 검증과 구별한다.
+
+같은 실제 설명 과제의 [분할 실험 방법과 실패](../../SPLIT_EXPLANATION_EXPERIMENT.md), [단계별 익명 결과](split-explanation-experiment.json): 전체 600.014초에 8단계 중 형식 통과 3개, 인용 거절 1개, 응답 전 취소 1개, 미시도 3개. 받은 결과에도 의미 오류가 남아 미채택이다. 동일 메시지 비교·일반 속도 벤치마크·전체 프로젝트 검증으로 세지 않는다.
+
 2026-10-20 추론 설정: [사용법과 평가 경계](../../LOCAL_AI_THINKING.md), [부분 핵심 36개·native 7개·한/영 화면·요청 동일성](thinking-settings-verification.json), [실제 4B 켜기 요청](thinking-settings-model.json). 같은 비공개 과제와 전체 chat 본문에서 추론 값만 바꿨고 600.016초에 생성 한도로 종료됐다. 완성 답변을 받지 못해 의미 정확도는 미평가이며 이전 끄기 요청의 의미 실패를 해결한 근거가 아니다. [최초 Windows CI 시간 초과](thinking-settings-ci-first-failure.json)도 별도 보존한다.
 
 추론 기능과 화면 후속 `e832712`의 [최종 교차 OS CI](thinking-settings-ci.json): 각 핵심 350개·개발/production 설치 각 69개·설치 파일 11개 해시·패키지 검사 7개 통과. Ubuntu의 첫 성공과 Windows의 같은 코드 재실행 성공이며 최초 5초 테스트 시간 초과의 원인 해결을 뜻하지 않는다.

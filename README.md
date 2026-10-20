@@ -10,6 +10,8 @@ Understand the code AI wrote. Change a rule. See which cases change.
 
 **VS Code extension · Korean / English · Local processing · MIT**
 
+Development evidence: [Read nested function bodies without AI](docs/NESTED_FUNCTIONS.md) · [Actual explanation splitting experiment: failed, not adopted](docs/SPLIT_EXPLANATION_EXPERIMENT.md).
+
 [HTML/CSS source facts and value edits](docs/HTML_CSS_SOURCE.md) now use bundled parsers in the browser and VS Code. They read tags, text, selectors and declarations without executing scripts or guessing rendered layout. Ordinary text, selected attributes and CSS values support preview, apply and undo; actual page behavior still needs checking.
 
 The [external modern-normalize check](docs/evidence/local-ai/web-source-project.md) runs all 54 upstream Chrome tests through VS Code: a deliberate CSS edit adds two failures, and undo restores the baseline. Seven pre-existing failures and eight assertion-free TODOs are disclosed; this is not an all-tests-passed claim.

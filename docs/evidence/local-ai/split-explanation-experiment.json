@@ -1,0 +1,131 @@
+{
+  "recordedAt": "2026-10-20T00:01:52.407Z",
+  "adopted": false,
+  "runtimeCommit": "16a338d188a5276fe19169e450c24e99baf61c43",
+  "model": "qwen3.5:4b",
+  "modelDigest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+  "processor": "cpu",
+  "thinking": false,
+  "method": {
+    "fullSourceAndOriginalQuestionPreserved": true,
+    "observationsReusedFromPriorNativeComparison": true,
+    "nativeObservationCoverage": {
+      "returnedMatches": 6,
+      "unavailable": 1
+    },
+    "strategy": "Sequential overview without observations, then one request per each of the seven observations",
+    "stageInstructionsAdded": true,
+    "identicalMessagesToPriorBatch": false,
+    "expectedStages": 8,
+    "perRequestOutputLimit": 4096,
+    "overallBudgetMs": 600000,
+    "allExamplesIntended": true,
+    "modelInputCodeRemainedLocal": true,
+    "paidAPICalls": 0
+  },
+  "result": {
+    "elapsedMs": 600014,
+    "overallLimitReached": true,
+    "attemptedStages": 5,
+    "completedResponses": 4,
+    "structurallyAccepted": 3,
+    "structurallyRejected": 1,
+    "cancelledWithoutResponse": 1,
+    "notAttempted": 3,
+    "completeTask": false,
+    "semanticAssessment": "failed",
+    "sourceUnchanged": true
+  },
+  "stages": [
+    {
+      "stage": 0,
+      "kind": "overview",
+      "elapsedMs": 137842,
+      "structuralAssessment": "passed",
+      "semanticAssessment": "failed",
+      "review": "Incorrect caller preconditions and incomplete assumptions.",
+      "metrics": {
+        "promptTokens": 1692,
+        "outputTokens": 521,
+        "promptNs": 49967472000,
+        "generationNs": 81705908000,
+        "doneReason": "stop"
+      },
+      "contextSize": 16384
+    },
+    {
+      "stage": 1,
+      "kind": "example",
+      "caseIndex": 1,
+      "elapsedMs": 130222,
+      "structuralAssessment": "failed-invalid-citation-reference",
+      "semanticAssessment": "not-accepted",
+      "review": "Invalid example citation reference; raw reply is not a product result.",
+      "metrics": {
+        "promptTokens": 2538,
+        "outputTokens": 290,
+        "promptNs": 76738209000,
+        "generationNs": 47233641000,
+        "doneReason": "stop"
+      }
+    },
+    {
+      "stage": 2,
+      "kind": "example",
+      "caseIndex": 2,
+      "elapsedMs": 92311,
+      "structuralAssessment": "passed",
+      "semanticAssessment": "failed",
+      "review": "Correct clamp direction, but contradictory input-check wording, false caller range restriction, and no explanation through to the observed return.",
+      "metrics": {
+        "promptTokens": 2534,
+        "outputTokens": 280,
+        "promptNs": 38923759000,
+        "generationNs": 53260860000,
+        "doneReason": "stop"
+      },
+      "contextSize": 32768
+    },
+    {
+      "stage": 3,
+      "kind": "example",
+      "caseIndex": 3,
+      "elapsedMs": 150305,
+      "structuralAssessment": "passed",
+      "semanticAssessment": "failed",
+      "review": "Correct clamp direction, but false caller range restriction, ambiguous division-error claim, and no explanation through to the observed return.",
+      "metrics": {
+        "promptTokens": 2543,
+        "outputTokens": 497,
+        "promptNs": 36395943000,
+        "generationNs": 113782599000,
+        "doneReason": "stop"
+      },
+      "contextSize": 32768
+    },
+    {
+      "stage": 4,
+      "kind": "example",
+      "caseIndex": 4,
+      "elapsedMs": 89281,
+      "structuralAssessment": "not-reached-no-response",
+      "semanticAssessment": "not-assessed-no-response",
+      "review": "Overall deadline cancelled this request."
+    }
+  ],
+  "limitations": [
+    "One private fixed-checkout task and one run; not a general quality rate.",
+    "Two complete example stages explain clamping but do not finish the requested connection to the observed return.",
+    "Overview and accepted examples still contain semantic errors.",
+    "Local build and analysis work overlapped; cache, prompt lengths and output lengths differ. Not an isolated speed benchmark.",
+    "This experiment does not add split-request orchestration to the product.",
+    "Private source, identifiers, inputs, values, replies and reasoning text are excluded."
+  ],
+  "cleanup": {
+    "requestCancelledAndServerIdleObserved": true,
+    "ownedServerAndRunnerIdentityChecked": true,
+    "ownedServerAndRunnerStopped": true,
+    "ownedListeningPortClosed": true,
+    "otherProjectServersUntouched": true
+  }
+}
