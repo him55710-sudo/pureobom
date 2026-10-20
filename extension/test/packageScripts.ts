@@ -37,6 +37,17 @@ export async function packageScriptChecks(
         vscode.workspace.fs.writeFile(manifest, bytes),
         observed,
       ]);
+      const open = vscode.workspace.textDocuments.find(
+        (doc) => doc.uri.toString() === manifest.toString(),
+      );
+      if (open)
+        await until(
+          () => open.getText() === Buffer.from(bytes).toString(),
+          "manifest editor reload",
+        );
+      // The full suite has already read this file. Its editor reload can
+      // invalidate the current analysis; wait as the disabled UI would.
+      await ready();
     } finally {
       clearTimeout(timer);
       subscription?.dispose();
