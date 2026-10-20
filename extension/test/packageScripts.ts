@@ -16,6 +16,33 @@ export async function packageScriptChecks(
   const root = vscode.workspace.workspaceFolders![0].uri;
   const manifest = vscode.Uri.joinPath(root, "package.json"),
     originalManifest = await vscode.workspace.fs.readFile(manifest);
+  async function writeManifest(bytes: Uint8Array) {
+    // The fixture changes this file before launching a check. Wait for the same
+    // workspace notification stream used by the product so a delayed event is
+    // not attributed to the next run. Never clear or bypass the stale guard.
+    const watcher = vscode.workspace.createFileSystemWatcher("**/*");
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let subscription: vscode.Disposable | undefined;
+    const observed = new Promise<void>((resolve, reject) => {
+      timer = setTimeout(
+        () => reject(Error("Manifest change was not observed")),
+        10000,
+      );
+      subscription = watcher.onDidChange((uri) => {
+        if (uri.toString() === manifest.toString()) resolve();
+      });
+    });
+    try {
+      await Promise.all([
+        vscode.workspace.fs.writeFile(manifest, bytes),
+        observed,
+      ]);
+    } finally {
+      clearTimeout(timer);
+      subscription?.dispose();
+      watcher.dispose();
+    }
+  }
   const doc = await vscode.workspace.openTextDocument(
     vscode.Uri.joinPath(root, "package-value.cjs"),
   );
@@ -73,10 +100,7 @@ export async function packageScriptChecks(
   const changed = JSON.parse(Buffer.from(originalManifest).toString());
   changed.scripts.precheck = "node package-hook.cjs changed";
   try {
-    await vscode.workspace.fs.writeFile(
-      manifest,
-      Buffer.from(JSON.stringify(changed)),
-    );
+    await writeManifest(Buffer.from(JSON.stringify(changed)));
     await assert.rejects(
       c.checks.start(c.state.contextId, task.id, true),
       /Package script changed|Task configuration changed|Refresh/,
@@ -87,7 +111,7 @@ export async function packageScriptChecks(
       "stale manifest is rejected before execution",
     );
   } finally {
-    await vscode.workspace.fs.writeFile(manifest, originalManifest);
+    await writeManifest(originalManifest);
   }
   reports.push(
     "Package scripts: built-in npm task discovery includes ungrouped check, displays actual script and pre/post declarations, excludes dev/watch/install/publish, never executes while listing and rejects a changed manifest before launch",
@@ -106,7 +130,8 @@ export async function packageScriptChecks(
     assert.equal(
       c.checks.result!.stale,
       false,
-      "Package check must still describe this saved fixture: " + JSON.stringify(c.checks.result),
+      "Package check must still describe this saved fixture: " +
+        JSON.stringify(c.checks.result),
     );
   }
   await run("passed");
@@ -183,10 +208,7 @@ export async function packageScriptChecks(
   const newManifest = JSON.parse(Buffer.from(originalManifest).toString());
   newManifest.description = "Changed configuration for comparison verification";
   try {
-    await vscode.workspace.fs.writeFile(
-      manifest,
-      Buffer.from(JSON.stringify(newManifest)),
-    );
+    await writeManifest(Buffer.from(JSON.stringify(newManifest)));
     await run("passed");
     assert.equal(
       c.checks.comparison.outcome,
@@ -196,7 +218,7 @@ export async function packageScriptChecks(
     await c.checks.pinBaseline(c.state.contextId, c.checks.result!.id);
     assert.equal(c.checks.comparison.outcome, "awaiting-run");
   } finally {
-    await vscode.workspace.fs.writeFile(manifest, originalManifest);
+    await writeManifest(originalManifest);
     c.checks.clearBaseline();
   }
   assert.equal(c.checks.comparison.outcome, "no-baseline");
